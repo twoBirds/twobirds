@@ -1,0 +1,29 @@
+{
+  "name": "twobirds",
+  "version": "0.0.1",
+  "description": "twobirds requirements compiler",
+  "author": {
+    "name": "Frank Thuerigen",
+    "email": "frank.thuerigen@two-birds.de"
+  },
+  "contributors": [
+    {
+      "name": "Frank Thuerigen",
+      "email": "frank.thuerigen@two-birds.de"
+    }
+  ],
+  "preferGlobal": "false",
+  "keywords": [
+    "twobirds",
+    "two-birds"
+  ],
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/FrankieTh/twobirds.git"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": "*"
+  },
+  "readme": "\n twobirds requirements compiler.\n This is a work in progress.\n"
+}
