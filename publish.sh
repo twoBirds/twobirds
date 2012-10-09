@@ -35,7 +35,7 @@ git commit -a -m "$msg"
 
 #upload to github
 echo "\n==> PUSH TO GITHUB <==" 
-git push git@github.com:FrankieTh/twobirds.git < gitpwd.txt
+git push git@github.com:FrankieTh/twobirds.git
 
 #npm publish
 echo "\n==> NPM PUBLISH <==" 
