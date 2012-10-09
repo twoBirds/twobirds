@@ -1,6 +1,6 @@
 {
   "name": "twobirds",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "twobirds requirements compiler",
   "author": {
     "name": "Frank Thuerigen",
@@ -23,7 +23,7 @@
   },
   "main": "index.js",
   "engines": {
-    "node": "*"
+    "node": "*",
     "express": "*"
   },
   "readme": "\n twobirds requirements compiler.\n This is a work in progress.\n"
