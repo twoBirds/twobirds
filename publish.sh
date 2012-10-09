@@ -7,26 +7,26 @@ cd /home/twobirds
 # no message given?
 if [ -z $1 ]
 then
-	read -p "commit message: " msg
+	read -p "message: " msg
 else
 	msg="$1"
+	echo "message: $msg"
 fi
-echo "\nmessage: $msg"
+
+# get old version
+old_version=`cat ./package.json | grep "version" | sed 's/"version": //g;s/"//g;s/ //g;s/,//g;s/\n//g;s/\r//g;s/\t//g'`
+echo "old version: $old_version"
 
 # no version given?
-old_version=`cat ./package.json | grep "version" | sed 's/"version": //g;s/"//g;s/ //g;s/,//g'`
-echo "\nold version: $old_version"
-
-#change version
-if [ -n $2 ]
+if [ -z $2 ]
 then
-	new_version="$2"
-	echo "\nnew version: $new_version"
+	read -p "new version: " new_version
 else
-	read -p "\nnew version: " new_version
+	new_version="$2"
+	echo "new version: $new_version"
 fi
-sed -i 's/$old_version/$new_version/g' ./package.json
-cat ./package.json | grep "version"
+replace $old_version $new_version -- ./package.json
+cat ./package.json | grep "vers"
 
 #commit changes
 echo "\n==> COMMIT CHANGES <==" 
