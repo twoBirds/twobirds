@@ -1,7 +1,7 @@
 {
-  "name": "twobirds",
-  "version": "0.0.3",
-  "description": "twobirds requirements compiler",
+  "name": "twoBirds",
+  "version": "0.0.4",
+  "description": "twoBirds requirements compiler",
   "author": {
     "name": "Frank Thuerigen",
     "email": "frank.thuerigen@two-birds.de"
@@ -26,5 +26,5 @@
     "node": "*",
     "express": "*"
   },
-  "readme": "\n twobirds requirements compiler.\n This is a work in progress.\n"
+  "readme": "\n twoBirds requirements compiler.\n This is a work in progress.\n"
 }
