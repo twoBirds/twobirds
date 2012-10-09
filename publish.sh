@@ -14,7 +14,7 @@ else
 fi
 
 # get old version
-old_version=`cat ./package.json | grep "version" | sed 's/"version": //g;s/"//g;s/ //g;s/,//g;s/\n//g;s/\r//g;s/\t//g'`
+old_version=`cat ./package.json | grep "version" | sed 's/"version": //g;s/" \w,\n\r\t//g'`
 echo "old version: $old_version"
 
 # no version given?
