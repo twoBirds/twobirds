@@ -44,6 +44,7 @@ demoapp.windowController = {
 				$( this.target ).find('.__scroll-content:first').prepend( '<div data-tb="' + ev.data + '"></div>' );
 				this.initChildren();
 				this.trigger('scroll:update');
+				this.trigger('scroll:scrollTo', 0);
 			}
 		}
 

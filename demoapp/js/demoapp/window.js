@@ -62,9 +62,9 @@ demoapp.window = {
 
 		{	name: 'window:close',
 			handler: function(ev){
-				//console.log('window close', ev.data);
 				if ( this.canClose || ev.data === true ){
-					//console.log('destroy window');
+					var next = $( this.target ).next();
+					if ( next[0] ) next.data('tbo').trigger('window:active', true);
 					$( this.target ).detach();
 					tb(/windowController/).trigger('scroll:update');
 					return;
