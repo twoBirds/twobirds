@@ -1,0 +1,48 @@
+<div>
+	<h2>What is twoBirds?</h2>
+	<p>Currently just a demo, but it is the fifth evolution of a javascript client framework that first appeared in 2006.<br />twoBirds is intended to make complex app development easy (I mean it: EASY).</p>
+	<p>twoBirds provides much less abstraction than e.g. ember or angularJS, but is more flexible therefore. </p><br>
+	<h2>Why should I use it?</h2>
+	<p>switch ( typeof READER ) { // = YOU !</p>
+	<p>'Management': Less TCO. Much less.</p>
+	<p>'Project Lead': Because javascript application development becomes both faster and more robust, especially in big environments.</p>
+	<p>'Programmer': Because after reading this you know almost everything there is to know about twoBirds. There is no abstraction level. Start coding!</p><br />
+	<h2>Are there any limitations?</h2>
+	<p>None that I know of... if you are a programmer check out the scroll.js file / tb.ui.scroll object to see what level of complexity can be turned into readable code.</p><br>
+	<h2>How does it work?</h2>
+	<p>twoBirds asynchrounous loads requirements, and does so recursively.<br />It has a namespaced application repository in the client, and constructs a full-page application by instanciating repo objects inside the DOM.<br />These objects can be accessed via a selector tb(...) and controlled via tb(...).trigger(...)<br />twoBirds completely separates code and design, making both processes easier and more robust.</p><br />
+	<h2>How does twoBirds boot an application?</h2>
+	<p>I suggest you look at the soucecode of this page now. It is as short as it can get:<br /><br />
+	&lt;body data-tb="demoapp/body.js"&gt;&lt;/body&gt;<br /><br />
+	By default, upon page load tB checks the DOM for elements that contain a data-tb attribute. This must contain a space separated list of javascript file names. For each of these files, twoBirds performs the following steps:<br /><br />
+	- extract a namespace from the filename,like demoapp/body.js becomes 'demoapp.body'<br />
+	- look up the namespace to detect whether the object already exists<br />
+	- if not, load the file and execute it.<br /><br />
+	Finally, an internal object is created.<br /><br />
+	<h2>How are twoBirds objects created?</h2>
+	Look up the code of body.js in your browsers development tool. In general you see that it is a plain object, but contains some weird named properties (namespaced, containing a "."), like 'tb.require', which obviously is an array containing filenames<br /><br />
+	twoBirds will now construct an internal object, copying the props of the namespaced object.<br /><br />
+	The internal object is then stored in the DOM element as $.data('tbo'), with an additional property 'target' which points to the DOM element.<br /><br />
+	If twoBirds stumbles upon one of the 'weird' names, it will look up the namespace. If the result is a function, it will execute it in the scope of the internal object, and with the 'weird' property as a parameter.<br />
+	In the case of 'tb.require', obviously the files are loaded.<br /><br />
+	Also in body.js, you see a 'tb.events' property. This is an array of objects, like { name: '...', handler: function(){...}}.<br />
+	I think it is more than obvious that these will be converted into a handler array.<br /><br />
+	Now here is the catch:<br />
+	One of the events elements is named 'tb.require:done'<br />
+	The tb.require function will trigger this event when requirement loading has finished, and hence initialize the bootstrap function 'init'.<br /><br />
+	In short, this is it.<br /><br />
+	You now have a selector tb(), which works like jQuery, but returns twoBirds objects only.<br /><br />
+	So, tb('body') will give you the twoBirds Object that is associated with the DOM node body<br />
+	In addition, you can use regexes as a selector, which will work on the name property of the twoBirds object.<br />
+	So, tb(/body/) will give you same object as above, but matched by its name: 'demoapp.body' property<br />
+	Event names can also be regexes, btw ;-)</p><br>
+	<h2>How do I work with tb() objects?</h2>
+	<p>All communication with and between tb(..) objects is done via tb(...).trigger('event'[, data]).</p>
+	<p>Contrary to jQuery twoBirds events are always asynchronous, meaning you will never experience a stack overflow in a ping-pong situation.</p><br>
+	<p>console: tb('body') will show the object, and also its methods.</p><br />
+	<p>EXAMPLES:</p>
+	<p>console: tb('body').children('div') will return all children of the body tb, that are attached to a div DOM node</p>
+	<p>console: tb('body').children('div').parent('div') will return an empty array. --> .parent('body') would have been better ;-)</p>
+	<p>console: tb('*') will return an array containing all tb objects in the current DOM.</p>
+	<p>console: tb({ myProp: (myValue) [, ...more ] }) will return an array containing all tb objects that match these properties.</p><br>		
+</div>

@@ -1,0 +1,59 @@
+<div>
+ <form id="loginform" action="" onsubmit="return false;">
+  <div id="user_usernickdiv">
+   <label>{user_nick}</label>
+   <input type="text" tabindex="1" class="input" id="login_usernick" value="" />
+  </div>
+  <div id="user_userpassdiv" style="display:none">
+   <span id="lbl_userpass">password</span>&nbsp;
+   <input style="margin:0px;padding:0px;" type="password" tabindex="5" class="input" id="user_password" onkeydown="return application.vUserlogin.userpass_keypressed( event );" onkeyup="if ( this.value.length == 0) {  document.getElementById('user_userloginspan').style.display='none'; } else { document.getElementById('user_userloginspan').style.display=''; };" value="" />
+  </div>
+  <div id="vUserloginoptionsdiv">
+   <span id="user_userguestspan" style="display:none">
+    <img src="./props/application/return.gif" height="13px" alt="" />=
+    <a href="" tabindex="2" onclick="application.vUserlogin.guestlogin();return false;"><span id="lbl_guest">guest</span></a>
+    &nbsp;or&nbsp;
+   </span>&nbsp;
+   <span id="user_userenterpassspan" style="display:none">
+    <img src="./props/application/return.gif" height="13px" alt="" />=
+    <span class="lbl_enterpass">
+     <a href="" tabindex="4" onclick="document.getElementById('user_userenterpassspan').style.display='none'; document.getElementById('user_userpassdiv').style.display=''; document.getElementById('user_password').focus();  document.getElementById('user_usernickdiv').style.display='none'; document.getElementById('user_usercancelspan').style.display=''; return false;">
+      proceed
+     </a> 
+     &nbsp;or&nbsp; 
+     <a href="" tabindex="7" onclick="tb.element.show('innercontentcontainer','application','passforgottenwindow'); return false;">
+      reminder
+     </a>
+    </span>
+   </span>
+   <span id="user_userloginspan" style="display:none">
+    <img src="./props/application/return.gif" height="13px" alt="" />=
+    <a href="" tabindex="6" onclick="application.vUserlogin.login( document.getElementById('user_usernick').value, document.getElementById('user_password').value );return false;">
+     login 
+    </a>
+   </span>&nbsp;
+   <span id="user_usercancelspan" style="display:none">
+    <img src="./props/application/escape.gif" height="13px" alt="" />=
+    <a href="" tabindex="8" onclick="application.vUserlogin.showlogin();return false;">
+     cancel
+    </a>
+   </span>
+   <span id="user_userregisterspan">
+    <a href="" tabindex="3" onclick="tb.element.show('innercontentcontainer','application','registerwindow'); return false;">
+     register
+    </a>
+   </span>
+  </div>
+ </form>
+</div>
+
+<div class='login-usergreeting'>
+ <form name="usergreetingform" action="" onsubmit="return false;">
+  <div style="margin:0px;padding:0px;">
+   Hello <!-- <img id="_user_status_img" src="" height="13px" /> -->&nbsp;<span id='_user_username'></span>&nbsp;!<br>
+  </div>
+  <div>
+   <a id="logoutlink" href="" tabindex="1" onclick="application.vUsergreeting.logout( true ); return false;">logout</a>
+  </div>
+ </form>
+</div>

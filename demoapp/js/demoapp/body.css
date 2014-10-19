@@ -1,0 +1,246 @@
+/*application.vBody.css;*/
+html  { 
+  width: 100%; 
+  height: 100%;
+  overflow: hidden;
+  list-style: none;
+}
+ 
+body  { 
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, Verdana, sans-serif; 
+  font-size: 1em; 
+}
+
+* {
+  margin: 0px;
+  padding: 0px;
+  font-weight:normal;
+}
+
+ul {
+    list-style: disc outside none;
+}
+
+div {
+  margin: 0.1em;
+}
+
+input, textarea, button {
+  background:#ffffff;
+  height:1.2em;
+  font-size:0.9em;
+  border:1px solid grey;
+  align:left;
+}
+
+.input {
+  background:#ffffff;
+  height:1.2em;
+  font-size:1.0em;
+  border:1px solid grey;
+  align:left;
+}
+
+a:link { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px;}
+a:visited { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px; } 
+a:active { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px; }
+a:hover { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:4px; margin-right:4px; }
+a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:4px; margin-right:4px; }
+
+.loading-indicator {
+  display: inline;
+  height: 0.9em;
+}
+
+.animate-spin:before {
+    font-size: inherit !important;
+    text-shadow: none;
+}
+
+*:before, *:after {
+    box-sizing: border-box;
+}
+
+.tbfontlogosmall {
+  display: inline;
+  height: 0.9em;
+}
+
+.tbfontlogosmaller {
+  display: inline;
+  height: 0.8em;
+}
+
+/* tiny devices (portrait and landscape) */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+}
+
+/* tiny devices (landscape)  */
+@media only screen and (min-width : 321px)  and (orientation : landscape) {
+}
+
+/* tiny devices (portrait)  */
+@media only screen and (max-width : 320px)  and (orientation : portrait) {
+}
+
+/* tablets and small desktops (portrait and landscape)  */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+}
+
+/* tablets and small desktops (landscape)  */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+}
+
+/* tablets and small desktops (portrait)  */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
+}
+
+/* Desktops and laptops ----------- */
+@media only screen and (min-width : 1224px) {
+
+  body {
+    font-size: 0.9em; 
+  }
+
+  .toparea {
+    font-size: 0.8em; 
+    padding: 0.1em;
+  }
+
+  #topleft {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    max-width: 15em; 
+    overflow:hidden;
+  }
+
+  #topcenter {
+    position: fixed;
+    top: 0; 
+    left: 15em; 
+    right: 15em; 
+    max-height: 4em; 
+    overflow:hidden;
+  }
+
+  #topright {
+    position: fixed;
+    top: 0; 
+    right: 0; 
+    max-width: 15em; 
+    max-height: 4em; 
+    overflow:hidden;
+  }
+
+  #menuline {
+    position: fixed;
+    padding: 0.1em;
+    padding-bottom: 0;
+    top: 4em;
+    left: 0;
+    right: 0;
+    /*
+    border-top:1px solid #808080; 
+    border-bottom:1px solid #808080; 
+    */
+    background: #eeeefe;
+  }
+
+  .middlearea {
+    padding: 0.1em;
+    font-size: 0.8em; 
+  }
+
+  #middleleft {
+    position: fixed;
+    top: 6.1em;
+    bottom: 5.1em; 
+    left: 0; 
+    max-width: 15em;
+    overflow:hidden;
+  }
+
+  #middlecenter {
+    position: fixed;
+    top: 6.1em;
+    bottom: 5.1em;
+    left: 15em; 
+    right: 15em; 
+    overflow:hidden;
+  }
+
+  #middleright {
+    position: fixed;
+    top: 6.1em;
+    bottom: 5.1em; 
+    right: 0; 
+    max-width: 15em; 
+    overflow:hidden;
+  }
+
+  .bottomarea {
+    border-top: 1px solid  #808080;
+    padding: 0.1em;
+    font-size: 0.8em; 
+  }
+
+  #bottomleft {
+    position: fixed;
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    max-width: 15em; 
+    min-height: 4em; 
+    max-height: 4em; 
+    overflow:hidden;
+  }
+
+  #bottomcenter {
+    position: fixed;
+    bottom: 0; 
+    left: 15em; 
+    right: 15em; 
+    min-height: 4em; 
+    max-height: 4em; 
+    overflow:hidden;
+  }
+
+  #bottomright {
+    position: fixed;
+    bottom: 0; 
+    right: 0; 
+    width: 100%; 
+    max-width: 15em; 
+    min-height: 4em; 
+    max-height: 4em; 
+    overflow:hidden;
+  }
+
+}
+
+/* Large screens ----------- */
+@media only screen and (min-width : 1024px) {
+
+  body  { 
+    font-size: 0.9em; 
+    background: url(props/twobirds_2.jpg) no-repeat center center fixed; 
+    background-size: cover;
+  }
+
+}
+
+/* iPhone 4+ ----------- */
+/*@media only screen and (-webkit-min-device-pixel-ratio : 1.5), only screen and (min-device-pixel-ratio : 1.5) {
+}
+*/
+
+/* iPhone >=5 ----------- */
+/* You've spent way too much on a phone */
+
+}

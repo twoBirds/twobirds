@@ -1,0 +1,68 @@
+.demoapp-window {
+	position: relative;
+	left: 0;
+	margin: 0;
+	margin-bottom: 4px;
+	margin-right: 10px;
+	border: 1px solid gray;
+	border-radius: 7px;
+}
+
+.demoapp-window-title {
+	left: 0;
+	right: 0;
+	margin: 0;
+	padding: 3px;
+	background-color: rgba(0,0,0,0.1);
+	font-weight: bold;
+	font-style: italic;
+	text-align: center;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+}
+
+._demoapp-window-active > .demoapp-window-title {
+	background-color: rgba(0,0,0,0.4);
+}
+
+.demoapp-window-content {
+	position: relative;
+	left: 0;
+	right: 0;
+	margin: 0;
+	height: 300px;
+	padding: 3px;
+	overflow: hidden;
+	background-color: rgba(255,255,255,0.5);
+}
+
+._demoapp-window-active > .demoapp-window-content {
+	background-color: rgba(255,255,255,1);
+}
+
+.demoapp-window-content > div > div > div {
+	margin: 10px;
+	margin-right: 50px;
+}
+
+.demoapp-window-content > div + div > div {
+	background-color: rgba(0,0,0,0.3);
+}
+
+.demoapp-window-statusbar{
+	left: 0;
+	right: 0;
+	margin: 0;
+	padding: 3px;
+	background-color: rgba(0,0,0,0.05);
+	font-weight: bold;
+	font-style: italic;
+	text-align: center;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+}
+
+._demoapp-window-active > .demoapp-window-statusbar {
+	background-color: rgba(0,0,0,0.2);
+}
+
