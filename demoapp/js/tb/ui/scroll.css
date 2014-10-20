@@ -46,6 +46,7 @@
     opacity: 0.3;
     filter:alpha(opacity=30);
     background-color: transparent;
+    border-radius: 5px;
     border: 1px solid grey;
 }
 
@@ -58,6 +59,7 @@
     top: 1px;
     background-color: lightgray;
     border: 1px solid grey;
+    border-radius: 5px;
     -webkit-transition: background-color 0.2s;
     transition: background-color 0.2s;
 
@@ -151,6 +153,7 @@
     margin-bottom: 10px;
     background-color: transparent;
     border: 1px solid grey;
+    border-radius: 5px;
 }
 
 /*scroll bar handle*/
@@ -162,6 +165,7 @@
     top: 1px;
     background-color: lightgray;
     border: 1px solid grey;
+    border-radius: 5px;
     -webkit-transition: background-color 0.2s;
     transition: background-color 0.2s;
 }
