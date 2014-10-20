@@ -6,8 +6,12 @@ twoBirds 5.0
 - stayed hidden during v3 & v4
 - resurfaced oct 2014 with a pale but happy skipper ;-)
 
-USE CASE & TARGET AUDIENCE: 
-- web component style programming ( with a twist )
+USE CASE: 
+- component style web programming
+- distributed programming
+- any size from embedded small functionality to enterprise apps
+
+TARGET AUDIENCE: 
 - hands-on JS programmers who distrust monster libs ...
 - ...but want to be able to implement the same features quality assured
 
