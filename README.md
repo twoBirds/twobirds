@@ -23,7 +23,7 @@ STATUS:
 
 QUICKSTART:
 - read twobirds.5.0.pdf
-- copy demoapp code to file system
+- copy demoapp code to a web server
 - open index.html in browser
 - have a look
 
