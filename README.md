@@ -2,15 +2,17 @@ twoBirds 5.0
 
 project started 2005, first published 2007 on ajaxian.com
 
-preliminary - proof of concept.
-
 HINT: 
-- google polymer now
+- google polymer now with a twist
+
+STATUS:
+- preliminary
+- may change
 
 QUICKSTART:
--read twobirds.5.0.pdf
--copy demo code to your server
--have a look
+- read twobirds.5.0.pdf
+- copy demo code to your server
+- have a look
 
 TRY on your site:
 - add lib file twobirds.js to your html head
