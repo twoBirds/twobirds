@@ -35,7 +35,9 @@ TRY on your site:
 - ok, create and add the file missing like so:
 
 myapp/body.js:
-myapp.body={
+
+tb.nameSpace('myapp').body={
+  name: 'myapp.body'
 }
 
 - reload
