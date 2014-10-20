@@ -32,12 +32,14 @@ TRY on your site:
 - add lib file twobirds.js to your html head
 - add data-tb="myapp/body.js" to your html body tag
 - reload and see what happens (you should get an error message in the network tab)
-- ok, create and add the file missing like so:
+- ok, add the file missing like so:
 
 myapp/body.js:
 
-tb.nameSpace('myapp').body={
-  name: 'myapp.body'
+tb.nameSpace('myapp', true).body={ // ,true creates the namespace if it is not there
+
+  name: 'myapp.body'    // so you can find it using the selector, and easily identify it when debugging
+  
 }
 
 - reload
