@@ -8,7 +8,8 @@
 	border-radius: 7px;
 }
 
-.demoapp-window-title {
+/* title line */
+.demoapp-window > div:nth-child(1) {
 	left: 0;
 	right: 0;
 	margin: 0;
@@ -17,15 +18,16 @@
 	font-weight: bold;
 	font-style: italic;
 	text-align: center;
-	border-top-left-radius: 7px;
-	border-top-right-radius: 7px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
 }
 
-._demoapp-window-active > .demoapp-window-title {
+._demoapp-window-active > div:nth-child(1) {
 	background-color: rgba(0,0,0,0.4);
 }
 
-.demoapp-window-content {
+/* content area */
+.demoapp-window > div:nth-child(2) {
 	position: relative;
 	left: 0;
 	right: 0;
@@ -36,20 +38,21 @@
 	background-color: rgba(255,255,255,0.5);
 }
 
-._demoapp-window-active > .demoapp-window-content {
+._demoapp-window-active > div:nth-child(2) {
 	background-color: rgba(255,255,255,1);
 }
 
-.demoapp-window-content > div > div > div {
+/* overload scroll css */
+.demoapp-window > div:nth-child(2) > div > div > div {
 	margin: 10px;
 	margin-right: 50px;
 }
 
-.demoapp-window-content > div + div > div {
+.demoapp-window > div:nth-child(2) > div + div > div {
 	background-color: rgba(0,0,0,0.3);
 }
 
-.demoapp-window-statusbar{
+.demoapp-window > div:nth-child(3){
 	left: 0;
 	right: 0;
 	margin: 0;
@@ -58,11 +61,11 @@
 	font-weight: bold;
 	font-style: italic;
 	text-align: center;
-	border-bottom-left-radius: 7px;
-	border-bottom-right-radius: 7px;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
 }
 
-._demoapp-window-active > .demoapp-window-statusbar {
+._demoapp-window-active > div:nth-child(3) {
 	background-color: rgba(0,0,0,0.2);
 }
 

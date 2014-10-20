@@ -37,17 +37,18 @@ demoapp.window = {
 						that.trigger('window:active', true);
 					};})(this) );
 
-				var content = $( this.target ).find('.demoapp-window-content'),
-					title = $( this.target ).find('.demoapp-window-title'),
-					status = $( this.target ).find('.demoapp-window-statusbar');
-
+				console.log( this.target );
+				var content = $( this.target ).find('> div > div:nth-child(2)'),
+					title = $( this.target ).find('> div > div:nth-child(1)'),
+					status = $( this.target ).find('> div > div:nth-child(3)');
+				console.log( content[0] );
+				
 				content.css('height', this.config.height );
 				title.text( this.config.title || '&nbsp;' );
 				status.text( this.config.status || '&nbsp;' );
 
 				this['tb.ui.scroll'] = {
-					content: '.demoapp-window-content',
-					test: 'window scroll config test',
+					content: content[0],
 					direction: 'y',
 			        bubbleUp: true,
 			        pixelsPerSecond: 2000,
