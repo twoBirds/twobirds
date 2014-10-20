@@ -1,12 +1,12 @@
-demoapp.window = {
+tb.nameSpace('demoapp.sys').window = {
 
-	name: 'demoapp.window',
+	name: 'demoapp.sys.window',
 
 	active: false, // indicates this is the active window 
 
 	'tb.require': [
-		'demoapp/window.html',
-		'demoapp/window.css'
+		'demoapp/sys/window.html',
+		'demoapp/sys/window.css'
 	],
 
 	'tb.events': [ // what events do i listen to ?
@@ -31,7 +31,7 @@ demoapp.window = {
 				this.canClose = this.config.canClose;
 
 				$( this.target )
-					.html( tb.loader.get('demoapp/window.html') )
+					.html( tb.loader.get('demoapp/sys/window.html') )
 					.on( 'click', (function(that){ return function(){
 						//console.log('onClick trigger window:active', true);
 						that.trigger('window:active', true);

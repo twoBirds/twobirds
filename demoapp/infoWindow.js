@@ -2,7 +2,7 @@ demoapp.infoWindow = {
 
 	name: 'demoapp.infoWindow',
 
-	'demoapp.window': {
+	'demoapp.sys.window': {
         height: '300px',
 		canClose: true,
 		title: 'Information Window',

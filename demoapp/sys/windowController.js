@@ -1,13 +1,13 @@
-demoapp.windowController = {
+tb.nameSpace('demoapp.sys').windowController = {
 
 	name: 'demoapp.windowController',
 
-    'tb.require': [
+    'tb.require': [ // window is predictive load
     	'tb/ui/scroll.js',
-    	'demoapp/windowController.css',
-		'demoapp/window.js',
-		'demoapp/window.html',
-		'demoapp/window.css'
+    	'demoapp/sys/windowController.css',
+		'demoapp/sys/window.js',
+		'demoapp/sys/window.html',
+		'demoapp/sys/window.css'
 	],
 
 	'tb.events': [ // what events do i listen to ?
