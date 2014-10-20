@@ -1,17 +1,30 @@
 twoBirds 5.0
 
-project started 2005, first published 2007 on ajaxian.com
+- project started 2005
+- first published 2007 tB v2 ( on ajaxian.com )
+- submerged shortly afterwards
+- stayed there during v3 & v4
+- resurfaced oct 2014 with a pale but happy skipper ;-)
 
-HINT: 
-- google polymer now with a twist
+USE CASE & TARGET AUDIENCE: 
+- web components now ( with a twist )
+- hands-on JS programmers who distrust monster libs ...
+- ...but want to be able to implement the same features quality assured
+
+FEATURES:
+- async on demand loading
+- web components like programming
+- own chained selector for tB objects
+- own trigger mechanism
 
 STATUS:
 - preliminary
-- may change
+- will be updated w/ new functionality (chained) as needed
 
 QUICKSTART:
 - read twobirds.5.0.pdf
-- copy demo code to your server
+- copy demoapp code to file system
+- open index.html in browser
 - have a look
 
 TRY on your site:
@@ -29,6 +42,7 @@ myapp.body={
 - type:
 tb('body')
 - inspect object
+- rinse and repeat
 
 - revisit demo project, look at code
 
