@@ -23,7 +23,7 @@ STATUS:
 - will be updated w/ new functionality (chained) as needed
 
 FIRST PEEK:
-- https://dev.two-birds.selfhost.eu
+- http://dev.two-birds.selfhost.eu
 - on one of my home computers
 - cursed by ongoing development: if you are lucky it works
 - may be online/offline depending on my power bills status ;-)
