@@ -26,9 +26,10 @@ FIRST PEEK:
 - http://dev.two-birds.selfhost.eu
 - browser maximized or full-screen please, only desktop css
 - => demo for a non-native scroll widget implementation
-- on one of my home computers
-- cursed by ongoing development: if you are lucky it works
-- may be online/offline depending on my power bills status ;-)
+- BEWARE:
+- resides on one of my home computers
+- riddled by ongoing development: if you are lucky it works
+- may be online/offline depending on my power bill status ;-)
 - contact skype: frank.thuerigen if you want it stable for a while
 
 QUICKSTART:
