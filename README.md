@@ -3,7 +3,7 @@ twoBirds 5.0
 - project started 2005
 - first published 2007 tB v2 ( on ajaxian.com )
 - submerged shortly afterwards
-- stayed there during v3 & v4
+- stayed hidden during v3 & v4
 - resurfaced oct 2014 with a pale but happy skipper ;-)
 
 USE CASE & TARGET AUDIENCE: 
