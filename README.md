@@ -7,7 +7,7 @@ twoBirds 5.0
 - resurfaced oct 2014 with a pale but happy skipper ;-)
 
 USE CASE & TARGET AUDIENCE: 
-- web components now ( with a twist )
+- web component style programming ( with a twist )
 - hands-on JS programmers who distrust monster libs ...
 - ...but want to be able to implement the same features quality assured
 
