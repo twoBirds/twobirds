@@ -22,6 +22,13 @@ STATUS:
 - preliminary
 - will be updated w/ new functionality (chained) as needed
 
+FIRST PEEK:
+- https://dev.two-birds.selfhost.eu
+- on one of my home computers
+- cursed by ongoing development: if you are lucky it works
+- may be online/offline depending on my power bills status ;-)
+- contact skype: frank.thuerigen if you want it stable for a while
+
 QUICKSTART:
 - read twobirds.5.0.pdf
 - copy demoapp code to a web server
