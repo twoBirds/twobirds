@@ -12,10 +12,11 @@ USE CASE & TARGET AUDIENCE:
 - ...but want to be able to implement the same features quality assured
 
 FEATURES:
-- async on demand loading
+- async on demand loading, recursive inside tb objects
+- effective multiple inheritance
 - web components like programming
 - own chained selector for tB objects
-- own trigger mechanism
+- own async trigger mechanism on app level
 
 STATUS:
 - preliminary
