@@ -19,7 +19,7 @@ FEATURES:
 - async on demand loading, recursive inside tb objects
 - effective multiple inheritance
 - web components like programming, defining repository objects
-- instances of twoBirds top level tB objects live in a DOM node
+- instances of top level tB objects live in a DOM node
 - own chained selector for tl tB objects
 - own async trigger mechanism on app level
 
