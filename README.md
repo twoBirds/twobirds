@@ -62,7 +62,6 @@ tb.nameSpace('myapp', true).body={ // ,true creates the namespace if it is not t
 - type:
 tb('body')
 - inspect object
-- rinse and repeat
 
 - revisit demo project, look at code
 
