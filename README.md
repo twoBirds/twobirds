@@ -34,7 +34,7 @@ FIRST PEEK:
 - BEWARE:
 - resides on one of my home computers
 - riddled by ongoing development: if you are lucky it works
-- may be online/offline depending on my power bill status ;-)
+- may be offline
 - contact skype: frank.thuerigen if you want it stable for a while
 
 QUICKSTART:
