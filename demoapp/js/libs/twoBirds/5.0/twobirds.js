@@ -136,6 +136,7 @@ if (!Array.prototype.indexOf)
 		if( a && typeof a === 'object' && typeof a['nodeType'] !== 'undefined' ){ // a DOM node
 			
 			this.target = a;
+			this.handlers = {};
 
 		} else if ( a ) { // treat as selector
 
@@ -150,7 +151,162 @@ if (!Array.prototype.indexOf)
 
 		return { // public prototype, public static vars
 
-			trigger: function(){}, // skeleton, overloaded later
+			addHandler: function( pName, pFunction ){
+				// TBD
+			},
+
+			removeHandler: function( pName, pFunction ){
+				// TBD
+			},
+
+			handle: function( evt ){
+				var bubble = evt.bubble,
+					name = evt.name.split(':')[1],
+					data = evt.data,
+					cont = true,
+					that = this;
+				//console.log('HANDLE SCAN [', name, '] IN ', that);
+				$.each( this.handlers, function( i, v ){
+					//console.log('HANDLE SCAN [', name, '] ?= ', i);
+					if ( i === name ){
+						$.each( v, function( j, w ){
+							//console.log('HANDLE EXEC [', w.toString(), '] CONT ', cont, 'IN ', that);
+							if (cont === true) {
+								//console.log('HANDLE DO [', name, '] IN ', that);
+								cont = w.apply( that, [ evt ] ) === false ? false : true;
+							}
+						});
+					}
+				});
+				return cont;
+			},
+
+			trigger: function( pName, pData ){
+	
+				/*
+				EVENT SYNTAX:
+				<selector>:<eventName>:<bubble>
+				
+				<selector> : '', '*', '<tl tb selector>', 'this', 'root', 'super' 
+					(the latter 3 indicating local bubbling, the other top level bubbling)
+				<eventName>: any string
+				<bubble>: 'l', 'u', 'd' (or any combination of these) 
+
+				AUTOMATIC EVENT EXPANSION EXAMPLES:
+				'eventName'	 =>	'*:eventName:ld'
+				':eventName:' => 'this:eventName:l'
+				'*:eventName' => '*:eventName:ld'
+				*/
+
+				//console.log( 'TRIGGER !!! ', pName, pData );
+
+				function handleEvent( evt ){
+					var bubble = evt.bubble,
+						cont = true,
+						that = this;
+					//console.log( 'HANDLE EVENT', evt );
+
+					// this
+					if ( typeof this === 'array' || this instanceof Array ){
+						//if (this[0]) console.log('HANDLE EVENT array', this, evt);
+						$.each( this, function( i, v ){
+							handleEvent.apply( v, [ evt ] );
+						});
+					} else {
+						//console.log( 'HANDLE EVENT single', this, 'EVENT', evt );
+						if ( this['handlers'] ){
+							cont = this.handle.apply( this, [ evt ] ) === false ? false : true;
+						}
+					}
+
+					// bubble
+					if ( cont === true ){
+						if ( bubble.indexOf('l') > -1 ){ // local
+							//console.log( 'BUBBLE EVENT local', that, evt );
+							if ( bubble.indexOf('d') > -1 ){ // down
+								//console.log( 'BUBBLE EVENT down' );
+								$.each( this, function( i, v ){
+									//console.log( 'BUBBLE EVENT - test', i );
+									if ( /\./.test(i) && /^_/.test(i) === false && v instanceof tb ){ // this one is a subobject
+										//console.log( 'BUBBLE EVENT - match', i, evt, that[i] );
+										cont = handleEvent.apply( that[i], [evt] ) === false ? false : true;
+									}
+								});
+							}
+							if ( bubble.indexOf('u') ){ // down
+								if ( this['_super'] ){ // this one is a subobject
+									cont = handleEvent.apply( this['_super'], [evt] ) === false ? false : true;
+								}
+							}
+						}
+					}
+					return cont;
+				}
+
+				// recover full event description
+				if ( pName.indexOf(':') === -1 ){
+					// simple tlo event
+					pName = '*:' + pName + ':ld'; // standard = starting at every tlo object, bubble down inside tlo
+				}
+
+				var ea = pName.split(':');
+
+				if (ea.length === 2){ // 3rd missing, guess which is which
+					if ( ea[1].lenght < 4 && !/[^l|u|d]/.test( ea[1] ) ){
+						// 2nd seems to be bubble parameter, so 1st should be event name
+						ea = ea.unshift('this'); // event starts local, and follows bubble rules as defined
+					} else { // 2nd seems to be event name, 1st assumed to be target selector
+						ea.push( 'ld' ); // bubble from target local down
+					}
+				}
+
+				// now that we have the real expanded event name,
+				// set empty strings to standard behaviour
+				if ( ea[0].length === 0 ){ // no target selected
+					ea[0] = 'this';	// only this (sub-)object
+				}
+				if ( ea[2].length === 0 ){ // no bubble behaviour defined
+					ea[2] = 'ld';	// assume local only
+				}
+
+				// reassemble complete event name
+				pName = ea.join(':');
+
+				// event structure:
+				var evt = {
+						name: pName, 			// must be overwritten
+						origin: this,			// tb object origin
+						target: ea[0], 			// jquery origin element
+						bubble: ea[2],			// do not bubble, other options 'l', u', 'd', and any combination of it
+						data: pData
+					};
+
+				//console.log( 'TRIGGER:', this, 'EVENT', evt );
+
+				var start;
+				switch ( ea[0] ){
+					case 'this':
+						start = this;
+						break;
+					case 'root':
+						start = this['_super'] ? this._root() : this;
+						break;
+					case 'super':
+						start = this['_super'] ? this._super() : false;
+						break;
+					default: // tlo selector
+						start = ea[0].indexOf('.') > -1 ? tb( tb.nameSpace( ea[0] ) ) : tb( ea[0] );
+						break;
+				}
+
+				if ( start !== false ) setTimeout( 
+					(function( start, evt ){ return function(){
+						//console.log( 'TRIGGER START handleEvent', evt, 'IN', start  );
+						handleEvent.apply( start, [ evt ] );
+					};})( start, evt ),
+					0 // as instantaneous as possible
+				);
+			},
 
 			is: function( s ){ // selector match
 				var o = this instanceof Array ? this[0] : this;
@@ -249,25 +405,12 @@ if (!Array.prototype.indexOf)
 				return this;
 			},
 
-			inject: function( namespace, props ){
+			inject: function( namespace, props, recurse ){
+
 				var obj = tb.nameSpace( namespace, true ),
 					props = props || this[namespace];
 
-				this.status = 'inject';
-				// async load obj if not available yet
-				if ( $.isEmptyObject( obj ) && typeof obj === 'object' ){
-					//console.log( 'REQUIRE ', namespace, namespace.replace( /\./g, '/' ) + '.js' );
-					var fn = namespace.replace( /\./g, '/' ) + '.js';
-					this.status = 'inject::require ' + fn;
-					tb.require(
-						[ fn ],
-						(function(that, namespace){ return function(){
-							// retry inject
-							that.inject.apply( that, [ namespace ] )
-						};})(this, namespace)
-					);
-					return;
-				}
+				//this._status = 'inject';
 
 				//console.log( 'INJECT ', obj, ' NAMESPACE ', namespace, ' INTO ', this );
 
@@ -275,13 +418,15 @@ if (!Array.prototype.indexOf)
 				switch( typeof obj ){
 					case 'function':
 						//console.log( 'func prototype:', obj.prototype );
-						if ( $.isEmptyObject( obj.prototype ) ){
+						if ( obj.prototype === Function.prototype ){
 							//console.log('call plain function', namespace, 'with', this[namespace], 'on', this['_root'] ? this._root() : this );
 							obj.apply( this['_root'] ? this._root() : this, [ this[namespace] ] );
 						} else { // a constructor
-							//console.log('inject new object', tb.nameSpace(namespace), 'into this[\''+ namespace+ '\'], this=', this );
-							var result = new tb.nameSpace(namespace)( this );
-							$.extend( true, this, result );
+							var c = tb.nameSpace(namespace); // constructor
+							//console.log('inject new object', c, 'into this[\''+ namespace+ '\'], this=', this );
+							var r = new c( this[namespace] );
+							//console.log( ' ==> ', r );
+							this[namespace] = r;
 						}
 						break;
 					case 'object':
@@ -291,7 +436,7 @@ if (!Array.prototype.indexOf)
 						$.extend( 
 							true,
 							this[namespace],
-							new tb( this.target ), 
+							obj,
 							{
 								_super: this, 
 								config: props,
@@ -300,33 +445,35 @@ if (!Array.prototype.indexOf)
 									while ( that._super ){
 										that = that._super;
 									}
-									return that;
+									return $( that.target ).data('tbo');
 								} 
-							},
-							obj
+							}
 						); 
+
 						//console.log( this[namespace], 'INSTANCEOF', obj );
-						//this[namespace].instanceOf( obj, true );
 						var that = this;
+
 						$.each( this[namespace], function( i, v ){
 							//console.log('test property', i, 'in this[\''+ namespace+ '\']', this );
 							if ( that[namespace].hasOwnProperty( i ) && that[namespace][i] !== that[i] ){
 								//console.log('-hasOwnProperty', i );
-								if ( /\./.test( i ) ){ // it is a namespaced element
+								if ( /\./.test( i ) && i !== 'tb.require' ){ // it is a dotted (namespaced) element
 									// recursive inject
-									//console.log('--recurse inject', i, 'in that[\''+ namespace+ '\'][\''+ i+ '\']' );
+									//console.log('--recurse inject', tb.nameSpace( i ), 'in that[\''+ namespace+ '\'][\''+ i+ '\']' );
 									var o = that[namespace];
-									o.inject.apply( o, [ i ] );
+									o.inject.apply( o, [ i, props, true ] );
 								}
 							}
 						});
+
 						//console.log('injected plain object',obj,'into this[\''+ namespace+ '\']: this => ', this );
 						break;
 					default: 
 						//console.log('no handler -> ran into default', i );
 						break;
 				}
-				this.status = 'done';
+				//this._status = 'done';
+				if ( recurse !== true ) this.trigger('root:tb.init:ld');
 				if ( !this['_super']) $( this.target ).data('tbo', this);
 			},
 
@@ -476,10 +623,8 @@ tb.init = function(){
 	//console.log( 'Attempt: tb.init' )
 	if (!args[0]) { 
 		if (!tb.init['initialized']){
-			//console.log( '-> add cold start "body"' )
 			args.push( 'body' );
 		} else {
-			//console.log( '-> no parm but already initialized -> return' )
 			return;
 		}
 	}
@@ -499,29 +644,32 @@ tb.init = function(){
 			//console.log('no tb-data elements for', args[i] );
 		} else {
 			set.each( function( i, v ){ // for each domNode:data-tb element
+				
+				//console.log( 'tlo req DOM:', v );
 
 				if ( !$(v).data('tbo') ){
+					// create top level object
 					var tbo = new tb(v);
 					tbo.name = tb.getid();
-					tbo.status = 'init';
-					$(v).data('tbo', tbo );
 				} else {
 					return; // already initialized
 				}
 
 				var a = $(v).attr('data-tb').split(' ');
-				$( a ).each(function( i, e ){ // walk each .js file definition in data-tb
-					//console.log( 'tb.init element', e );
-					var ns = e.replace(/\//g, '.').split('.');
-					//console.log( 'tb.init ns', ns );
-					ns.pop(); // cut extension
-					ns = ns.join('.');
-					e = tb.nameSpace( ns, true );
-					tbo[ns] =  new tb(v);
-					//console.log( 'init: ', tbo, ns );
-					tbo.inject.apply( tbo, [ ns ] );
-				});
-				tbo.status = 'done';
+				//console.log( 'tlo req:', a );
+
+				tb.require( a, (function( tbo, a, v ){ return function(){
+					//console.log( 'TOPLEVEL tbo req cb:', tbo, a );
+					$.each( a, function( i, e ){
+						var ns = e.replace( /.js$/, '').replace( /\//g, '.' );
+						//console.log( 'TOPLEVEL ns, element', ns, e );
+						//tbo[ns] =  new tb( v );
+						tbo.inject.apply( tbo, [ ns ] );
+						//console.log( tbo );					
+						//$(v).data('tbo', tbo );
+					});
+				};})( tbo, a, v ));
+					
 			});
 		};
 	}
@@ -531,19 +679,20 @@ tb.init = function(){
  * handles all requirements loading
  * @namespace tb.require
  */
-tb.require = function( pA, pCb ){
+tb.require = function( pA, pCb, pId ){
 
 	var myCb = pCb || tb.nop,
+		id = pId || tb.getid(),
 		myA = typeof pA === 'string' || pA instanceof String ? [pA] : pA,
 		lA = []; // array of files that need to be loaded
 
 	if ( ! ( typeof myA === Array || myA instanceof Array ) ) return;
 
-	//console.log( 'require', pA, this, this instanceof tb );
+	//console.log( 'require function call: ', pA, this, this instanceof tb, pCb.toString(), pId );
 
 	// if called as a tb().require()
 	// will trigger 'tb.require:done' on that tb object when finished
-	//console.log( 'tb.require() this=', this, this instanceof tb );
+	//console.log( 'tb.require() this=', this, this instanceof tb, pA, pId );
     if ( this instanceof tb || this['trigger'] ){
 		//console.log( 'tb.require() callback construction for tb object', this );
     	myCb = (function(that, a, myCb){ return function(){
@@ -557,7 +706,7 @@ tb.require = function( pA, pCb ){
     }
 
     $.each( myA, function( i, v ){
-        if ( !tb.loader.test( v ) ) { // not finished loading
+        if ( !tb.loader.test( v ) ) { // not loading or not finished loading
         	lA.push( v );
         }
     });
@@ -569,14 +718,37 @@ tb.require = function( pA, pCb ){
         myCb();
         return;
     } else { // open requirements: add to requirements group object
-    	//console.log('tb.require open reqs', lA);
-    	lA.cb = myCb
-    	tb.require.groups.push( lA );
+    	//console.log('tb.require open reqs', lA, 'in', pId, 'RGs', tb.require.groups );
+    	lA.cb = myCb;
+    	lA.id = id;
+    	var aLeft = $.extend( true, [], lA );
+    	aLeft.cb = myCb;
+    	aLeft.id = id;
+    	if ( pId === id ){ // if an id is given, add to existing requirements group
+	    	//console.log('APPEND', aLeft, ' TO', pId, $.extend( true, [], tb.require.groups ) );
+			$.each( tb.require.groups, function( i, v ){
+	    		//console.log( 'RG extend SCAN', v, v.id, ' ?= ', id );
+	    		if ( v.id === pId ){
+	    			//var cb = tb.require.groups[i].cb;
+	    			//console.log( 'RG extend', $.extend( true, [], v ), ' WITH ', lA );
+	    			while ( lA.length > 0 ){
+	    				tb.require.groups[i].push( lA.pop() );
+	    			}
+	    			//console.log( ' ==> ', tb.require.groups[i] );
+	    		} 
+	    	});
+    	} else { // add new requirements group
+			//console.log( 'NEW RG', id, ' ==> ', lA );
+	    	tb.require.groups.push( lA );
+    	}
     }
 
-    $.each( lA, function( i, v ){
-        tb.loader.load( v, tb.require.checkGroups );
+    $.each( aLeft, function( i, v ){ // now do the loading
+        tb.loader.load( v, tb.require.checkGroups, id ); 
+        // id is used to extend the checkgroup on recursive loads
     });
+
+    return id;
 };
 
 
@@ -592,6 +764,7 @@ tb.require.checkGroups = function(){ // check all requirement groups
 			aLeft = [];
 		
 		aLeft.cb = pV.cb || tb.nop;
+		aLeft.id = pV.id || null;
 		
 		//console.log( 'checkGroup', pI, pV );
 		$.each( pV, function( i, v ){
@@ -619,142 +792,8 @@ tb.require.checkGroups = function(){ // check all requirement groups
 	});
 }
 
-// add trigger function to tb prototype
-// so result sets will have it too
 tb.prototype.require = tb.require;
 
-/**
- * create namespace
- * @class
- * @memberOf tb
- * @namespace tb.nameSpace
- * @description 
- */
-tb.events = function( pTb ){
-	// add trigger function to tb prototype
-	// so result sets will have it too
-	// tb.prototype.trigger = tb.prototype['trigger'] || tb.events.prototype.trigger;
-	var handlers = pTb.handlers || [];
-	//console.log( 'new events', pTb, pTb['tb.events'] );
-	$.extend( handlers, pTb['tb.events'] || [] );
-	delete  pTb['tb.events'];
-	return { handlers: handlers };
-}
-
-tb.events.prototype = (function(){ 
-
-	function handleEvent(ev){
-		// event handler
-		var that = this,
-			bubble = true;
-		//console.log('TB event caught:', ev, 'in TB    ', that );
-		if (this['handlers']) $.each( this.handlers, function( i, v ){
-			if ( v.name === ev.name || ( v.name instanceof RegExp && v.name.test(ev.name) ) ){
-				//console.log('TB event match:', ev, 'in', that );
-				if ( v['handler'] ) {
-					//console.log('call handler', v['name'], v['handler'] , 'in the scope of', that );
-					bubble = bubble && v['handler'].apply( that, [ev] ) === false ? false : true;
-					// bubble
-					if ( bubble && ev.bubble ){
-						var b = evt.bubble;
-						//console.log( 'bubble', b, 'in', that );
-						if ( b.indexOf( 'u' ) > -1 && that.parent()[0] ){
-							//console.log( 'bubble up', that.parent()[0] );
-							evt.bubble='u';
-							that.parent().trigger.apply( that.parent(), [evt] );
-						}
-						if ( b.indexOf( 'd' ) > -1 ){
-							//console.log( 'bubble down', that, that.children() );
-							evt.bubble='d';
-							var c = that.children();
-							if ( c instanceof Array || typeof c === 'array' ) {
-								$.each( that.children(), function( i, v ){
-									if (v instanceof tb) v.trigger( evt );
-								});
-							} else if ( c instanceof tb ) {
-								c.trigger( evt );
-							}
-						}
-					}
-				}
-			}
-		});
-		//console.log('subtrigger of', that);
-		$.each( that, function( i, v ){
-			//console.log(' test', i, v );
-			if ( v instanceof tb ) if ( i && typeof i === 'string' && !(/^_/).test(i) && v['_super'] ) {
-				//console.log(' -> is tb', v);
-				handleEvent.apply( v, [ ev ] );
-			}
-		});
-		return true;
-	};
-
-	return {
-		trigger: function(ev, data){
-			// event standard structure:
-			var stdEv = {
-					name: 'stdEvent', 			// must be overwritten
-					origin: this,				// tb object origin
-					target: $( this.target ), 	// jquery origin element
-					bubble: ''					// do not bubble, other options 'u', 'd', 'ud'
-				},
-				evt;
-
-			if ( typeof ev === 'string' || ev instanceof String ){ // simple event, notification, ev = name
-				// convert to obj:
-				evt = $.extend(
-					stdEv,
-					true,
-					{
-						name: ev,
-						data: data
-					}
-				);
-			} else if ( typeof ev === 'object' || ev instanceof Object ){
-				evt = $.extend(
-					stdEv,
-					true,
-					{ data: data },
-					ev
-				);
-			}
-			
-			//console.log( 'trigger', evt, 'on', this['_root'] ? this._root() : this );
-
-			if ( this instanceof Array ){
-				// assume array
-				// console.log( 'trigger', ev, 'on array', this );
-				$.each( this, function( i, v ){
-					if ( v instanceof tb ) v.trigger( evt );
-				});
-			} else {
-				setTimeout( 
-					(function( that, evt ){ return function(){
-						handleEvent.apply( $(that.target).data('tbo'), [ evt ] );
-					};})( this['_super'] !== undefined ? this._root() : this, evt ),
-					20
-				);
-			}
-			return this;
-		}
-	};
-})();
-
-tb.prototype.trigger = tb.events.prototype.trigger;
-
-/**
- * browser sniff - TBD replace by feature sniffer, modernizr
- * @memberOf tb
- * @namespace tb.browser
- * @description <br>tb.browser = {<br>
-    version: ((navigator.userAgent.toLowerCase()).match(/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/) || [])[1],<br>
-    safari: /webkit/.test(navigator.userAgent.toLowerCase()),<br>
-    opera: /opera/.test(navigator.userAgent.toLowerCase()),<br>
-    msie: /msie/.test(navigator.userAgent.toLowerCase()) && !/opera/.test(navigator.userAgent.toLowerCase()),<br>
-    mozilla: /mozilla/.test(navigator.userAgent.toLowerCase()) && !/(compatible|webkit)/.test(navigator.userAgent.toLowerCase())<br>
-};<br>
- */
 tb.browser = {
     version: ((navigator.userAgent.toLowerCase()).match(/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/) || [])[1],
     safari: /webkit/.test(navigator.userAgent.toLowerCase()),
@@ -1347,10 +1386,10 @@ tb.loader = (function(){
     		//console.log( 'load count', count, pInc === 1 ? '-->' : '<--', pPath );
     		if ( count === 0 ){
     			//console.log('tb status idle', tb('*'));
-    			tb('*').trigger('tb:idle');
+    			tb('*').trigger('tb.idle');
     		} else if ( count === 1 && Math.abs( pInc ) === pInc ) {
     			//console.log('tb status loading', tb('*'));
-    			tb('*').trigger('tb:loading');
+    			tb('*').trigger('tb.loading');
     		}
 		},
 
@@ -1401,7 +1440,7 @@ tb.loader.js = (function () {
     var c = new tb.Cache();
 
     // execute JavaScript by <script>-tag
-    function addScript( pPath, pUrl, pCb ) {
+    function addScript( pPath, pUrl, pCb, pId ) {
   		var head = document.getElementsByTagName('head')[0],
 			script = document.createElement('script'),
 			done = false;
@@ -1409,13 +1448,76 @@ tb.loader.js = (function () {
 		script.setAttribute('type', 'text/javascript');
 		script.setAttribute('src', pUrl);
 
+		//console.log('LOAD JS FILE', pPath, pId );
+
+		if ( pId !== undefined ){
+			$.each( tb.require.groups, function( i, v ){
+				if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
+					//console.log('APPEND TO', pPath, pId, $.extend( true, [], tb.require.groups ) );
+					tb.require.groups[i].push( pPath );
+				}
+			});
+		}
+
 		function completed(){
+			var ns = pPath.replace(/\//g, '.').replace(/.js$/, ''),
+				ns = tb.nameSpace( ns );
+
 			// make sure, this is called only once
 			if ( done ) return;
 			done = true;
+
+			//console.log('LOAD JS FILE CALLBACK', pPath);
+			
 			c.set( pPath, 1 );
             tb.loader.count( -1, 'JS: ' + pPath );
-			if ( pCb ) pCb();
+			//if ( pCb ) pCb();
+			
+			// check for further requirements:
+			//console.log('SCAN JS FILE ' + pPath, ns, 'RG = ', pId );
+			if ( ns && $.isPlainObject(ns) ){ 
+				//console.log('SCAN JS FILE is plain object', ns, 'RG = ', pId );
+				$.each( ns, function( i, v ){
+					//console.log('SCAN JS FILE check ' + i);
+					if ( (/\./).test(i) ){ // a 'dotted' property
+						if ( i === 'tb.require' ){
+							//console.log( 'DOTTED "tb.require" loading ' + v );
+							tb.require( // load requirement array into existing requirement group
+								v, 
+								(function(o, pCb){ return function(){
+									delete o['tb.require'];
+									if (pCb) {
+										//console.log('REQUIREMENT LOADER CALLBACK execute', pCb.toString() );
+										pCb();
+									} 
+									tb.require.checkGroups();
+								};})( ns, pCb ),
+								pId
+							);
+						} else { // other dotted property
+							var o = tb.nameSpace( i, true ); // create empty object if nothing present
+							//console.log( 'DOTTED "'+ i +'" check ', o );
+							if ( $.isPlainObject( o ) && $.isEmptyObject( o ) ){ // no content in this namespace 
+								//console.log( 'DOTTED "'+ i +'" loading...' );
+								var fn = i.replace( /\./g, '/' ) + '.js';
+								tb.loader.load( // load js file 
+									fn, 
+									(function(o, pCb){ return function(){ // load requirement array
+										if (pCb) {
+											//console.log('JS LOADER CALLBACK execute', pCb.toString() );
+											pCb();
+										} 
+										tb.require.checkGroups();
+									};})( ns, pCb ),
+									pId
+								); 
+							}
+						}
+					}
+				});
+			}
+
+			// now check groups
 			tb.require.checkGroups();
 		}
 		
@@ -1443,15 +1545,15 @@ tb.loader.js = (function () {
 		 * @function
 		 * @memberOf tb.loader.js
 		 */
-        load: function ( pPath, pCb ) {
+        load: function ( pPath, pCb, pId ) {
             var url,
                 pCb = pCb || tb.nop;
 
         	if ( !pPath ) return;
         	url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
 			tb.loader.count( 1, 'JS: ' + pPath );
-            c.set( pPath, 0 );   	
-        	addScript( pPath, url, pCb);
+            c.set( pPath, 0 );  
+        	addScript.apply( this, [ pPath, url, pCb, pId ] );
         },
 
         test: function( pPath ){

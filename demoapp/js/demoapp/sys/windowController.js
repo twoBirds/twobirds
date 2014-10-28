@@ -1,53 +1,47 @@
-tb.nameSpace('demoapp.sys').windowController = {
+tb.nameSpace( 'demoapp.sys', true ).windowController = {
 
 	name: 'demoapp.windowController',
 
-    'tb.require': [ // window is predictive load
-    	'tb/ui/scroll.js',
-    	'demoapp/sys/windowController.css',
-		'demoapp/sys/window.js',
-		'demoapp/sys/window.html',
-		'demoapp/sys/window.css'
+    'tb.require': [
+    	'demoapp/sys/windowController.css'
 	],
 
-	'tb.events': [ // what events do i listen to ?
-		{	name: 'tb.require:done',
-			handler: function(ev){
-				if ( this.ready ) return;
-				//console.log('controller init');
-				this.ready = true;
-				
-				this['tb.ui.scroll'] = {
-					direction: 'y',
-			        bubbleUp: false,
-			        pixelsPerSecond: 2000,
-			        attachDelay: 0,
-			        easing: 'swing'
-    			};
-    			this.inject( 'tb.ui.scroll' );
-			}
-		},
+	'tb.ui.scroll': {
+		direction: 'y',
+	    bubbleUp: false,
+	    pixelsPerSecond: 2000,
+	    attachDelay: 0,
+	    easing: 'swing'
+	},
 
-		{	name: /scroll:ready/,
-			handler: function(ev){
-				//console.log('controller /scroll:ready/', this);
-				// add test window(s)
-				//this.trigger('addWindow', 'demoapp/infoWindow.js');
-				this.trigger('scroll:update');
+	handlers: { 
+		'tb.init': [
+			function windowController_tb_init(ev){
+				if ( this.ready === true ) return;
+				console.log('windowController_tb_init', this);
+				this.ready = true;
+			}
+		],
+
+		'scroll.ready': [
+			function windowController_scroll_ready(ev){
+				//console.log('windowController_scroll_ready');
+				this.trigger('this:scroll.update:ld');
 				return false;
 			}
-		},
+		],
 
-		{	name: 'addWindow',
-            handler: function(ev){
-				//console.log('controller /addWindow/', this);
+		'addWindow': [
+			function windowController_addWindow(ev){
+				//console.log('windowController_addWindow');
 				$( this.target ).find('.__scroll-content:first').prepend( '<div data-tb="' + ev.data + '"></div>' );
 				this.initChildren();
-				this.trigger('scroll:update');
-				this.trigger('scroll:scrollTo', 0);
+				this.trigger('this:scroll.update:ld');
+				this.trigger('this:scroll.scrollTo:ld', 0);
+				return false;
 			}
-		}
+		]
 
-	]
+	}
 
 };

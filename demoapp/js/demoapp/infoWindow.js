@@ -13,22 +13,20 @@ demoapp.infoWindow = {
 		'demoapp/infoWindow.html'
 	],
 
-	'tb.events': [ // what events do i listen to ?
-		{	name: 'tb.require:done',
-			handler: function(ev){
+	handlers: {
+		'tb.init': [
+			function infoWindow_tb_init(ev){
 				if (this.ready) return;
 				this.ready = true;
 			}
-		},
+		],
 
-		{	name: 'scroll:ready',
-			handler: function(ev){
+		'scroll.ready': [
+			function infoWindow_scroll_ready(ev){
 				$(this.target).find('.__scroll-content').html( tb.loader.get('demoapp/infoWindow.html') );
-				tb(/windowController/).trigger('scroll:update')
-				this.trigger('scroll:update');
+				this.trigger('root:scroll.update:ld');
 			}
-		}
-
-	]
+		]
+	}
 
 };

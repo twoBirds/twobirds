@@ -9,9 +9,9 @@ tb.nameSpace('demoapp.sys').window = {
 		'demoapp/sys/window.css'
 	],
 
-	'tb.events': [ // what events do i listen to ?
-		{	name: 'tb.require:done',
-			handler: function(ev){
+	handlers: {
+		'tb.init': [
+			function sys_window_tb_init(ev){
 				if ( this.ready ) return;
 				this.ready = true;
 				
@@ -34,14 +34,14 @@ tb.nameSpace('demoapp.sys').window = {
 					.html( tb.loader.get('demoapp/sys/window.html') )
 					.on( 'click', (function(that){ return function(){
 						//console.log('onClick trigger window:active', true);
-						that.trigger('window:active', true);
+						that.trigger(':window.active:', true);
 					};})(this) );
 
-				console.log( this.target );
+				//console.log( this.target );
 				var content = $( this.target ).find('> div > div:nth-child(2)'),
 					title = $( this.target ).find('> div > div:nth-child(1)'),
 					status = $( this.target ).find('> div > div:nth-child(3)');
-				console.log( content[0] );
+				//console.log( content[0] );
 				
 				content.css('height', this.config.height );
 				title.text( this.config.title || '&nbsp;' );
@@ -57,31 +57,31 @@ tb.nameSpace('demoapp.sys').window = {
     			};
     			this.inject( 'tb.ui.scroll' );
 
-				this.trigger('window:active', true)
+				this.trigger(':window.active:', true)
 			}
-		},
+		],
 
-		{	name: 'window:close',
-			handler: function(ev){
+		'window.close': [
+			function sys_window_close(ev){
 				if ( this.canClose || ev.data === true ){
 					var next = $( this.target ).next();
-					if ( next[0] ) next.data('tbo').trigger('window:active', true);
+					if ( next[0] ) next.data('tbo').trigger(':window.active:ld', true);
 					$( this.target ).detach();
-					tb(/windowController/).trigger('scroll:update');
+					tb(/windowController/).trigger(':scroll.update:ld');
 					return;
 				}
-				this.descendants().trigger({ name: 'window:closeRequested' });
+				this.descendants().trigger({ name: ':window.closeRequested:' });
 				this.canClose = true;
 				setTimeout( (function(that){ return function(){
 					if ( that.canClose ){
-						that.trigger('window:close', true);
+						that.trigger(':window.close:', true);
 					}
 				};})(this), 300)
 			}
-		},
+		],
 
-		{	name: 'window:active',
-			handler: function(ev){
+		'window.active': [
+			function sys_window_active(ev){
 				//console.log('window:active', ev.data, this );
 				if ( this.active === ev.data ) return;
 				this.active = ev.data;
@@ -92,22 +92,22 @@ tb.nameSpace('demoapp.sys').window = {
 	                	checkname = this._root().name;
 					if (windows instanceof Array) $.each( windows, function( i, v ){
 		                if( v.name !== checkname ){
-				            v.trigger('window:active', false);
+				            v.trigger(':window.active:ld', false);
 		                }
 	                });
 				} else {
 					win.removeClass('_demoapp-window-active');
 				}
 			}
-		},
+		],
 
-		{	name: 'window:denyclose',
-			handler: function(ev){
+		'window:denyclose': [
+			function sys_window_denyclose(ev){
 				console.log('window deny close', ev.data);
 				that.canClose = false;
 			}
-		}
+		]
 
-	]
+	}
 
 };

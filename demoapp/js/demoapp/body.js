@@ -1,10 +1,10 @@
-demoapp.body = {
+tb.nameSpace( 'demoapp', true ).body = {
 
 	name: 'demoapp.body',
 
-	'tb.events': [ 
-		{	name: /tb.require:done/, 
-			handler: function(ev){
+	handlers: {
+		'tb.init': [
+			function body_init(ev){
 				$(this.target).html( tb.loader.get('demoapp/body.html') );
 
 				var url = $('.thissitenamelink')
@@ -13,8 +13,8 @@ demoapp.body = {
 
 				this.initChildren();
 			}
-		}
-	],
+		]
+	},
 
 	'tb.require': [
 		'demoapp/props/icomoon/style.css',

@@ -1,6 +1,4 @@
-tb.ui = tb.ui || {};
-
-tb.ui.scroll = {
+tb.nameSpace('tb.ui', true).scroll = {
 
 	name: 'tb.ui.scroll',
 
@@ -10,33 +8,33 @@ tb.ui.scroll = {
 		'tb/ui/scroll.css'
 	],
 
-	handlers: [
+	handlers: {
 
 		// requirement loading done - start init
-		{	name: 'tb.require:done',
-			handler: function(ev){
+		'tb.init': [
+			function scroll_tb_init(ev){
 				if (this.ready) return;
 				this.ready = true;
 				// console.log('scroll req loaded');
 				this.init.apply( this );
 			}
-		},
+		],
 
 		// toggle scroll active class ( & freeze surrounding scroll )
-		{	name: /scroll:active/,
-			handler: function (ev) {
+		'scroll.active': [
+			function scroll_active(ev) {
 				//console.log('HANDLER FUNCTION scrollActive', ev.data, this);
 				if (ev.data) {
 					// disable all other scrolls
 					var scrolls = tb(/tb.ui.scroll/);
 					$.each( scrolls, function( i, v ){
 						if ( v.id !== this.id ){
-							v.trigger('scroll:active', false)
+							v.trigger('this:scroll.active:ld', false)
 						}
 					});
 					// now activate this one
 					this.scrollRoot.addClass('_tb-ui-scroll-active');
-					this.parents(/tb.ui.scroll/).trigger('scroll:active', false);
+					this.parents(/tb.ui.scroll/).trigger('this:scroll.active:ld', false);
 					this.scrollRoot.css('overflow-'+this.config.direction, 'scroll');
 					this.active = true;
 				} else {
@@ -45,11 +43,11 @@ tb.ui.scroll = {
 					this.active = false;
 				}
 			}
-		},
+		],
 
 		// freeze scroll
-		{	name: /scroll:freeze/,
-			handler: function (ev) {
+		'scroll.freeze': [
+			function scroll_freeze(ev) {
 				//console.log('HANDLER FUNCTION scrollEnable', pBool);
 				var self = this.scrollRoot,
 					root = this.root,
@@ -65,25 +63,25 @@ tb.ui.scroll = {
 					self.addClass('_tb-ui-scroll-frozen');
 				}
 
-				this.trigger('scroll:update');
+				this.trigger(':scroll.update:');
 						
 			}
-		},
+		],
 
 		// enable scroll
-		{	name: /scroll:enable/,
-			handler: function (ev) {
+		'scroll.enable': [
+			function scroll_enable(ev) {
 				//console.log('HANDLER FUNCTION scrollEnable', pBool);
 				this.isScrollEnabled = ev.data;
 				//console.log('enable', pBool, self);
-				this.trigger('scroll:update');
-				this.parent().trigger('scroll:enable', !ev.data); // disable/enable parent scroll ***
+				this.trigger(':scroll.update:');
+				this.parent().trigger(':scroll.enable:', !ev.data); // disable/enable parent scroll ***
 			}
-		},
+		],
 
 		// toggle scrollon class ( blink effect when moved )
-		{	name: /scroll:scrolling/,
-			handler: function(ev){
+		'scroll.scrolling': [
+			function scroll_scrolling(ev){
 				//console.log('HANDLER FUNCTION scrollScrolling:', ev );
 				if (ev.data) {
 					this.scrollRoot.addClass('_tb-ui-scroll-scrolling');
@@ -91,11 +89,12 @@ tb.ui.scroll = {
 					this.scrollRoot.removeClass('_tb-ui-scroll-scrolling');
 				}
 			}
-		},
+		],
 
 		// create scroll DOM structure
-		{	name: /scroll:init/,
-			handler: function(ev){
+		'scroll.init': [
+			function scroll_init(ev){
+				//console.log( 'SCROLL INIT', this );
 				// make dom substructure
 				//console.log(this, ev);
 				
@@ -149,14 +148,14 @@ tb.ui.scroll = {
 				// this indicates the scroll is moving or has been activated
 				this.scrollOn = (function (that) {
 					return function () {
-						that.trigger('scroll:scrolling', true);
+						that.trigger(':scroll.scrolling:', true);
 
 						clearTimeout(this.scrollingClassTimeout);
 
 						this.scrollingClassTimeout = setTimeout(
 							(function (that) {
 								return function () {
-									that.trigger('scroll:scrolling', false);
+									that.trigger(':scroll.scrolling:', false);
 								};
 							})(this),
 							500
@@ -184,12 +183,12 @@ tb.ui.scroll = {
 
 					//console.log('scroll', that);
 					that.scrollOn();
-					that.trigger('scroll:update');
+					that.trigger(':scroll.update:');
 
 					if (!$._data( that.scrollRoot[0], "events").mousewheel ) {
 						// if no wheel handler attached here & not about to -> its a touch event
 						//console.log('touch event SCROLL');
-						that.scrollRoot.trigger('scroll:active', true);
+						that.scrollRoot.trigger(':scroll.active:', true);
 					}
 
 					ev.stopPropagation();
@@ -207,7 +206,7 @@ tb.ui.scroll = {
 							ev.preventDefault();
 							return false;
 						}
-						that.trigger('scroll:wheelHandlerTimeout');
+						that.trigger(':scroll.wheelHandlerTimeout:');
 						//ev.stopImmediatePropagation();
 					 };})(this),
 					(function(that){ return function (ev) {
@@ -223,8 +222,8 @@ tb.ui.scroll = {
 						window.clearTimeout(this.attachWheelHandlerTimeout);
 						this.attachWheelHandlerTimeout = null;
 
-						that.trigger('scroll:detachWheelHandler');
-						that.trigger('scroll:active', false);
+						that.trigger(':scroll.detachWheelHandler:');
+						that.trigger(':scroll.active:', false);
 
 					};})(this)
 				);
@@ -233,8 +232,8 @@ tb.ui.scroll = {
 					'click',
 					(function(that){ return function(ev){
 						////console.log('scrollContainer click', that );
-						that.trigger('scroll:active', true);
-						that.trigger('scroll:attachWheelHandler');
+						that.trigger(':scroll.active:', true);
+						that.trigger(':scroll.attachWheelHandler:');
 						//ev.stopPropagation();
 					};})(this)
 				);
@@ -286,22 +285,22 @@ tb.ui.scroll = {
 				this.scrollOn();
 
 				if( this.root.is(':hover') ) {
-					this.trigger('scroll:wheelHandlerTimeout');
+					this.trigger(':scroll.wheelHandlerTimeout:');
 				} else {
-					this.trigger('scroll:active', false);
+					this.trigger(':scroll.active:', false);
 				}
 
-				this.trigger('scroll:update');
-				this._super.trigger('scroll:ready');
+				this.trigger(':scroll.update:');
+				this._super.trigger(':scroll.ready:');
 			}
-		},
+		],
 		
 		// attach scrollTo handler
-		{	name: /scroll:scrollTo/,
-			handler: function (ev) {
+		'scroll.scrollTo': [
+			function scroll_scrollTo(ev) {
 				//console.log('HANDLER FUNCTION scrollTo', ev.data, this);
 				if (this.isScrollFrozen) return;
-				this.scrollRoot.trigger('scroll:stopAnimation');
+				this.scrollRoot.trigger(':scroll.stopAnimation:');
 				var dir = this.direction,
 					myProps = {},
 					elm = this.scrollRoot,
@@ -313,35 +312,20 @@ tb.ui.scroll = {
 				this.scrollOn();
 				elm[0][which] = ev.data;
 			}
-		},
-
-		// mouse enter handler
-		/*
-		{	name: /scroll:mouseEnter/,
-			handler: function (ev) {
-				console.debug('HANDLER mouseEnter', this);
-				if ($._data( this.scrollRoot[0], "events").mousewheel
-					|| this.attachWheelHandlerTimeout !== null
-					|| this.scrollRoot.hasClass('_tb-ui-scroll-active') === true) {
-					return;
-				}
-				this.trigger('scroll:wheelHandlerTimeout');
-			}
-		},
-		*/
+		],
 
 		// stop animation handler
-		{	name: /scroll:stopAnimation/,
-			handler: function (ev) {
+		'scroll.stopAnimation': [
+			function scroll_stopAnimation(ev) {
 				//console.log('HANDLER FUNCTION scrollStopAnimation');
 				this.root.stop();
 			}
-		},
+		],
 
 		// update scrollbar size and position
-		{	name: /scroll:update/,
-			handler: function (ev) {
-				//console.log('scroll update handler', this);
+		'scroll.update': [
+			function scroll_update(ev) {
+				//console.log('SCROLL UPDATE', this);
 				var dir = this.config.direction,
 					root = this.root,
 					self = this.scrollRoot,
@@ -396,20 +380,20 @@ tb.ui.scroll = {
 				this.scrollRoot.addClass('_tb-ui-scroll-on');
 				//tb.nop(this.scrollRoot[0].offsetHeight);
 			}
-		},
+		],
 
 		// attach wheel handler timeout
-		{	name: /scroll:wheelHandlerTimeout/,
-			handler: function (ev) {
+		'scroll.wheelHandlerTimeout': [
+			function scroll_wheelHandlerTimeout(ev) {
 				//console.log( 'HANDLER scroll:wheelHandlerTimeout', this);
 				if (!this.attachWheelHandlerTimeout && !$._data( this.scrollRoot[0], "events")['mousewheel']) { // attach only once
-					attachWheelHandlerTimeout = window.setTimeout(
+					this.attachWheelHandlerTimeout = window.setTimeout(
 						(function (that) {
 							return function () {
 								//console.log('TIMEOUT CALLBACK FUNCTION scroll:wheelHandlerTimeout');
-								that.parents(/tb.ui.scroll/).trigger( 'scroll:detachWheelHandler' );
+								that.parents(/tb.ui.scroll/).trigger( 'this:scroll.detachWheelHandler:ld' );
 								that.attachWheelHandlerTimeout = null;
-								that.trigger('scroll:attachWheelHandler');
+								that.trigger(':scroll.attachWheelHandler:');
 							};
 						})( this ),
 						// if parent scroll -> delay
@@ -417,11 +401,11 @@ tb.ui.scroll = {
 					);
 				}
 			}
-		},
+		],
 
 		// attach wheel handler
-		{	name: /scroll:attachWheelHandler/,
-			handler: function (ev) {
+		'scroll.attachWheelHandler': [
+			function scroll_attachWheelHandler(ev) {
 				//console.debug('HANDLER FUNCTION attachWheelHandler', this);
 				var root = this.root,
 					self = this.scrollRoot,
@@ -439,7 +423,7 @@ tb.ui.scroll = {
 				
 				// activate scroll
 				this
-					.trigger('scroll:active', true);
+					.trigger(':scroll.active:', true);
 
 				//console.log('attach');
 				// attach native handler
@@ -461,7 +445,7 @@ tb.ui.scroll = {
 							return;
 						}                                        
 						
-						that.trigger('scroll:update');
+						that.trigger(':scroll.update:');
 						that.scrollOn();
 
 						elm[0][which] = np;
@@ -477,13 +461,13 @@ tb.ui.scroll = {
 					};})(this) );
 			
 			}
-		},
+		],
 
 		// detach wheel handler
-		{	name: /scroll:detachWheelHandler/,
-			handler: function(ev) {
+		'scroll.detachWheelHandler': [
+			function scroll_detachWheelHandler(ev) {
 				//console.debug('HANDLER FUNCTION detachWheelHandler', this);
-				this.trigger('scroll:active', false);
+				this.trigger(':scroll.active:', false);
 
 				// kill timeout, just to be sure
 				window.clearTimeout(this.attachWheelHandlerTimeout);
@@ -492,23 +476,23 @@ tb.ui.scroll = {
 				//console.log( 'dwh events', $._data( this.scrollRoot[0], 'events') );
 				this.scrollRoot.off('mousewheel');
 			}
-		},
+		],
 
-		// detach wheel handler
-		{	name: /destroy/,
-			handler: (function(that){ return function(ev) {
+		// destroy scroll
+		'destroy': [
+			(function(that){ return function(ev) {
 				this.root
 					.off('mouseenter')
 					.off('mouseleave');
 				$( this.target ).html( this.scrollContent.detach() );
 			};})(this)
-		}
-	],
+		]
+	},
 
-	init: function( config ){
+	init: function(){
 		//console.log('scroll init');
 		//console.log($(this.target).data('tbo')['tb.ui.scroll'], this.parent(), this.parent()['tb.ui.scroll']);
-		this.trigger('tb.ui.scroll:init', $.extend(
+		this.trigger(':scroll.init:', $.extend(
 			true,
 			{ // default
 				direction: 'y',
@@ -532,7 +516,7 @@ tb.ui.scroll = {
 			scrollClickFactor = p / maxScrollBar,
 			newOffset = maxScroll * scrollClickFactor;
 		//console.log('setNewOffset', p, dir, maxScroll, maxScrollBar, scrollClickFactor, newOffset);            
-		this.trigger('scroll:scrollTo', newOffset);
+		this.trigger(':scroll.scrollTo:', newOffset);
 	},
 
 	setNewOffset: function(pPixelDifference) {
@@ -545,7 +529,7 @@ tb.ui.scroll = {
 			scrollFactor = maxScroll / maxScrollBar,
 			newOffset = (this.dragstarthandle + pPixelDifference) * scrollFactor;
 		//console.log('setNewOffset', newOffset);            
-		this.trigger('scroll:scrollTo', newOffset);
+		this.trigger(':scroll.scrollTo:', newOffset);
 	},
 
 	isTouchDevice: (function() { // run only once
@@ -558,6 +542,6 @@ tb.ui.scroll = {
 // attach window resize handler
 $(window).on('resize', function () {
 	//console.log('window RESIZE captured');
-	tb(/tb.ui.scroll/).trigger('scroll:update');
+	tb(/tb.ui.scroll/).trigger('scroll.update');
 });
 
