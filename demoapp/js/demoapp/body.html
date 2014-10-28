@@ -25,7 +25,8 @@
 <!-- middle left -->
 <div id="middleleft" class="middlearea">
 	<div><a href="#" onclick="tb(/cont/i).trigger('addWindow', 'demoapp/infoWindow.js');return false;">new middle window</a></div>
-	<div><a href="#" onclick="var myWin = tb(/info/); if ( myWin instanceof tb || ( myWin[0] !== undefined ) ) myWin = myWin instanceof tb ? myWin : myWin[0]; myWin.trigger('window:close'); return false;">remove top window</a></div>
+	<div><a href="#" onclick="var myWin = tb(/cont/i).children(); if ( myWin instanceof tb || ( myWin[0] !== undefined ) ) myWin = myWin instanceof tb ? myWin : myWin[0]; myWin.trigger('this:window.close:ld'); return false;">remove top window</a></div><br>
+	<div><a href="#" onclick="tb(/cont/i).trigger('addWindow', 'demoapp/webglWindow.js');return false;">new webgl test window</a></div>
 </div>
 <!-- middle center -->
 <div id="middlecenter" class="middlearea">

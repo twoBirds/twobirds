@@ -15,7 +15,7 @@ tb.nameSpace('demoapp.sys').window = {
 				if ( this.ready ) return;
 				this.ready = true;
 				
-				//console.log('window init', ev);
+				console.log('WINDOW INIT', ev);
 
 				// mix configuration
 				this.config = $.extend( 
@@ -24,7 +24,8 @@ tb.nameSpace('demoapp.sys').window = {
 						title: '<title placeholder>',
 						height: '200px',
 						canClose: false,
-						status: '<status placeholder>'
+						status: '<status placeholder>',
+						scrollBar: true
 					}, 
 					this.config 
 				);
@@ -47,22 +48,32 @@ tb.nameSpace('demoapp.sys').window = {
 				title.text( this.config.title || '&nbsp;' );
 				status.text( this.config.status || '&nbsp;' );
 
-				this['tb.ui.scroll'] = {
-					content: content[0],
-					direction: 'y',
-			        bubbleUp: true,
-			        pixelsPerSecond: 2000,
-			        attachDelay: 2000,
-			        easing: 'swing'
-    			};
-    			this.inject( 'tb.ui.scroll' );
+				this.content = content;
+				
+				if ( this.config.scrollBar === true ) {
 
-				this.trigger(':window.active:', true)
+					this['tb.ui.scroll'] = {
+						content: content[0],
+						direction: 'y',
+				        bubbleUp: true,
+				        pixelsPerSecond: 2000,
+				        attachDelay: 2000,
+				        easing: 'swing'
+	    			};
+
+	    			this.inject( 'tb.ui.scroll' );
+
+					this.content = $(this.target).find('.__scroll-content');
+				}
+
+				this.trigger(':window.active:', true);
+				this.trigger(':window.ready:lu');
 			}
 		],
 
 		'window.close': [
 			function sys_window_close(ev){
+				console.log( 'WINDOW CLOSE', this._super.name )
 				if ( this.canClose || ev.data === true ){
 					var next = $( this.target ).next();
 					if ( next[0] ) next.data('tbo').trigger(':window.active:ld', true);
@@ -101,7 +112,7 @@ tb.nameSpace('demoapp.sys').window = {
 			}
 		],
 
-		'window:denyclose': [
+		'window.denyclose': [
 			function sys_window_denyclose(ev){
 				console.log('window deny close', ev.data);
 				that.canClose = false;

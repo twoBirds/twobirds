@@ -17,6 +17,7 @@ tb.nameSpace( 'demoapp', true ).body = {
 	},
 
 	'tb.require': [
+		'demoapp/webglWindow/CubicVR.js', // must be preloaded, strange behaviour
 		'demoapp/props/icomoon/style.css',
 		'demoapp/body.html',
 		'demoapp/body.css'
