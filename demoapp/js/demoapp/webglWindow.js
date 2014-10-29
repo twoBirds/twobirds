@@ -37,7 +37,8 @@ demoapp.webglWindow = {
 				ev.origin.content.append( renderer.domElement ); 
 				
 				var geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
-				var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ); 
+				//var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ); 
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ); 
 				var cube = new THREE.Mesh( geometry, material ); 
 				
 				scene.add( cube ); 
@@ -51,10 +52,14 @@ demoapp.webglWindow = {
 				
 				camera.position.z = 5; 
 				
+				var cameraMove = -0.02;
+
 				var render = function () { 
 					requestAnimationFrame( render ); 
-					cube.rotation.x += 0.1; 
-					cube.rotation.y += 0.1; 
+					cube.rotation.x += 0.05; 
+					cube.rotation.y += 0.05; 
+					camera.position.z += cameraMove;
+					if ( camera.position.z < 2 || camera.position.z > 5 ) cameraMove *= -1;
 					renderer.render(scene, camera); 
 				}; 
 
