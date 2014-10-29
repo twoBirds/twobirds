@@ -28,17 +28,11 @@ STATUS:
 - will be updated w/ new functionality (chained) as needed
 
 FIRST PEEK:
-- http://dev.two-birds.selfhost.eu
+- http://demo.two-birds.ch
 - browser maximized or full-screen please, only desktop css
-- => demo for a non-native scroll widget implementation
-- BEWARE:
-- resides on one of my home computers
-- riddled by ongoing development: if you are lucky it works
-- may be offline
-- contact skype: frank.thuerigen if you want it stable for a while
+- contact skype: frank.thuerigen if you have questions
 
 QUICKSTART:
-- read twobirds.5.0.pdf
 - copy demoapp code to a web server
 - open index.html in browser
 - have a look
