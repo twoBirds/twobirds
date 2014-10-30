@@ -141,11 +141,51 @@ if (!Array.prototype.indexOf)
 		return { // public prototype, public static vars
 
 			addHandler: function( pName, pFunction ){
-				// TBD
+
+				if ( pName === undefined 
+					|| pFunction === undefined
+					|| typeof pName !== 'string'
+					|| typeof pFunction !== 'function'){
+					return;
+				}
+
+				if ( this['handlers'] === undefined ){
+					this.handlers = {};
+				}
+				if ( this['handlers'][pName] === undefined ){
+					this['handlers'][pName] = [];
+				}
+				
+				this['handlers'][pName].push( pFunction );
 			},
 
 			removeHandler: function( pName, pFunction ){
-				// TBD
+
+				if ( pName === undefined 
+					|| pFunction === undefined
+					|| typeof pName !== 'string'
+					|| typeof pFunction !== 'function'){
+					return;
+				}
+
+				if ( this['handlers'] === undefined || this['handlers'][pName] === undefined ){
+					return;
+				}
+				
+				var a = [];
+
+				$.each( this['handlers'][pName], function( i, v ){
+					if ( v !== pFunction ){
+						a.push( v );
+					}
+				});
+
+				if ( a.length > 0){
+					this['handlers'][pName] = a;
+				} else {
+					this['handlers'][pName] = null;			
+					delete this['handlers'][pName];			
+				}
 			},
 
 			handle: function( evt ){
