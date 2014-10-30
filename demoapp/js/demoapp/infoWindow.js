@@ -20,7 +20,8 @@ demoapp.infoWindow = {
 		},
 
 		'scroll.ready': function infoWindow_scroll_ready(ev){
-			$(this.target).find('.__scroll-content').html( tb.loader.get('demoapp/infoWindow.html') );
+			console.log( 'scroll.ready', this, this['demoapp.sys.window'].content );
+			this['demoapp.sys.window'].content.html( tb.loader.get('demoapp/infoWindow.html') );
 			this.trigger('root:scroll.update:ld');
 		}
 	}

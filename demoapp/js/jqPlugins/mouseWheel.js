@@ -214,4 +214,3 @@
         return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
     }
 }));
-//# sourceMappingURL=jquery.mousewheel.js.map

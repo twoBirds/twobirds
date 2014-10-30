@@ -46,7 +46,9 @@ tb.nameSpace('demoapp.sys').window = {
 			this.content = content;
 			
 			if ( this.config.scrollBar === true ) {
-
+				// SPECIAL CASE: 
+				// no requirement loading necessary, 
+				// since parent() already has a scroll!
 				this['tb.ui.scroll'] = {
 					content: content[0],
 					direction: 'y',
@@ -62,7 +64,7 @@ tb.nameSpace('demoapp.sys').window = {
 			}
 
 			this.trigger(':window.active:', true);
-			this.trigger(':window.ready:lu');
+			this._super().trigger(':window.ready:lu');
 		},
 
 		'window.close': function sys_window_close(ev){

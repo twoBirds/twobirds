@@ -204,14 +204,15 @@ if (!Array.prototype.indexOf)
 						if ( bubble.indexOf('l') > -1 ){ // local
 							if ( bubble.indexOf('d') > -1 ){ // down
 								$.each( this, function( i, v ){
-									if ( /\./.test(i) && /^_/.test(i) === false && v instanceof tb ){ // this one is a subobject
+									if ( /\./.test(i) && v instanceof tb ){ // this one is a subobject
 										cont = handleEvent.apply( that[i], [evt] ) === false ? false : true;
 									}
 								});
 							}
-							if ( bubble.indexOf('u') ){ // down
-								if ( this['_super'] ){ // this one is a subobject
-									cont = handleEvent.apply( this['_super'], [evt] ) === false ? false : true;
+							if ( bubble.indexOf('u') > -1 ){ // up
+								if ( this['_super'] !== undefined ){ // this one is a subobject
+									//console.log( 'bubble up', evt.name, evt.bubble, bubble, that.name, that._super().name );
+									cont = handleEvent.apply( that._super(), [evt] ) === false ? false : true;
 								}
 							}
 						}
@@ -300,13 +301,13 @@ if (!Array.prototype.indexOf)
 					return r.length === 1 ? r[0] : r;
 				
 				} else if ( this instanceof tb ) { // instanceof tb, normal method
-					var root = this['_super'] ? this._root() : this,
+					var root = this['_super'] !== undefined ? this._root() : this,
 						result = false,
 						names = [];
 
 					function walk( pTb ){
 						$.each( pTb, function( i, v ){
-							if ( v instanceof tb && v['_super'] ){ // sub object, not handle to foreign tb element
+							if ( v instanceof tb && v['_super'] !== undefined ){ // sub object, not handle to foreign tb element
 								names.push( v.name );
 								walk( v );
 							}
@@ -336,7 +337,7 @@ if (!Array.prototype.indexOf)
 			},
 
 			initChildren: function(){
-				if ( this['_super'] ) return this._root().initChildren();
+				if ( this['_super'] !== undefined ) return this._root().initChildren();
 				if ( this['target'] ) {
 					var elms = $(this.target)
 									.find('[data-tb]')
@@ -367,68 +368,87 @@ if (!Array.prototype.indexOf)
 			inject: function( namespace, props, recurse ){
 
 				var obj = tb.nameSpace( namespace, true ),
-					props = props || this[namespace];
+					props = props || this[namespace],
+					that = this;
+
+				if ( $.isEmptyObject(this[namespace]) ){
+					this[namespace] = new tb( this.target );
+				}
 
 				// depending on the type of the loaded resource...
 				switch( typeof obj ){
+
 					case 'function':
 						if ( obj.prototype === Function.prototype ){
 							obj.apply( this['_root'] ? this._root() : this, [ this[namespace] ] );
 						} else { // a constructor
-							var c = tb.nameSpace(namespace); // constructor
-							var r = new c( this[namespace] );
+							var c = tb.nameSpace(namespace), // constructor
+								r = new c( this[namespace] );
 							this[namespace] = r;
 						}
 						break;
+
 					case 'object':
-						var props = this[namespace];
-						this[namespace] = new tb( this.target );
+						var props = this[namespace],
+							tbo = new tb( this.target );
 
 						$.extend( // mix in repo object
 							true,
-							this[namespace],
-							obj,
-							{
-								_super: this, 
-								config: props,
-								_root: function(){
-									var that = this;
-									while ( that._super ){
-										that = that._super;
-									}
-									return $( that.target ).data('tbo');
-								} 
-							}
+							tbo,
+							obj
 						); 
 
-						var that = this;
-
-						// walk handlers and convert to array if necessary
-						if ( that[namespace]['handlers'] && $.isPlainObject( that[namespace]['handlers'] ) ) {
-							$.each( that[namespace]['handlers'], function( i, v ){
+						// walk handlers and convert each to array of functions if necessary
+						if ( tbo['handlers'] && $.isPlainObject( tbo['handlers'] ) ) {
+							$.each( tbo['handlers'], function( i, v ){
 								if ( $.isFunction(v) ){
-									that[namespace]['handlers'][i] = [ v ]; // convert to array to be able to add more handlers for this event
+									tbo['handlers'][i] = [ v ]; // convert to array to be able to add more handlers for this event
 								}
 							});
 						}
 
 						// walk object, recursive inject tb objects
-						$.each( this[namespace], function( i, v ){
-							if ( that[namespace].hasOwnProperty( i ) && that[namespace][i] !== that[i] ){
+						$.each( tbo, function( i, v ){
+							if ( tbo.hasOwnProperty( i ) ){
 								if ( /\./.test( i ) && i !== 'tb.require' ){ // it is a dotted (namespaced) element
 									// recursive inject
-									var o = that[namespace];
-									o.inject.apply( o, [ i, props, true ] );
+									//console.log( 'recursive INJECT', i, 'INTO', tbo.name, 'PROPS', v );
+									tbo.inject.apply( tbo, [ i, v, true ] );
+									//console.log( 'result INJECTED', tbo );
 								}
 							}
 						});
+
+						$.extend( // mix in special properties
+							true,
+							tbo,
+							{
+								config: props,
+								_root: function(){
+									var that = this;
+									while ( that['_super'] ){
+										that = that._super();
+									}
+									return that;
+								},
+								_super: (function(that){ return function(){
+									return that;
+								};})(this)
+							}
+						);
+
+						this[namespace] = tbo;
+
+						//console.log( 'result after [' + namespace + '] is injected:', this );
 						break;
+
 					default: 
 						//console.log('no handler -> ran into default', i );
 						break;
 				}
+
 				if ( recurse !== true ) this.trigger('root:tb.init:ld');
-				if ( !this['_super']) $( this.target ).data('tbo', this);
+				if ( !this['_super'] ) $( this.target ).data('tbo', this);
 			},
 
 			parents: function( s ){

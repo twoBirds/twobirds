@@ -126,12 +126,8 @@ tb.nameSpace('tb.ui', true).scroll = {
 			this.dragmode = false;
 			
 			// inject content position into super object
-			//console.log('scroll target', this.target);
-			//console.log('scroll content', this.scrollContent );
-			this._super.content = this.scrollContent;
+			this._super().content = this.scrollContent;
 
-			//if ( ( /dow$/ ).test( this._super.name ) ) debugger;
-			//console.log(this)
 			this.scrollRoot.addClass( '_tb-ui-scroll-' + this.config.direction );
 
 			// this indicates the scroll is moving or has been activated
@@ -280,7 +276,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 			}
 
 			this.trigger(':scroll.update:');
-			this._super.trigger(':scroll.ready:');
+			this.trigger(':scroll.ready:lu');
 		},
 		
 		// attach scrollTo handler

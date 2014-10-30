@@ -17,7 +17,6 @@ tb.nameSpace( 'demoapp.sys', true ).windowController = {
 	handlers: { 
 		'tb.init': function windowController_tb_init(ev){
 			if ( this.ready === true ) return;
-			console.log('windowController_tb_init', this);
 			this.ready = true;
 		},
 
