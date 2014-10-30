@@ -6,19 +6,13 @@ demoapp.globalSpinner = {
 
 	handlers: {
 
-		'tb.loading': [
-			function globalSpinner_tb_loading(ev){
-				//console.log('globalSpinner_tb_loading', this);
-				this['tb.ui.spinner'].trigger(':tb.ui.spinner.on:');
-			}
-		],
+		'tb.loading': function globalSpinner_tb_loading(ev){
+			this['tb.ui.spinner'].trigger(':tb.ui.spinner.on:');
+		},
 
-		'tb.idle': [
-			function globalSpinner_tb_idle(ev){
-				//console.log('globalSpinner_tb_idle', this);
-				this['tb.ui.spinner'].trigger(':tb.ui.spinner.off:');
-			}
-		]
+		'tb.idle': function globalSpinner_tb_idle(ev){
+			this['tb.ui.spinner'].trigger(':tb.ui.spinner.off:');
+		}
 	}
 
 }

@@ -9,26 +9,17 @@ tb.nameSpace( 'tb.ui', true ).spinner = {
 	
 	handlers: {
 
-		'tb.init': [
-			function spinner_tb_init(ev){
-				//console.log('spinner_tb_init');
-				$(this.target).html( tb.loader.get('tb/ui/spinner.html') );
-			}
-		],
+		'tb.init': function spinner_tb_init(ev){
+			$(this.target).html( tb.loader.get('tb/ui/spinner.html') );
+		},
 
-		'tb.ui.spinner.on': [
-			function spinner_on(ev){
-				//console.log('spinner_on');
-				$(this.target).show();
-			}
-		],
+		'tb.ui.spinner.on': function spinner_on(ev){
+			$(this.target).show();
+		},
 
-		'tb.ui.spinner.off': [
-			function spinner_off(ev){
-				//console.log('spinner_off');
-				$(this.target).hide();
-			}
-		]
+		'tb.ui.spinner.off': function spinner_off(ev){
+			$(this.target).hide();
+		}
 
 	}
 

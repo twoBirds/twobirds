@@ -14,19 +14,15 @@ demoapp.infoWindow = {
 	],
 
 	handlers: {
-		'tb.init': [
-			function infoWindow_tb_init(ev){
-				if (this.ready) return;
-				this.ready = true;
-			}
-		],
+		'tb.init': function infoWindow_tb_init(ev){
+			if (this.ready) return;
+			this.ready = true;
+		},
 
-		'scroll.ready': [
-			function infoWindow_scroll_ready(ev){
-				$(this.target).find('.__scroll-content').html( tb.loader.get('demoapp/infoWindow.html') );
-				this.trigger('root:scroll.update:ld');
-			}
-		]
+		'scroll.ready': function infoWindow_scroll_ready(ev){
+			$(this.target).find('.__scroll-content').html( tb.loader.get('demoapp/infoWindow.html') );
+			this.trigger('root:scroll.update:ld');
+		}
 	}
 
 };

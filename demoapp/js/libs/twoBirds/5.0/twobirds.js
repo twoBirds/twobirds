@@ -67,21 +67,15 @@ if (!Array.prototype.indexOf)
 		if ( e && e['nodeType'] && $(e).data('tbo') ) e = $(e).data('tbo');
 		if ( !e || !e instanceof tb ) return false;
 		if ( !s instanceof RegExp ) console.log( '_me', e, s );
-		//if ( !e ) return false;
 
 		if ( typeof s === 'string' ){ // assume jquery selector
 			return $(e.target).is(s);
 		} else if ( $.isPlainObject(s) ){ // a test object to match against
-			//console.log( 'testing', e, 'against', tb );
 			var match = true;
 			$.each( s, function( key, val){
-				//console.log( key, val, e );
 				if ( !e[key] || !( val === e[key] || typeof e[key] === val || (val instanceof RegExp && typeof e[key] === 'string' && val.test(e[key]) ) ) ) {
 					match = false;
-					//console.log('no match');
 					$.each( $.extend( [], true, e ), function( i, v ){
-						//console.log( 'test sub object', v, s );
-						//console.log( 'test sub object', v.is( s ) );
 						match = match || v.is( s );
 					});
 					return match;
@@ -91,7 +85,6 @@ if (!Array.prototype.indexOf)
 		} else if ( s instanceof RegExp ){ 
 			// shortcut for testing name against regexp, 
 			// e.g. tb(/body/) all tb objects that contain 'body' in their name
-			//console.log( _me( e, { name: s } ), e, s );
 			return s.test( e.instanceOf().join(',') );
 		}
 		return false;
@@ -100,14 +93,11 @@ if (!Array.prototype.indexOf)
 	// private: match array engine
 	function _ma( a, s ){ // a = Array, e = selector
 		var r = [];
-		//console.log( '_ma', a, s );
 		$.each( a, function( i, v ){
 			if ( v && v['nodeType'] && $(v).data('tbo') ){
 				v = $(v).data('tbo');
-				//console.log( '_ma v=', v, v instanceof tb );
 			}
 			if ( _me( v, s ) ){
-				//console.log( 'add match', v );
 				r.push( v );
 			}
 		});
@@ -125,7 +115,6 @@ if (!Array.prototype.indexOf)
 		if ( this === window ){ // simple selector call tb('...') 
 			return _ma( a, s );
 		} else if ( a instanceof Array || a instanceof tb ){ // assume call on instance(s) e.g. tb('body').filter(...)
-			//console.log( '-ARRAY or TBO testing selector ', typeof s, '(', s, ') in ', a );
 			return _ma( this, s );
 		}
 		return false; // return array of tbo objects
@@ -165,14 +154,10 @@ if (!Array.prototype.indexOf)
 					data = evt.data,
 					cont = true,
 					that = this;
-				//console.log('HANDLE SCAN [', name, '] IN ', that);
 				$.each( this.handlers, function( i, v ){
-					//console.log('HANDLE SCAN [', name, '] ?= ', i);
 					if ( i === name ){
 						$.each( v, function( j, w ){
-							//console.log('HANDLE EXEC [', w.toString(), '] CONT ', cont, 'IN ', that);
 							if (cont === true) {
-								//console.log('HANDLE DO [', name, '] IN ', that);
 								cont = w.apply( that, [ evt ] ) === false ? false : true;
 							}
 						});
@@ -198,22 +183,17 @@ if (!Array.prototype.indexOf)
 				'*:eventName' => '*:eventName:ld'
 				*/
 
-				//console.log( 'TRIGGER !!! ', pName, pData );
-
 				function handleEvent( evt ){
 					var bubble = evt.bubble,
 						cont = true,
 						that = this;
-					//console.log( 'HANDLE EVENT', evt );
 
 					// this
 					if ( typeof this === 'array' || this instanceof Array ){
-						//if (this[0]) console.log('HANDLE EVENT array', this, evt);
 						$.each( this, function( i, v ){
 							handleEvent.apply( v, [ evt ] );
 						});
 					} else {
-						//console.log( 'HANDLE EVENT single', this, 'EVENT', evt );
 						if ( this['handlers'] ){
 							cont = this.handle.apply( this, [ evt ] ) === false ? false : true;
 						}
@@ -222,13 +202,9 @@ if (!Array.prototype.indexOf)
 					// bubble
 					if ( cont === true ){
 						if ( bubble.indexOf('l') > -1 ){ // local
-							//console.log( 'BUBBLE EVENT local', that, evt );
 							if ( bubble.indexOf('d') > -1 ){ // down
-								//console.log( 'BUBBLE EVENT down' );
 								$.each( this, function( i, v ){
-									//console.log( 'BUBBLE EVENT - test', i );
 									if ( /\./.test(i) && /^_/.test(i) === false && v instanceof tb ){ // this one is a subobject
-										//console.log( 'BUBBLE EVENT - match', i, evt, that[i] );
 										cont = handleEvent.apply( that[i], [evt] ) === false ? false : true;
 									}
 								});
@@ -281,8 +257,6 @@ if (!Array.prototype.indexOf)
 						data: pData
 					};
 
-				//console.log( 'TRIGGER:', this, 'EVENT', evt );
-
 				var start;
 				switch ( ea[0] ){
 					case 'this':
@@ -301,7 +275,6 @@ if (!Array.prototype.indexOf)
 
 				if ( start !== false ) setTimeout( 
 					(function( start, evt ){ return function(){
-						//console.log( 'TRIGGER START handleEvent', evt, 'IN', start  );
 						handleEvent.apply( start, [ evt ] );
 					};})( start, evt ),
 					0 // as instantaneous as possible
@@ -320,7 +293,6 @@ if (!Array.prototype.indexOf)
 					var r = [];
 					$.each( this, function(i,v){
 						if ( v.instanceOf( pObj ) ) {
-							//console.log( 'filter match', pObj, v );
 							r.push( v );
 						}
 					});
@@ -331,8 +303,6 @@ if (!Array.prototype.indexOf)
 					var root = this['_super'] ? this._root() : this,
 						result = false,
 						names = [];
-
-					//console.log( this );
 
 					function walk( pTb ){
 						$.each( pTb, function( i, v ){
@@ -346,18 +316,14 @@ if (!Array.prototype.indexOf)
 					if ( pObj !== undefined ){
 						var a = root.instanceOf(); // all sub objects
 						if ( pObj instanceof String || typeof pObj === 'string' ) {
-							//console.log( 'STRING check', a, 'for', pObj );
 							return a.indexOf( pObj ) > -1 ? true : false;
 						} else if ( pObj instanceof RegExp ) {
-							//console.log( 'REGEXP check', a, 'for', pObj );
 							$.each( a, function( i, v ){
-								//console.log( ' check', i, v, 'for', pObj, '=>', pObj.test( v )  );
 								if ( pObj.test( v ) ) {
 									result = true;
 								}
 							});
 						} else { // assume repo object
-							//console.log( 'OBJECT check', a, 'for', pObj );
 							return a.indexOf( pObj.name ) > -1 ? true : false;
 						}
 					} else {
@@ -378,15 +344,8 @@ if (!Array.prototype.indexOf)
 										return $( this ).data('tbo') ? null : $( this );
 										})
 									.get();
-					//console.log( 'initChildren()', elms );
 					$.each( elms, function( i, v ){
-						//console.log('initChildren(i,v)', i, v);
-						//setTimeout(
-						//	(function(v){ return function(){ 
-								tb.init( v );
-						//	};})(v),
-						//	0
-						//);
+						tb.init( v );
 					});
 				}
 			},
@@ -410,30 +369,22 @@ if (!Array.prototype.indexOf)
 				var obj = tb.nameSpace( namespace, true ),
 					props = props || this[namespace];
 
-				//this._status = 'inject';
-
-				//console.log( 'INJECT ', obj, ' NAMESPACE ', namespace, ' INTO ', this );
-
 				// depending on the type of the loaded resource...
 				switch( typeof obj ){
 					case 'function':
-						//console.log( 'func prototype:', obj.prototype );
 						if ( obj.prototype === Function.prototype ){
-							//console.log('call plain function', namespace, 'with', this[namespace], 'on', this['_root'] ? this._root() : this );
 							obj.apply( this['_root'] ? this._root() : this, [ this[namespace] ] );
 						} else { // a constructor
 							var c = tb.nameSpace(namespace); // constructor
-							//console.log('inject new object', c, 'into this[\''+ namespace+ '\'], this=', this );
 							var r = new c( this[namespace] );
-							//console.log( ' ==> ', r );
 							this[namespace] = r;
 						}
 						break;
 					case 'object':
-						//console.log('inject plain object', obj, 'into this[\''+ namespace+ '\']' );
 						var props = this[namespace];
 						this[namespace] = new tb( this.target );
-						$.extend( 
+
+						$.extend( // mix in repo object
 							true,
 							this[namespace],
 							obj,
@@ -450,29 +401,32 @@ if (!Array.prototype.indexOf)
 							}
 						); 
 
-						//console.log( this[namespace], 'INSTANCEOF', obj );
 						var that = this;
 
+						// walk handlers and convert to array if necessary
+						if ( that[namespace]['handlers'] && $.isPlainObject( that[namespace]['handlers'] ) ) {
+							$.each( that[namespace]['handlers'], function( i, v ){
+								if ( $.isFunction(v) ){
+									that[namespace]['handlers'][i] = [ v ]; // convert to array to be able to add more handlers for this event
+								}
+							});
+						}
+
+						// walk object, recursive inject tb objects
 						$.each( this[namespace], function( i, v ){
-							//console.log('test property', i, 'in this[\''+ namespace+ '\']', this );
 							if ( that[namespace].hasOwnProperty( i ) && that[namespace][i] !== that[i] ){
-								//console.log('-hasOwnProperty', i );
 								if ( /\./.test( i ) && i !== 'tb.require' ){ // it is a dotted (namespaced) element
 									// recursive inject
-									//console.log('--recurse inject', tb.nameSpace( i ), 'in that[\''+ namespace+ '\'][\''+ i+ '\']' );
 									var o = that[namespace];
 									o.inject.apply( o, [ i, props, true ] );
 								}
 							}
 						});
-
-						//console.log('injected plain object',obj,'into this[\''+ namespace+ '\']: this => ', this );
 						break;
 					default: 
 						//console.log('no handler -> ran into default', i );
 						break;
 				}
-				//this._status = 'done';
 				if ( recurse !== true ) this.trigger('root:tb.init:ld');
 				if ( !this['_super']) $( this.target ).data('tbo', this);
 			},
@@ -480,9 +434,7 @@ if (!Array.prototype.indexOf)
 			parents: function( s ){
 				var r = [];
 				if ( this instanceof Array ){
-					//console.log( 'array', this);
 					$.each( this, function( i, v ){
-						//console.log( 'check', v);
 						var p = v.parents(s);
 						$.extend(r, true, p instanceof tb ? [p] : p );
 					});
@@ -526,7 +478,6 @@ if (!Array.prototype.indexOf)
 				var r = [],
 					that = this;
 				if ( this instanceof Array ){
-					//console.log( 'children array', this);
 					$.each( this, function( i, v ){
 						var c = v.children(s);
 						$.extend(r, true, c instanceof tb ? [c] : c );
@@ -557,14 +508,11 @@ if (!Array.prototype.indexOf)
 						r.push( $(v).data('tbo') );
 					});
 				} else if ( this instanceof Array ){
-					// assume array of tbo objects
-					//console.log( this instanceof Array, this[0], this[0] instanceof tb );
 					$.each( this, function( i, v ){
 						var d = v.descendants(s)
 						$.extend(r, true, d instanceof tb ? [d] : d );
 					});
 				}
-				//console.log('--descendants(',s ? s : '',') are:', r);
 				$.extend(r, true, tb.prototype)
 				if (s) r = r.filter(s);
 				return r.length === 1 ? r[0] : r;
@@ -594,7 +542,7 @@ if (!Array.prototype.indexOf)
 							if ( p.indexOf(v) === -1 ){
 								v.structure.apply( v, [ indent + 1, i, origin ] );
 							} else {
-								console.log( indentString + '\t<element is anchestor of origin tbo, recursion warning>');
+								//console.log( indentString + '\t<element is anchestor of origin tbo, recursion warning>');
 							}
 						}
 					});
@@ -631,7 +579,6 @@ tb.init = function(){
 	
 	//walk args array -> every domNode /w [data-tb]
 	for ( var i=0, l=args.length; i<l; i++ ) {
-		//console.log( args[i] );
 		// construct matches		
 		if ( $( args[i] ).attr('data-tb') ){
 			var set = $( args[i] );
@@ -645,8 +592,6 @@ tb.init = function(){
 		} else {
 			set.each( function( i, v ){ // for each domNode:data-tb element
 				
-				//console.log( 'tlo req DOM:', v );
-
 				if ( !$(v).data('tbo') ){
 					// create top level object
 					var tbo = new tb(v);
@@ -656,17 +601,11 @@ tb.init = function(){
 				}
 
 				var a = $(v).attr('data-tb').split(' ');
-				//console.log( 'tlo req:', a );
 
 				tb.require( a, (function( tbo, a, v ){ return function(){
-					//console.log( 'TOPLEVEL tbo req cb:', tbo, a );
 					$.each( a, function( i, e ){
 						var ns = e.replace( /.js$/, '').replace( /\//g, '.' );
-						//console.log( 'TOPLEVEL ns, element', ns, e );
-						//tbo[ns] =  new tb( v );
 						tbo.inject.apply( tbo, [ ns ] );
-						//console.log( tbo );					
-						//$(v).data('tbo', tbo );
 					});
 				};})( tbo, a, v ));
 					
@@ -688,17 +627,11 @@ tb.require = function( pA, pCb, pId ){
 
 	if ( ! ( typeof myA === Array || myA instanceof Array ) ) return;
 
-	//console.log( 'require function call: ', pA, this, this instanceof tb, pCb.toString(), pId );
-
-	// if called as a tb().require()
-	// will trigger 'tb.require:done' on that tb object when finished
-	//console.log( 'tb.require() this=', this, this instanceof tb, pA, pId );
+	// if called as a tb().require() method
     if ( this instanceof tb || this['trigger'] ){
-		//console.log( 'tb.require() callback construction for tb object', this );
-    	myCb = (function(that, a, myCb){ return function(){
-	        //console.log('require CB on object: ', that, a, myCb);
-    		that.trigger({
-    			name: 'tb.require:done', 
+		myCb = (function(that, a, myCb){ return function(){
+	        that.trigger({
+    			name: ':tb.require.done:', 
     			data: a 
     		});
     		myCb();
@@ -711,35 +644,25 @@ tb.require = function( pA, pCb, pId ){
         }
     });
 
-    //console.log( 'lA', lA );
-
     if ( lA.length === 0 ) { // all requirements met
-    	//console.log('tb.require all reqs met', myA);
         myCb();
         return;
     } else { // open requirements: add to requirements group object
-    	//console.log('tb.require open reqs', lA, 'in', pId, 'RGs', tb.require.groups );
     	lA.cb = myCb;
     	lA.id = id;
     	var aLeft = $.extend( true, [], lA );
     	aLeft.cb = myCb;
     	aLeft.id = id;
     	if ( pId === id ){ // if an id is given, add to existing requirements group
-	    	//console.log('APPEND', aLeft, ' TO', pId, $.extend( true, [], tb.require.groups ) );
 			$.each( tb.require.groups, function( i, v ){
-	    		//console.log( 'RG extend SCAN', v, v.id, ' ?= ', id );
 	    		if ( v.id === pId ){
-	    			//var cb = tb.require.groups[i].cb;
-	    			//console.log( 'RG extend', $.extend( true, [], v ), ' WITH ', lA );
 	    			while ( lA.length > 0 ){
 	    				tb.require.groups[i].push( lA.pop() );
 	    			}
-	    			//console.log( ' ==> ', tb.require.groups[i] );
 	    		} 
 	    	});
     	} else { // add new requirements group
-			//console.log( 'NEW RG', id, ' ==> ', lA );
-	    	tb.require.groups.push( lA );
+			tb.require.groups.push( lA );
     	}
     }
 
@@ -766,9 +689,7 @@ tb.require.checkGroups = function(){ // check all requirement groups
 		aLeft.cb = pV.cb || tb.nop;
 		aLeft.id = pV.id || null;
 		
-		//console.log( 'checkGroup', pI, pV );
 		$.each( pV, function( i, v ){
-			//console.log( '-', i, v, tb.loader.test( v ) );
 			if ( !tb.loader.test( v ) ){
 				aLeft.push(v);
 				done = false;
@@ -776,13 +697,10 @@ tb.require.checkGroups = function(){ // check all requirement groups
 		});
 
 		if ( done === true ){ // execute callback and delete req group 
-			//console.log( 'done group', pV);
 			tb.require.groups.splice( pI, 1 );
-			//console.log( 'execute group callback', pV.cb.toString() );
 			if (pV.cb) pV.cb(); // execute callback
 			return;
 		} else {
-			//console.log( 'group', pV, ' is now ', aLeft );
 			tb.require.groups[pI] = aLeft;
 		};
 	}
@@ -814,12 +732,9 @@ tb.nameSpace = function( pString, pCreate ){
 		ns = 'window',
 		ret = false;
 
-	//console.log('ns check', pString, 'in', ns)
-
-	if ( pCreate ){
+	if ( pCreate === true ){
 		while ( a[0] ){
 			var me = a.shift();
-			//console.log('check', me, 'in', ns, '->', e, e[me] );
 			if ( !e.hasOwnProperty(me) ){
 				e[me]={};
 			}
@@ -829,7 +744,6 @@ tb.nameSpace = function( pString, pCreate ){
 	} else {
 		while ( a[0] ){
 			var me = a.shift();
-			//console.log('check', me, 'in', ns, '->', e, e[me] );
 			if ( !e.hasOwnProperty(me) ){
 				return false;
 			} 
@@ -1398,12 +1312,9 @@ tb.loader = (function(){
     	 */
     	count: function( pInc, pPath ){
     		count += pInc;
-    		//console.log( 'load count', count, pInc === 1 ? '-->' : '<--', pPath );
     		if ( count === 0 ){
-    			//console.log('tb status idle', tb('*'));
     			tb('*').trigger('tb.idle');
     		} else if ( count === 1 && Math.abs( pInc ) === pInc ) {
-    			//console.log('tb status loading', tb('*'));
     			tb('*').trigger('tb.loading');
     		}
 		},
@@ -1415,7 +1326,6 @@ tb.loader = (function(){
     	 * @returns
     	 */
 		load : function(){ // general loader switch
-			//console.log( 'load apply', Array.prototype.slice.call( arguments ) );
 			return tb.loader[ getType( arguments[0] ) ].load.apply( this, Array.prototype.slice.call( arguments ) );
 		},
 
@@ -1439,8 +1349,7 @@ tb.loader = (function(){
 
 	        /** private */
     	errCb: function( url) {
-	    	//console.log('generate css callback');
-	        return function(){
+	    	return function(){
 	        	throw ( 'NOT LOADED: ' + url );
 	        };
 	    }
@@ -1463,12 +1372,9 @@ tb.loader.js = (function () {
 		script.setAttribute('type', 'text/javascript');
 		script.setAttribute('src', pUrl);
 
-		//console.log('LOAD JS FILE', pPath, pId );
-
 		if ( pId !== undefined ){
 			$.each( tb.require.groups, function( i, v ){
 				if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
-					//console.log('APPEND TO', pPath, pId, $.extend( true, [], tb.require.groups ) );
 					tb.require.groups[i].push( pPath );
 				}
 			});
@@ -1482,27 +1388,19 @@ tb.loader.js = (function () {
 			if ( done ) return;
 			done = true;
 
-			//console.log('LOAD JS FILE CALLBACK', pPath);
-			
 			c.set( pPath, 1 );
             tb.loader.count( -1, 'JS: ' + pPath );
-			//if ( pCb ) pCb();
 			
 			// check for further requirements:
-			//console.log('SCAN JS FILE ' + pPath, ns, 'RG = ', pId );
 			if ( ns && $.isPlainObject(ns) ){ 
-				//console.log('SCAN JS FILE is plain object', ns, 'RG = ', pId );
 				$.each( ns, function( i, v ){
-					//console.log('SCAN JS FILE check ' + i);
 					if ( (/\./).test(i) ){ // a 'dotted' property
 						if ( i === 'tb.require' ){
-							//console.log( 'DOTTED "tb.require" loading ' + v );
 							tb.require( // load requirement array into existing requirement group
 								v, 
 								(function(o, pCb){ return function(){
 									delete o['tb.require'];
 									if (pCb) {
-										//console.log('REQUIREMENT LOADER CALLBACK execute', pCb.toString() );
 										pCb();
 									} 
 									tb.require.checkGroups();
@@ -1511,15 +1409,12 @@ tb.loader.js = (function () {
 							);
 						} else { // other dotted property
 							var o = tb.nameSpace( i, true ); // create empty object if nothing present
-							//console.log( 'DOTTED "'+ i +'" check ', o );
 							if ( $.isPlainObject( o ) && $.isEmptyObject( o ) ){ // no content in this namespace 
-								//console.log( 'DOTTED "'+ i +'" loading...' );
 								var fn = i.replace( /\./g, '/' ) + '.js';
 								tb.loader.load( // load js file 
 									fn, 
 									(function(o, pCb){ return function(){ // load requirement array
 										if (pCb) {
-											//console.log('JS LOADER CALLBACK execute', pCb.toString() );
 											pCb();
 										} 
 										tb.require.checkGroups();
