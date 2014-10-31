@@ -62,6 +62,62 @@ if (!Array.prototype.indexOf)
  */
 (function(){
 
+	// private init twobirds objects in DOM
+	// args[0] is DOM node or set to DOM body node if undefined
+	_init = function(){
+		
+		// construct args array
+		//console.log( arguments );
+		_init.initialzed = true;
+
+		var args = Array.prototype.slice.call( arguments, 0 );
+
+		//console.log( 'Attempt: tb.init' )
+		if (!args[0]) { 
+			if (!_init['initialized']){
+				args.push( 'body' );
+			} else {
+				return;
+			}
+		}
+		
+		//walk args array -> every domNode /w [data-tb]
+		for ( var i=0, l=args.length; i<l; i++ ) {
+			// construct matches		
+			if ( $( args[i] ).attr('data-tb') ){
+				var set = $( args[i] );
+				set = set.add(set.find('[data-tb]'));
+			} else {
+				var set = $( args[i] ).find('[data-tb]');
+			}
+
+			if ( !set ){
+				//console.log('no tb-data elements for', args[i] );
+			} else {
+				set.each( function( i, v ){ // for each domNode:data-tb element
+					
+					if ( !$(v).data('tbo') ){
+						// create top level object
+						var tbo = new tb(v);
+						tbo.name = tb.getid();
+					} else {
+						return; // already initialized
+					}
+
+					var a = $(v).attr('data-tb').split(' ');
+
+					tb.require( a, (function( tbo, a, v ){ return function(){
+						$.each( a, function( i, e ){
+							var ns = e.replace( /.js$/, '').replace( /\//g, '.' );
+							tbo.inject.apply( tbo, [ ns ] );
+						});
+					};})( tbo, a, v ));
+						
+				});
+			};
+		}
+	};
+
 	// private: match tbo engine
 	function _me( e, s ){ // e = tbo object, e = selector
 		if ( e && e['nodeType'] && $(e).data('tbo') ) e = $(e).data('tbo');
@@ -386,7 +442,7 @@ if (!Array.prototype.indexOf)
 										})
 									.get();
 					$.each( elms, function( i, v ){
-						tb.init( v );
+						_init( v );
 					});
 				}
 			},
@@ -611,68 +667,14 @@ if (!Array.prototype.indexOf)
 
 		};
 	})();
+
+	// bootstrap application when ready ==> MUST BE LAST IN TB FILE
+	$( function(){
+		$.extend( true, window['tb'], tb.config || {} ); 
+		_init(); 
+	} );
+
 })();
-
-/**
- * init twobirds objects
- * @memberOf tb
- * @namespace tb.init
- * @params arguments is any mix of elements
- * @description 
- */
-tb.init = function(){
-	
-	// construct args array
-	//console.log( arguments );
-	tb.init.initialzed = true;
-
-	var args = Array.prototype.slice.call( arguments, 0 );
-
-	//console.log( 'Attempt: tb.init' )
-	if (!args[0]) { 
-		if (!tb.init['initialized']){
-			args.push( 'body' );
-		} else {
-			return;
-		}
-	}
-	
-	//walk args array -> every domNode /w [data-tb]
-	for ( var i=0, l=args.length; i<l; i++ ) {
-		// construct matches		
-		if ( $( args[i] ).attr('data-tb') ){
-			var set = $( args[i] );
-			set = set.add(set.find('[data-tb]'));
-		} else {
-			var set = $( args[i] ).find('[data-tb]');
-		}
-
-		if ( !set ){
-			//console.log('no tb-data elements for', args[i] );
-		} else {
-			set.each( function( i, v ){ // for each domNode:data-tb element
-				
-				if ( !$(v).data('tbo') ){
-					// create top level object
-					var tbo = new tb(v);
-					tbo.name = tb.getid();
-				} else {
-					return; // already initialized
-				}
-
-				var a = $(v).attr('data-tb').split(' ');
-
-				tb.require( a, (function( tbo, a, v ){ return function(){
-					$.each( a, function( i, e ){
-						var ns = e.replace( /.js$/, '').replace( /\//g, '.' );
-						tbo.inject.apply( tbo, [ ns ] );
-					});
-				};})( tbo, a, v ));
-					
-			});
-		};
-	}
-};
 
 /**
  * handles all requirements loading
@@ -1170,21 +1172,21 @@ tb.request = (function () {
     /**
      * @name tb.request
      * @function
- * @param pOptions { object } a hash object containing these options:<br><br><br>
- * @returns a twoBirds request object
- * 
- * @param pOptions.url: (string, omitted) the URL to call
- * @param pOptions.parms: (object, optional) a hash object containing the parameters to post
- * @param pOptions.method: (string, optional, defaults to 'POST') the XHR method
- * @param pOptions.headers: (object, optional) a hash object containing additional XHR headers  
- * @param pOptions.success: (function, optional) the function to call with the request result
- * @param pOptions.failure: (function, optional) the function to call if request status not in 200...299
- * @param pOptions.statechange: (function, deprecated, optional) the function to call when readyState changes
- * @param pOptions.timeout: (object, optional ) structure sample: { cb: myFunction, ms:10000 }<br>
- * cb: callback to run when timeout occurs<br>
- * ms: number of milliseconds the request will run before being terminated
- * @param pOptions.cachable: (boolean, deprecated, optional) defaults to true, indicates whether or not to include a unique id in URL
- * @param pOptions.async: (boolean, optional, defaults to true) whether or not to make an asynchronous request
+	 * @param pOptions { object } a hash object containing these options:<br><br><br>
+	 * @returns a twoBirds request object
+	 * 
+	 * @param pOptions.url: (string, omitted) the URL to call
+	 * @param pOptions.parms: (object, optional) a hash object containing the parameters to post
+	 * @param pOptions.method: (string, optional, defaults to 'POST') the XHR method
+	 * @param pOptions.headers: (object, optional) a hash object containing additional XHR headers  
+	 * @param pOptions.success: (function, optional) the function to call with the request result
+	 * @param pOptions.failure: (function, optional) the function to call if request status not in 200...299
+	 * @param pOptions.statechange: (function, deprecated, optional) the function to call when readyState changes
+	 * @param pOptions.timeout: (object, optional ) structure sample: { cb: myFunction, ms:10000 }<br>
+	 * cb: callback to run when timeout occurs<br>
+	 * ms: number of milliseconds the request will run before being terminated
+	 * @param pOptions.cachable: (boolean, deprecated, optional) defaults to true, indicates whether or not to include a unique id in URL
+	 * @param pOptions.async: (boolean, optional, defaults to true) whether or not to make an asynchronous request
      */
     return function (pOptions) {
         var myIndex = tb.getid(),
@@ -1688,8 +1690,3 @@ tb.loader.html = (function () {
     };
 })();
 
-// bootstrap application when ready ==> MUST BE LAST IN TB FILE
-$( function(){
-	$.extend( true, window['tb'], tb.config || {} ); 
-	tb.init(); 
-} );
