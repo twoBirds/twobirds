@@ -216,8 +216,8 @@ tb.nameSpace('tb.ui', true).scroll = {
 			this.scrollContainer.on(
 				'click',
 				(function(that){ return function(ev){
-					////console.log('scrollContainer click', that );
-					that.trigger(':scroll.active:', true);
+					//console.log('scrollContainer click', that );
+					//that.trigger(':scroll.active:', true);
 					that.trigger(':scroll.attachWheelHandler:');
 					//ev.stopPropagation();
 				};})(this)
@@ -428,7 +428,9 @@ tb.nameSpace('tb.ui', true).scroll = {
 					// bubble wheel event up the dom, so outer container scrolls 
 					// when inner position reaches bounds
 					if ( that.config.bubbleUp === true && op === elm[0][which] ) {
-						$( that.root ).parent().trigger(ev, delta);
+						if ($( that.root ).parents(/tb.ui.scroll/) ) {
+							$( that.root ).parents(/tb.ui.scroll/).trigger(ev, delta);
+						} 
 					}
 
 					ev.stopPropagation();

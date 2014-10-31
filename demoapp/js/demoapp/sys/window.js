@@ -60,6 +60,13 @@ tb.nameSpace('demoapp.sys').window = {
 
     			this.inject( 'tb.ui.scroll' );
 
+    			this['tb.ui.scroll'].addHandler(
+    				'scroll.active', 
+    				function(){
+    					this._super().trigger(':window.active:', true); // make window active when scroll becomes active
+    				}
+    			);
+
 				this.content = $(this.target).find('.__scroll-content');
 			}
 
@@ -88,7 +95,7 @@ tb.nameSpace('demoapp.sys').window = {
 			if ( this.active === ev.data ) return;
 			this.active = ev.data;
 			var win = $( this.target ).find('.demoapp-window');
-			if ( this.active ){
+			if ( this.active === true ){
 				win.addClass('_demoapp-window-active');
                 var windows = tb(/./).instanceOf( demoapp.window ),
                 	checkname = this._root().name;
@@ -100,6 +107,7 @@ tb.nameSpace('demoapp.sys').window = {
 			} else {
 				win.removeClass('_demoapp-window-active');
 			}
+			return false;
 		},
 
 		'window.denyclose': function sys_window_denyclose(ev){
