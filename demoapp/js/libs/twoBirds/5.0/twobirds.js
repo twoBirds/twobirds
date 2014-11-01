@@ -72,7 +72,7 @@ if (!Array.prototype.indexOf)
 
 		var args = Array.prototype.slice.call( arguments, 0 );
 
-		//console.log( 'Attempt: tb.init' )
+		//console.log( '_init ', arguments )
 		if (!args[0]) { 
 			if (!_init['initialized']){
 				args.push( 'body' );
@@ -91,24 +91,33 @@ if (!Array.prototype.indexOf)
 				var set = $( args[i] ).find('[data-tb]');
 			}
 
+			//console.log( '_init set = ', set )
+
 			if ( !set ){
 				//console.log('no tb-data elements for', args[i] );
 			} else {
 				set.each( function( i, v ){ // for each domNode:data-tb element
+
+					//console.log( '_init set element = ', i, v );
 					
-					if ( !$(v).data('tbo') ){
+					if ( $(v).data('tbo') === undefined ){
 						// create top level object
 						var tbo = new tb(v);
 						tbo.name = tb.getid();
 					} else {
+						//console.log( '_init set element ALREADY INITIALIZED' );
 						return; // already initialized
 					}
+
+					//console.log( '_init set element new tbo = ', tbo );
 
 					var a = $(v).attr('data-tb').split(' ');
 
 					tb.require( a, (function( tbo, a, v ){ return function(){
+						//console.log( '_init set element new tbo CALLBACK', tbo );
 						$.each( a, function( i, e ){
 							var ns = e.replace( /.js$/, '').replace( /\//g, '.' );
+							//console.log( '_init set element new tbo CALLBACK INJECT', ns );
 							tbo.inject.apply( tbo, [ ns ] );
 						});
 					};})( tbo, a, v ));
@@ -120,10 +129,14 @@ if (!Array.prototype.indexOf)
 
 	// private: match tbo engine
 	function _me( e, s ){ // e = tbo object, e = selector
-		if ( e && e['nodeType'] && $(e).data('tbo') ) e = $(e).data('tbo');
-		if ( !e || !e instanceof tb ) return false;
-		if ( !s instanceof RegExp ) console.log( '_me', e, s );
-
+		if ( e instanceof HTMLElement ){
+			//console.log( 'convert:', e );
+			e = $(e).data('tbo');
+			//console.log( 'now is :', e );
+		}
+		if ( e === undefined || !e instanceof tb ) return false;
+		//console.log( 'selector _me', e, s );
+		
 		if ( typeof s === 'string' ){ // assume jquery selector
 			return $(e.target).is(s);
 		} else if ( $.isPlainObject(s) ){ // a test object to match against
@@ -149,8 +162,10 @@ if (!Array.prototype.indexOf)
 	// private: match array engine
 	function _ma( a, s ){ // a = Array, e = selector
 		var r = [];
+		//console.log( 'selector _ma', a, s );
 		$.each( a, function( i, v ){
-			if ( v && v['nodeType'] && $(v).data('tbo') ){
+			if ( v instanceof HTMLElement ){
+				//console.log( 'selector _ma element', v, v instanceof HTMLElement, $(v).data('tbo') );
 				v = $(v).data('tbo');
 			}
 			if ( _me( v, s ) ){
@@ -168,6 +183,8 @@ if (!Array.prototype.indexOf)
 			a = this === window ? $('[data-tb]') : this, // either jquery all tb DOM nodes array or assume result set
 			r = [];
 
+		//console.log( 'selector _se', a );
+
 		if ( this === window ){ // simple selector call tb('...') 
 			return _ma( a, s );
 		} else if ( a instanceof Array || a instanceof tb ){ // assume call on instance(s) e.g. tb('body').filter(...)
@@ -184,9 +201,8 @@ if (!Array.prototype.indexOf)
 			this.handlers = {};
 
 		} else if ( a ) { // treat as selector
-
+			//console.log( 'selector', a );
 			return _se( a );
-
 		}
 	};
 
@@ -442,6 +458,7 @@ if (!Array.prototype.indexOf)
 										})
 									.get();
 					$.each( elms, function( i, v ){
+						//console.log( 'initChildren', v );
 						_init( v );
 					});
 				}
@@ -494,6 +511,7 @@ if (!Array.prototype.indexOf)
 							obj
 						); 
 
+						//console.log( 'inject '+namespace+' walk handlers' );
 						// walk handlers and convert each to array of functions if necessary
 						if ( tbo['handlers'] && $.isPlainObject( tbo['handlers'] ) ) {
 							$.each( tbo['handlers'], function( i, v ){
@@ -502,6 +520,8 @@ if (!Array.prototype.indexOf)
 								}
 							});
 						}
+
+						//console.log( 'inject walk object' );
 
 						// walk object, recursive inject tb objects
 						$.each( tbo, function( i, v ){
@@ -514,6 +534,8 @@ if (!Array.prototype.indexOf)
 								}
 							}
 						});
+
+						//console.log( 'inject special properties' );
 
 						$.extend( // mix in special properties
 							true,
@@ -532,6 +554,8 @@ if (!Array.prototype.indexOf)
 								};})(this)
 							}
 						);
+
+						//console.log( 'inject', tbo, ' INTO ', this);
 
 						this[namespace] = tbo;
 
@@ -1557,6 +1581,8 @@ tb.loader.css = (function () {
             
         	//console.log('filepath', filepath );
         	//console.log('css loader callback function', pPath, pUrl );
+
+        	if (pText.length === 0) pText = '/* empty css file */';
 
             tb.loader.css.cache.set( pPath, pText );
             tb.loader.count( -1, 'CSS: ' + pPath );
