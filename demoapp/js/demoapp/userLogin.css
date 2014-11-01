@@ -9,6 +9,16 @@
 	border: 1px solid #CC0000;
 }
 
-.userlogin p {
+.userlogin,
+.usergreeting {
+	min-width: 100%;
+}
+.userlogin p,
+.usergreeting p {
+	margin: 0.1em;
 	float: right;
+}
+
+.usergreeting div {
+	float: left;
 }
