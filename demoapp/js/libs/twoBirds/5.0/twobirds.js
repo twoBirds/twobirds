@@ -19,14 +19,14 @@
  */
 if ( typeof Object.getPrototypeOf !== "function" ) {
   if ( typeof "test".__proto__ === "object" ) { // Mozilla
-    Object.getPrototypeOf = function(pObj){
-      return pObj ?  pObj.__proto__ : this.__proto__;
-    };
+	Object.getPrototypeOf = function(pObj){
+	  return pObj ?  pObj.__proto__ : this.__proto__;
+	};
   } else {
-    Object.getPrototypeOf = function(pObj){
-      // May break if the constructor has been tampered with
-      return pObj ? pObj.constructor.prototype : this.constructor.prototype;
-    };
+	Object.getPrototypeOf = function(pObj){
+	  // May break if the constructor has been tampered with
+	  return pObj ? pObj.constructor.prototype : this.constructor.prototype;
+	};
   }
 }
 
@@ -34,22 +34,22 @@ if (!Array.prototype.indexOf)
 {
   Array.prototype.indexOf = function( pEle )
   {
-    var len = this.length;
+	var len = this.length;
 
-    var from = Number(arguments[1]) || 0;
-    from = (from < 0)
-         ? Math.ceil(from)
-         : Math.floor(from);
-    if (from < 0)
-      from += len;
+	var from = Number(arguments[1]) || 0;
+	from = (from < 0)
+		 ? Math.ceil(from)
+		 : Math.floor(from);
+	if (from < 0)
+	  from += len;
 
-    for (; from < len; from++)
-    {
-      if (from in this &&
-          this[from] === pEle)
-        return from;
-    }
-    return -1;
+	for (; from < len; from++)
+	{
+	  if (from in this &&
+		  this[from] === pEle)
+		return from;
+	}
+	return -1;
   };
 }
 
@@ -498,6 +498,7 @@ if (!Array.prototype.indexOf)
 							var c = tb.nameSpace(namespace), // constructor
 								r = new c( this[namespace] );
 							this[namespace] = r;
+							this[namespace]['_tbo'] = this;
 						}
 						break;
 
@@ -714,50 +715,50 @@ tb.require = function( pA, pCb, pId ){
 	if ( ! ( typeof myA === Array || myA instanceof Array ) ) return;
 
 	// if called as a tb().require() method
-    if ( this instanceof tb || this['trigger'] ){
+	if ( this instanceof tb || this['trigger'] ){
 		myCb = (function(that, a, myCb){ return function(){
-	        that.trigger({
-    			name: ':tb.require.done:', 
-    			data: a 
-    		});
-    		myCb();
-    	};})(this, myA, myCb );
-    }
+			that.trigger({
+				name: ':tb.require.done:', 
+				data: a 
+			});
+			myCb();
+		};})(this, myA, myCb );
+	}
 
-    $.each( myA, function( i, v ){
-        if ( !tb.loader.test( v ) ) { // not loading or not finished loading
-        	lA.push( v );
-        }
-    });
+	$.each( myA, function( i, v ){
+		if ( !tb.loader.test( v ) ) { // not loading or not finished loading
+			lA.push( v );
+		}
+	});
 
-    if ( lA.length === 0 ) { // all requirements met
-        myCb();
-        return;
-    } else { // open requirements: add to requirements group object
-    	lA.cb = myCb;
-    	lA.id = id;
-    	var aLeft = $.extend( true, [], lA );
-    	aLeft.cb = myCb;
-    	aLeft.id = id;
-    	if ( pId === id ){ // if an id is given, add to existing requirements group
+	if ( lA.length === 0 ) { // all requirements met
+		myCb();
+		return;
+	} else { // open requirements: add to requirements group object
+		lA.cb = myCb;
+		lA.id = id;
+		var aLeft = $.extend( true, [], lA );
+		aLeft.cb = myCb;
+		aLeft.id = id;
+		if ( pId === id ){ // if an id is given, add to existing requirements group
 			$.each( tb.require.groups, function( i, v ){
-	    		if ( v.id === pId ){
-	    			while ( lA.length > 0 ){
-	    				tb.require.groups[i].push( lA.pop() );
-	    			}
-	    		} 
-	    	});
-    	} else { // add new requirements group
+				if ( v.id === pId ){
+					while ( lA.length > 0 ){
+						tb.require.groups[i].push( lA.pop() );
+					}
+				} 
+			});
+		} else { // add new requirements group
 			tb.require.groups.push( lA );
-    	}
-    }
+		}
+	}
 
-    $.each( aLeft, function( i, v ){ // now do the loading
-        tb.loader.load( v, tb.require.checkGroups, id ); 
-        // id is used to extend the checkgroup on recursive loads
-    });
+	$.each( aLeft, function( i, v ){ // now do the loading
+		tb.loader.load( v, tb.require.checkGroups, id ); 
+		// id is used to extend the checkgroup on recursive loads
+	});
 
-    return id;
+	return id;
 };
 
 
@@ -799,11 +800,11 @@ tb.require.checkGroups = function(){ // check all requirement groups
 tb.prototype.require = tb.require;
 
 tb.browser = {
-    version: ((navigator.userAgent.toLowerCase()).match(/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/) || [])[1],
-    safari: /webkit/.test(navigator.userAgent.toLowerCase()),
-    opera: /opera/.test(navigator.userAgent.toLowerCase()),
-    msie: /msie/.test(navigator.userAgent.toLowerCase()) && !/opera/.test(navigator.userAgent.toLowerCase()),
-    mozilla: /mozilla/.test(navigator.userAgent.toLowerCase()) && !/(compatible|webkit)/.test(navigator.userAgent.toLowerCase())
+	version: ((navigator.userAgent.toLowerCase()).match(/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/) || [])[1],
+	safari: /webkit/.test(navigator.userAgent.toLowerCase()),
+	opera: /opera/.test(navigator.userAgent.toLowerCase()),
+	msie: /msie/.test(navigator.userAgent.toLowerCase()) && !/opera/.test(navigator.userAgent.toLowerCase()),
+	mozilla: /mozilla/.test(navigator.userAgent.toLowerCase()) && !/(compatible|webkit)/.test(navigator.userAgent.toLowerCase())
 };
 
 /**
@@ -841,6 +842,75 @@ tb.nameSpace = function( pString, pCreate ){
 	return e;
 }
 
+/** @memberOf tb
+ * @namespace tb.Cache
+ * @class
+ * @description provides a caching mechanism 
+ */
+tb.Model = function ( pOptions, pObject ) {
+	//default
+	$.extend( 
+		this, 
+		{
+			url: '',
+			method: 'GET',
+			ok: true
+		}
+	);
+
+	if ( !$.isPlainObject( pOptions ) || pOptions['url'] === undefined || pOptions['url'].length === 0 ){
+		this.ok = false;
+		this.url = 'no url given to model'
+		return;
+	}
+
+	this.url = pOptions.url;
+	this.tbo = (function(that){ return function(){
+		return that;
+	};})(pObject)
+};
+
+tb.Model.prototype = (function(){ 
+
+	function _convertToHash( pString ){
+		var paramObject = {},
+			para,
+			kv;
+		
+		if ( pString !== undefined ){
+			para = pString.split( '&' );
+			$.each( para, function( i, v ){
+				kv = v.split('=');
+				paramObject[ kv[0] ] = kv[1];
+			});
+		}
+
+		return paramObject
+	}
+
+	return {
+
+		'get': function( pPara ){ // if parameter given, expects string of GET type parameters $a=...&b=... 
+			// map in url
+			var myUrl = tb.parse( _convertToHash( pPara ), this.url );
+
+			tb.request({
+				url:  myUrl,
+				method: 'GET',
+				cachable: true,
+				success: (function(that){ return function( pXml, pText ){
+						that.trigger( ':tb.model.success:', JSON.parse(pText) );
+					};})(this.tbo()),
+				failure: (function(that, myUrl){ return function( pXml, pText ){
+						that.trigger( ':tb.model.failure:', myUrl );
+					};})(this.tbo(), myUrl)
+			});
+
+			//console.log( myUrl );
+		}
+	};
+})();
+
 /** 
  * @memberOf tb
  * @namespace tb.parse
@@ -851,7 +921,7 @@ tb.nameSpace = function( pString, pCreate ){
  */
 tb.parse = function( pParse, pText ){
 	$.each( pParse, function(i, v){
-		pText = pText.replace( (new RegExp('{'+i+'}', 'g')), v );
+		pText = pText.replace( (new RegExp('\{'+i+'\}', 'g')), v );
 	});
 	return pText;
 }
@@ -864,85 +934,85 @@ tb.parse = function( pParse, pText ){
 tb.Cache = function () {
 	/** @private
 	 * cache hash */
-    this.c = {};
+	this.c = {};
 };
 
 tb.Cache.prototype = (function () {
-    /**
-     * @private
-     * @description Deletes an item from the cache
-     * @param pId Id of the item
-     */
+	/**
+	 * @private
+	 * @description Deletes an item from the cache
+	 * @param pId Id of the item
+	 */
 
-    function d(pId) {
-        this.c[pId] = null;
-        delete this.c[pId];
-    }
+	function d(pId) {
+		this.c[pId] = null;
+		delete this.c[pId];
+	}
 
-    /**
-     * @private
-     * @description Adds an item to the cache
-     * @param pWhat Item
-     */
+	/**
+	 * @private
+	 * @description Adds an item to the cache
+	 * @param pWhat Item
+	 */
 
-    function a(pWhat) {
-        var myId = tb.getid();
-        this.c[myId] = pWhat;
-        return myId;
-    }
+	function a(pWhat) {
+		var myId = tb.getid();
+		this.c[myId] = pWhat;
+		return myId;
+	}
 
-    /** @lends tb.Cache */
-    return {
-        /**
-         * @public
-         * @description Cache of the TwoBirds object
-         */
-        c: this.c,
-        // debugging handler
-        /**
-         * @public
-         * @description Adds a key-value pair to the cache
-         * @param pId key
-         * @param pContent value
-         */
-        set: function (pId, pContent) {
-            if (pId) {
-                this.c[pId] = pContent;
-            }
-            else {
-                return a.call(this, pContent);
-            }
-        },
+	/** @lends tb.Cache */
+	return {
+		/**
+		 * @public
+		 * @description Cache of the TwoBirds object
+		 */
+		c: this.c,
+		// debugging handler
+		/**
+		 * @public
+		 * @description Adds a key-value pair to the cache
+		 * @param pId key
+		 * @param pContent value
+		 */
+		set: function (pId, pContent) {
+			if (pId) {
+				this.c[pId] = pContent;
+			}
+			else {
+				return a.call(this, pContent);
+			}
+		},
 
-        /**
-         * @public
-         * @description Returns the value to the given key from the cache
-         * @param pId key
-         * @returns value or false if it doesn't exist
-         * 
-         */
-        get: function (pId) {
-            return this.c[pId] || false;
-        },
+		/**
+		 * @public
+		 * @description Returns the value to the given key from the cache
+		 * @param pId key
+		 * @returns value or false if it doesn't exist
+		 * 
+		 */
+		get: function (pId) {
+			return this.c[pId] || false;
+		},
 
-        extract: function (pId) {
-            var r = this.c[pId];
-            pId = pId ? d.call(this, pId) : null;
-            return r || false;
-        },
+		extract: function (pId) {
+			var r = this.c[pId];
+			pId = pId ? d.call(this, pId) : null;
+			return r || false;
+		},
 
-        /**
-         * @public
-         * @description Clears the cache
-         * @returns previous cache entries
-         */
-        flush: function () {
-            var c = this.c;
-            this.c = {};
-            return c;
-        }
+		/**
+		 * @public
+		 * @description Clears the cache
+		 * @returns previous cache entries
+		 */
+		flush: function () {
+			var c = this.c;
+			this.c = {};
+			return c;
+		}
 
-    };
+	};
 })();
 
 /**
@@ -952,64 +1022,64 @@ tb.Cache.prototype = (function () {
  * @description a collection object for functions, which can be executed with one call
  */
 tb.Chain = function () {
-    this.chain = {};
+	this.chain = {};
 };
 
 tb.Chain.prototype = {
 	/**
 	 * @description returns number of entries in chain
 	 */
-    length: function () {
-    	var i, 
-    		j = 0;
-    	for (var i in this.chain) j++;
-    	return j;
-    },
+	length: function () {
+		var i, 
+			j = 0;
+		for (var i in this.chain) j++;
+		return j;
+	},
 
 	/**
 	 * @description Adds a function to the chain
 	 * @param pName key
 	 * @param pCb function
 	 */
-    add: function (pName, pCb) {
-        //console.log('adding to chain: ' + pName + '    ' + tb.serialize(pCb) );
-        this.chain[pName] = pCb;
-    },
+	add: function (pName, pCb) {
+		//console.log('adding to chain: ' + pName + '    ' + tb.serialize(pCb) );
+		this.chain[pName] = pCb;
+	},
 
-    /**
-     * @description Removes a function from the chain
-     * @param pName key
-     */
-    remove: function (pName) {
-    	if ( pName ){
-            delete this.chain[pName];
-    	}
-    	else {
-    		this.chain = {};
-    	}
-    },
+	/**
+	 * @description Removes a function from the chain
+	 * @param pName key
+	 */
+	remove: function (pName) {
+		if ( pName ){
+			delete this.chain[pName];
+		}
+		else {
+			this.chain = {};
+		}
+	},
 
-    /**
-     * Removes all functions from the chain
-     */
-    flush: function() {
-    	this.chain = {};
-    },
+	/**
+	 * Removes all functions from the chain
+	 */
+	flush: function() {
+		this.chain = {};
+	},
 
-    /**
-     * @description Executes the chain of functions
-     * @param (arguments) (any type) parameters to hand over to the functions 
-     */
-    execute: function() {
-        //console.log('executing chain with Parameters: ' + tb.serialize( arguments ) );
-        for (var i in this.chain) {
-            if (typeof this.chain[i] === 'function') {
-                //console.log('executing  chain: ' + tb.serialize( this.chain[i] ) );
-                //console.log('using parameters: ' + tb.serialize( pParms ) );
-                this.chain[i].apply(this, arguments);
-            }
-        }
-    }
+	/**
+	 * @description Executes the chain of functions
+	 * @param (arguments) (any type) parameters to hand over to the functions 
+	 */
+	execute: function() {
+		//console.log('executing chain with Parameters: ' + tb.serialize( arguments ) );
+		for (var i in this.chain) {
+			if (typeof this.chain[i] === 'function') {
+				//console.log('executing  chain: ' + tb.serialize( this.chain[i] ) );
+				//console.log('using parameters: ' + tb.serialize( pParms ) );
+				this.chain[i].apply(this, arguments);
+			}
+		}
+	}
 };
 
 /**
@@ -1027,7 +1097,7 @@ tb.nop = function () {
  * @param pTimeout { number, optional, default 0 } milliseconds to wait
  */
 tb.sync = function ( pFunc, pTimeout ) {
-    window.setTimeout( pFunc, pTimeout || 0 );
+	window.setTimeout( pFunc, pTimeout || 0 );
 };
 
 /**
@@ -1039,9 +1109,9 @@ tb.sync = function ( pFunc, pTimeout ) {
 * @type function
  */
 tb.bind = function ( pFunc, pObj ) {
-    var retFunc = function(){ ( pFunc._super ? pFunc._super : pFunc ).apply( pObj, arguments ); };
-    retFunc._super = ( pFunc._super ? pFunc._super : pFunc );
-    return retFunc;
+	var retFunc = function(){ ( pFunc._super ? pFunc._super : pFunc ).apply( pObj, arguments ); };
+	retFunc._super = ( pFunc._super ? pFunc._super : pFunc );
+	return retFunc;
 };
 
 /**
@@ -1051,8 +1121,8 @@ tb.bind = function ( pFunc, pObj ) {
  * @type string
  */
 tb.getid = function(){
-    var myDate = new Date();
-    return '_' + myDate.getTime() + '_' + Math.random().toString().replace(/\./, '');
+	var myDate = new Date();
+	return '_' + myDate.getTime() + '_' + Math.random().toString().replace(/\./, '');
 };
 
 /**
@@ -1062,140 +1132,140 @@ tb.getid = function(){
  * @description the twoBirds request object
  */
 tb.request = (function () {
-    /** @private */
-    var interval = 30,
-        msoft = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP'];
+	/** @private */
+	var interval = 30,
+		msoft = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP'];
 
-    /** @private */
-    function addhandler(pId, pCb) {
-        tb.cache.set(pId, pCb);
-    }
+	/** @private */
+	function addhandler(pId, pCb) {
+		tb.cache.set(pId, pCb);
+	}
 
-    /** @private */
-    function getConnection(pId) {
-        var myObj = {};
-        var myHttp;
+	/** @private */
+	function getConnection(pId) {
+		var myObj = {};
+		var myHttp;
 
-        if (typeof ActiveXObject !== 'undefined') for (var i = 0; i < msoft.length; ++i) {
-            try {
-                myHttp = new ActiveXObject(msoft[i]);
-                myObj = {
-                    connection: myHttp,
-                    identifier: pId
-                };
-                /** @ignore */
-                getConnection = (function (pType) {
-                    return function (pId) {
-                        var myHttp = new ActiveXObject(pType);
-                        myObj = {
-                            connection: myHttp,
-                            identifier: pId
-                        };
-                        return myObj;
-                    };
-                })(msoft[i]);
-            }
-            catch (e) {}
-        }
+		if (typeof ActiveXObject !== 'undefined') for (var i = 0; i < msoft.length; ++i) {
+			try {
+				myHttp = new ActiveXObject(msoft[i]);
+				myObj = {
+					connection: myHttp,
+					identifier: pId
+				};
+				/** @ignore */
+				getConnection = (function (pType) {
+					return function (pId) {
+						var myHttp = new ActiveXObject(pType);
+						myObj = {
+							connection: myHttp,
+							identifier: pId
+						};
+						return myObj;
+					};
+				})(msoft[i]);
+			}
+			catch (e) {}
+		}
 
-        try {
-            myHttp = new XMLHttpRequest();
-            myObj = {
-                connection: myHttp,
-                identifier: pId
-            };
-            /** @ignore */
-            getConnection = function (pId) {
-                var myHttp = new XMLHttpRequest();
-                myObj = {
-                    connection: myHttp,
-                    identifier: pId
-                };
-                return myObj;
-            };
-        }
-        catch (e) {
-        }
-        finally{
-        	return myObj;
-        }
-    }
+		try {
+			myHttp = new XMLHttpRequest();
+			myObj = {
+				connection: myHttp,
+				identifier: pId
+			};
+			/** @ignore */
+			getConnection = function (pId) {
+				var myHttp = new XMLHttpRequest();
+				myObj = {
+					connection: myHttp,
+					identifier: pId
+				};
+				return myObj;
+			};
+		}
+		catch (e) {
+		}
+		finally{
+			return myObj;
+		}
+	}
 
-    /** @private */
-    function handlereadyState(pReq, pCallback, pStateChange, pFailure) {
-        var myConnection = this;
-        var myReq = pReq;
-        var myPoll = window.setInterval((function (preadyState) {
-            return function () {
-            	if (myReq.connection.readyState !== preadyState) {
-                    preadyState = myReq.connection.readyState;
-                    //pStateChange();
-                }
-                if ( preadyState === 4) {
-                    if (myReq.aborttimer) {
-                        window.clearTimeout(myReq.aborttimer);
-                    }
-                    window.clearInterval(myPoll);
-                    handleTransactionResponse(pReq, pCallback, pFailure);
-                }
-            };
-        })( 0 ), interval );
-        return myPoll;
-    }
+	/** @private */
+	function handlereadyState(pReq, pCallback, pStateChange, pFailure) {
+		var myConnection = this;
+		var myReq = pReq;
+		var myPoll = window.setInterval((function (preadyState) {
+			return function () {
+				if (myReq.connection.readyState !== preadyState) {
+					preadyState = myReq.connection.readyState;
+					//pStateChange();
+				}
+				if ( preadyState === 4) {
+					if (myReq.aborttimer) {
+						window.clearTimeout(myReq.aborttimer);
+					}
+					window.clearInterval(myPoll);
+					handleTransactionResponse(pReq, pCallback, pFailure);
+				}
+			};
+		})( 0 ), interval );
+		return myPoll;
+	}
 
-    /** @private */
-    function handleTransactionResponse(pReq, pCallback, pFailure) {
-        try {
-            var httpStatus = pReq.connection.status;
-        }
-        catch (e) {
-            var httpStatus = 13030;
-        }
-        if (httpStatus >= 200 && httpStatus < 300) {
-            var responseObject = createResponseObject(pReq, pCallback.argument);
-            try {
-            	//console.log( pReq.src );
-            	//console.log( 'request callback: '+pCallback.toString() );
-                pCallback.apply(pCallback, [responseObject.responseXml, responseObject.responseText, responseObject]);
-            }
-            catch (e) {
-            	if ( tb.debug ) debugger; 
-            }
-        }
-        else {
-            var responseObject = createResponseObject(pReq, pCallback.argument);
-            pFailure.apply( pFailure, [ responseObject ] );
-        }
-        release(pReq);
-    }
+	/** @private */
+	function handleTransactionResponse(pReq, pCallback, pFailure) {
+		try {
+			var httpStatus = pReq.connection.status;
+		}
+		catch (e) {
+			var httpStatus = 13030;
+		}
+		if (httpStatus >= 200 && httpStatus < 300) {
+			var responseObject = createResponseObject(pReq, pCallback.argument);
+			try {
+				//console.log( pReq.src );
+				//console.log( 'request callback: '+pCallback.toString() );
+				pCallback.apply(pCallback, [responseObject.responseXml, responseObject.responseText, responseObject]);
+			}
+			catch (e) {
+				if ( tb.debug ) debugger; 
+			}
+		}
+		else {
+			var responseObject = createResponseObject(pReq, pCallback.argument);
+			pFailure.apply( pFailure, [ responseObject ] );
+		}
+		release(pReq);
+	}
 
-    /** @private */
-    function createResponseObject(pObj, pCallbackArg) {
-        var myObj = {};
-        myObj.tId = pObj.identifier;
-        myObj.status = pObj.connection.status;
-        myObj.statusText = pObj.connection.statusText;
-        myObj.allResponseHeaders = pObj.connection.getAllResponseHeaders();
-        myObj.responseText = pObj.connection.responseText;
-        myObj.responseXML = pObj.connection.responseXML;
-        if (pCallbackArg) {
-            myObj.argument = pCallbackArg;
-        }
-        return myObj;
-    }
+	/** @private */
+	function createResponseObject(pObj, pCallbackArg) {
+		var myObj = {};
+		myObj.tId = pObj.identifier;
+		myObj.status = pObj.connection.status;
+		myObj.statusText = pObj.connection.statusText;
+		myObj.allResponseHeaders = pObj.connection.getAllResponseHeaders();
+		myObj.responseText = pObj.connection.responseText;
+		myObj.responseXML = pObj.connection.responseXML;
+		if (pCallbackArg) {
+			myObj.argument = pCallbackArg;
+		}
+		return myObj;
+	}
 
-    /** @private */
-    function release(pReq) {
-        tb.request.dec();
-        if (pReq.connection) pReq.connection = null;
-        delete pReq.connection;
-        pReq = null;
-        delete pReq;
-    }
+	/** @private */
+	function release(pReq) {
+		tb.request.dec();
+		if (pReq.connection) pReq.connection = null;
+		delete pReq.connection;
+		pReq = null;
+		delete pReq;
+	}
 
-    /**
-     * @name tb.request
-     * @function
+	/**
+	 * @name tb.request
+	 * @function
 	 * @param pOptions { object } a hash object containing these options:<br><br><br>
 	 * @returns a twoBirds request object
 	 * 
@@ -1211,122 +1281,122 @@ tb.request = (function () {
 	 * ms: number of milliseconds the request will run before being terminated
 	 * @param pOptions.cachable: (boolean, deprecated, optional) defaults to true, indicates whether or not to include a unique id in URL
 	 * @param pOptions.async: (boolean, optional, defaults to true) whether or not to make an asynchronous request
-     */
-    return function (pOptions) {
-        var myIndex = tb.getid(),
-            myUid = 'tb' + myIndex,
-            myXmlreq = false,
-            myMethod = (pOptions.method ? pOptions.method.toUpperCase() : false) || 'POST',
-            myUrl = pOptions.url,
-            myParms = '';
+	 */
+	return function (pOptions) {
+		var myIndex = tb.getid(),
+			myUid = 'tb' + myIndex,
+			myXmlreq = false,
+			myMethod = (pOptions.method ? pOptions.method.toUpperCase() : false) || 'POST',
+			myUrl = pOptions.url,
+			myParms = '';
 
-        if (typeof pOptions.parms != 'undefined') {
-        	var ct = ( pOptions.headers && pOptions.headers['Content-Type'] 
-        				? pOptions.headers['Content-Type'] 
-        				: 'application/x-www-form-urlencoded' );
-        	
-        	switch ( ct ){
-        	case 'application/json':
-        		myParms = $.toJSON( pOptions.parms );
-        		break;
-        	default:
-                for (var i in pOptions.parms) { // concat parameter string
-                    myParms += ((myParms.length > 0 ? '&' : '') + i + '=' + pOptions.parms[i]);
-                }
-        		break;
-        	}
-        }
-        
-        var myResponseXmlHandler = pOptions.success || tb.nop,
-            myFailureHandler = pOptions.failure || tb.nop,
-            myStateHandler = pOptions.statechange || tb.nop,
-            myIsCachable = pOptions.cachable || false,
-            myTimeout = pOptions.timeout || false,
-            myIsAsync = (typeof pOptions.async !== 'undefined' && pOptions.async === false) ? false : true;
+		if (typeof pOptions.parms != 'undefined') {
+			var ct = ( pOptions.headers && pOptions.headers['Content-Type'] 
+						? pOptions.headers['Content-Type'] 
+						: 'application/x-www-form-urlencoded' );
+			
+			switch ( ct ){
+			case 'application/json':
+				myParms = $.toJSON( pOptions.parms );
+				break;
+			default:
+				for (var i in pOptions.parms) { // concat parameter string
+					myParms += ((myParms.length > 0 ? '&' : '') + i + '=' + pOptions.parms[i]);
+				}
+				break;
+			}
+		}
+		
+		var myResponseXmlHandler = pOptions.success || tb.nop,
+			myFailureHandler = pOptions.failure || tb.nop,
+			myStateHandler = pOptions.statechange || tb.nop,
+			myIsCachable = pOptions.cachable || false,
+			myTimeout = pOptions.timeout || false,
+			myIsAsync = (typeof pOptions.async !== 'undefined' && pOptions.async === false) ? false : true;
 
-        tb.request.inc();
+		tb.request.inc();
 
-        if (myIsCachable === false) { // proxy disable
-            myUrl += (myUrl.indexOf('?') < 0 ? '?' : '&') + 'tbUid=' + myUid;
-        }
+		if (myIsCachable === false) { // proxy disable
+			myUrl += (myUrl.indexOf('?') < 0 ? '?' : '&') + 'tbUid=' + myUid;
+		}
 
-        myXmlreq = getConnection(myUid);
-        if (myXmlreq) {
-            if ( myMethod === 'GET' && myParms !== '') {
-                myUrl = myUrl + (myUrl.indexOf('?') < 0 ? '?' : '&') + myParms;
-            }
-            myXmlreq.src=myUrl;
+		myXmlreq = getConnection(myUid);
+		if (myXmlreq) {
+			if ( myMethod === 'GET' && myParms !== '') {
+				myUrl = myUrl + (myUrl.indexOf('?') < 0 ? '?' : '&') + myParms;
+			}
+			myXmlreq.src=myUrl;
 
-            myXmlreq.connection.open(myMethod, myUrl, myIsAsync);
+			myXmlreq.connection.open(myMethod, myUrl, myIsAsync);
 
-            if (myIsAsync === true) {
-                myXmlreq.poll = handlereadyState(myXmlreq, myResponseXmlHandler, myStateHandler, myFailureHandler, myUrl);
-            }
+			if (myIsAsync === true) {
+				myXmlreq.poll = handlereadyState(myXmlreq, myResponseXmlHandler, myStateHandler, myFailureHandler, myUrl);
+			}
 
-            // set request headers
-            if (pOptions.headers) {
-                for (var i in pOptions.headers) {
-                	if (i !== 'Content-Type') {
-                		myXmlreq.connection.setRequestHeader(i, pOptions.headers[i]);
-                	}
-                }
-            }
+			// set request headers
+			if (pOptions.headers) {
+				for (var i in pOptions.headers) {
+					if (i !== 'Content-Type') {
+						myXmlreq.connection.setRequestHeader(i, pOptions.headers[i]);
+					}
+				}
+			}
 
-            // abort functionality
-            if (myTimeout) {
-                myXmlreq.timeoutTimer = window.setTimeout(
+			// abort functionality
+			if (myTimeout) {
+				myXmlreq.timeoutTimer = window.setTimeout(
 
-                function (pT, pR) {
-                    var myF = typeof pT.cb === 'function' ? pT.cb : false;
-                    return function () {
-                        //if ( !myR && myR.connection.status == 4 ) return;
-                        if (typeof myF == 'function') {
-                            myF( /*createResponseObject(myR)*/ );
-                        }
-                        pR.connection.abort();
-                        window.clearInterval(pR.poll);
-                    };
-                }(myTimeout, myXmlreq), myTimeout.ms);
-            }
+				function (pT, pR) {
+					var myF = typeof pT.cb === 'function' ? pT.cb : false;
+					return function () {
+						//if ( !myR && myR.connection.status == 4 ) return;
+						if (typeof myF == 'function') {
+							myF( /*createResponseObject(myR)*/ );
+						}
+						pR.connection.abort();
+						window.clearInterval(pR.poll);
+					};
+				}(myTimeout, myXmlreq), myTimeout.ms);
+			}
 
-            myXmlreq.abort=tb.bind( function () {
-                window.clearInterval(this.poll);
-                if (this.connection) this.connection.abort();
-                release(this);
-            }, myXmlreq );
+			myXmlreq.abort=tb.bind( function () {
+				window.clearInterval(this.poll);
+				if (this.connection) this.connection.abort();
+				release(this);
+			}, myXmlreq );
 
-            // send
-            if (myMethod === 'POST' || myMethod === 'PUT') {
-                if (myParms !== '') {
-                    myXmlreq.connection.setRequestHeader('Content-Type', ct);
-                    myXmlreq.connection.send(myParms);
-                }
-                else {
-                    myXmlreq.connection.send(null);
-                }
-            }
-            else {
-                myXmlreq.connection.send(null);
-            }
-            // if sync request direct handler call
-            if (myIsAsync === false) {
-                tb.request.dec();
-                if (myXmlreq.connection.status >= 200 && myXmlreq.connection.status < 300) {
-                    myResponseXmlHandler(myXmlreq.connection.responseXML, myXmlreq.connection.responseText);
-                }
-                else {
-                    myFailureHandler( myXmlreq );
-                }
-            }
-            else {
-                return myXmlreq;
-            }
-            return;
-        }
-        else {
-            return false;
-        }
-    }
+			// send
+			if (myMethod === 'POST' || myMethod === 'PUT') {
+				if (myParms !== '') {
+					myXmlreq.connection.setRequestHeader('Content-Type', ct);
+					myXmlreq.connection.send(myParms);
+				}
+				else {
+					myXmlreq.connection.send(null);
+				}
+			}
+			else {
+				myXmlreq.connection.send(null);
+			}
+			// if sync request direct handler call
+			if (myIsAsync === false) {
+				tb.request.dec();
+				if (myXmlreq.connection.status >= 200 && myXmlreq.connection.status < 300) {
+					myResponseXmlHandler(myXmlreq.connection.responseXML, myXmlreq.connection.responseText);
+				}
+				else {
+					myFailureHandler( myXmlreq );
+				}
+			}
+			else {
+				return myXmlreq;
+			}
+			return;
+		}
+		else {
+			return false;
+		}
+	}
 })();
 
 tb.request.loadlist = [];
@@ -1335,22 +1405,22 @@ tb.request.cachable = false;
 tb.request.log = false;
 
 tb.request.inc = function ( pReq ) {
-    tb.request.loadlist.push( pReq );
-    tb.request.count = tb.request.loadlist.length;
-    tb.request.readyState = 'loading';
+	tb.request.loadlist.push( pReq );
+	tb.request.count = tb.request.loadlist.length;
+	tb.request.readyState = 'loading';
 };
 
 tb.request.dec = function ( pReq ) {
-    for ( var i=0, l=tb.request.loadlist.length; i < l; i++){
-    	if ( pReq === tb.request.loadlist[i] ){
-            tb.request.loadlist.splice( i, 1 );
-            tb.request.count = tb.request.loadlist.length;
-            if ( tb.request.loadlist.length === 0 ){
-                tb.request.readyState = 'complete';
-            }
-            break;
-    	}
-    }
+	for ( var i=0, l=tb.request.loadlist.length; i < l; i++){
+		if ( pReq === tb.request.loadlist[i] ){
+			tb.request.loadlist.splice( i, 1 );
+			tb.request.count = tb.request.loadlist.length;
+			if ( tb.request.loadlist.length === 0 ){
+				tb.request.readyState = 'complete';
+			}
+			break;
+		}
+	}
 };
 
 
@@ -1363,10 +1433,10 @@ if ( !console ) {
 
 $.each( 
 	['log','debug','info','warn','error','assert',
-    'dir','dirxml','trace','group','groupCollapsed',
-    'groupEnd','time','timeEnd','profile','profileEnd',
-    'count','exception','table'],
-    function( i, v ){
+	'dir','dirxml','trace','group','groupCollapsed',
+	'groupEnd','time','timeEnd','profile','profileEnd',
+	'count','exception','table'],
+	function( i, v ){
 		console[v] = console[ v ] || tb.nop;
 	}
 );
@@ -1385,61 +1455,61 @@ tb.loader = (function(){
 	}
 
 	/** @lends tb.loader */
-    return {
-    	/** @function
-    	 * @private
-    	 */
-    	getType: getType,
-    	
-    	/**
-    	 * start or end of load trigger this function
-    	 * @param pInc { numeric, omitted, -1 or +1 }
-    	 * @param pPath { string, optional } path part of the URL
-    	 */
-    	count: function( pInc, pPath ){
-    		count += pInc;
-    		if ( count === 0 ){
-    			tb('*').trigger('tb.idle');
-    		} else if ( count === 1 && Math.abs( pInc ) === pInc ) {
-    			tb('*').trigger('tb.loading');
-    		}
+	return {
+		/** @function
+		 * @private
+		 */
+		getType: getType,
+		
+		/**
+		 * start or end of load trigger this function
+		 * @param pInc { numeric, omitted, -1 or +1 }
+		 * @param pPath { string, optional } path part of the URL
+		 */
+		count: function( pInc, pPath ){
+			count += pInc;
+			if ( count === 0 ){
+				tb('*').trigger('tb.idle');
+			} else if ( count === 1 && Math.abs( pInc ) === pInc ) {
+				tb('*').trigger('tb.loading');
+			}
 		},
 
-    	/**
-    	 * load a resource using the specific type loader
-    	 * @param pPath {string, omitted} path part of the URL
-    	 * @param pCallback {function, optional} callback function after resource has loaded
-    	 * @returns
-    	 */
+		/**
+		 * load a resource using the specific type loader
+		 * @param pPath {string, omitted} path part of the URL
+		 * @param pCallback {function, optional} callback function after resource has loaded
+		 * @returns
+		 */
 		load : function(){ // general loader switch
 			return tb.loader[ getType( arguments[0] ) ].load.apply( this, Array.prototype.slice.call( arguments ) );
 		},
 
-        /**
-         * tests whether a resource was loaded already using the specific type loader
-         * @param pPath {string, omitted} path part of the URL
-         * @returns
-         */
+		/**
+		 * tests whether a resource was loaded already using the specific type loader
+		 * @param pPath {string, omitted} path part of the URL
+		 * @returns
+		 */
 		test: function ( pPath ) { // returns true when element has loaded, false otherwise
-	        return tb.loader[ getType( pPath ) ].test( pPath );
-	    },
-	    
-	    /**
-	     * get a resource using the specific type loader
-	     * @param pPath
-	     * @returns
-	     */
-	    get: function( pPath ){ // get result from loader cache
-	        return tb.loader[ getType( pPath ) ].cache.get( pPath );
-	    },
+			return tb.loader[ getType( pPath ) ].test( pPath );
+		},
+		
+		/**
+		 * get a resource using the specific type loader
+		 * @param pPath
+		 * @returns
+		 */
+		get: function( pPath ){ // get result from loader cache
+			return tb.loader[ getType( pPath ) ].cache.get( pPath );
+		},
 
-	        /** private */
-    	errCb: function( url) {
-	    	return function(){
-	        	throw ( 'NOT LOADED: ' + url );
-	        };
-	    }
-    };
+			/** private */
+		errCb: function( url) {
+			return function(){
+				throw ( 'NOT LOADED: ' + url );
+			};
+		}
+	};
 })();
 
 /**
@@ -1447,11 +1517,11 @@ tb.loader = (function(){
  * @namespace tb.loader.js
  */
 tb.loader.js = (function () {
-    var c = new tb.Cache();
+	var c = new tb.Cache();
 
-    // execute JavaScript by <script>-tag
-    function addScript( pPath, pUrl, pCb, pId ) {
-  		var head = document.getElementsByTagName('head')[0],
+	// execute JavaScript by <script>-tag
+	function addScript( pPath, pUrl, pCb, pId ) {
+		var head = document.getElementsByTagName('head')[0],
 			script = document.createElement('script'),
 			done = false;
 
@@ -1475,7 +1545,7 @@ tb.loader.js = (function () {
 			done = true;
 
 			c.set( pPath, 1 );
-            tb.loader.count( -1, 'JS: ' + pPath );
+			tb.loader.count( -1, 'JS: ' + pPath );
 			
 			// check for further requirements:
 			if ( ns && $.isPlainObject(ns) ){ 
@@ -1529,34 +1599,34 @@ tb.loader.js = (function () {
 		}
 
 		head.appendChild(script);
-    }
+	}
 
-    /** @lends tb.loader.js */
-    return {
+	/** @lends tb.loader.js */
+	return {
 
-    	/** @private */
-        cache: c,
+		/** @private */
+		cache: c,
 
 		/**
 		 * @function
 		 * @memberOf tb.loader.js
 		 */
-        load: function ( pPath, pCb, pId ) {
-            var url,
-                pCb = pCb || tb.nop;
+		load: function ( pPath, pCb, pId ) {
+			var url,
+				pCb = pCb || tb.nop;
 
-        	if ( !pPath ) return;
-        	url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
+			if ( !pPath ) return;
+			url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
 			tb.loader.count( 1, 'JS: ' + pPath );
-            c.set( pPath, 0 );  
-        	addScript.apply( this, [ pPath, url, pCb, pId ] );
-        },
+			c.set( pPath, 0 );  
+			addScript.apply( this, [ pPath, url, pCb, pId ] );
+		},
 
-        test: function( pPath ){
-        	var i = c.get( pPath );
-        	return !!i; // status 1 is done
-        }
-    };
+		test: function( pPath ){
+			var i = c.get( pPath );
+			return !!i; // status 1 is done
+		}
+	};
 })();
 
 
@@ -1565,154 +1635,201 @@ tb.loader.js = (function () {
  * @namespace tb.loader.css
  */
 tb.loader.css = (function () {
-    var c = new tb.Cache();
+	var c = new tb.Cache();
 
-    /** private */
-    function cb( pPath, pUrl, pCb ) {
-    	//console.log('generate css callback');
-        return function (pXml, pText ) {
+	/** private */
+	function cb( pPath, pUrl, pCb ) {
+		//console.log('generate css callback');
+		return function (pXml, pText ) {
 
-            var css = document.createElement('style'),
-                head = document.getElementsByTagName('head')[0],
-                filepath = pUrl.split('/');
+			var css = document.createElement('style'),
+				head = document.getElementsByTagName('head')[0],
+				filepath = pUrl.split('/');
 
-            filepath.pop();
-            filepath = filepath.join('/') + '/';
-            
-        	//console.log('filepath', filepath );
-        	//console.log('css loader callback function', pPath, pUrl );
+			filepath.pop();
+			filepath = filepath.join('/') + '/';
+			
+			//console.log('filepath', filepath );
+			//console.log('css loader callback function', pPath, pUrl );
 
-        	if (pText.length === 0) pText = '/* empty css file */';
+			if (pText.length === 0) pText = '/* empty css file */';
 
-            tb.loader.css.cache.set( pPath, pText );
-            tb.loader.count( -1, 'CSS: ' + pPath );
+			tb.loader.css.cache.set( pPath, pText );
+			tb.loader.count( -1, 'CSS: ' + pPath );
 
-            css.setAttribute('type', 'text/css');
-            css.setAttribute('filename', pPath);
+			css.setAttribute('type', 'text/css');
+			css.setAttribute('filename', pPath);
 
-            // correct static content urls
-            pText = pText.replace(/url\((.*)\)/g, 'url(' + filepath + '$1)');
-            /*
-            pText = pText.replace(/src="(.*)"/g, 'src="' + filepath + '$1"');
-            pText = pText.replace(/href="(.*)"/g, 'href="' + filepath + '$1"');
+			// correct static content urls
+			pText = pText.replace(/url\((.*)\)/g, 'url(' + filepath + '$1)');
+			/*
+			pText = pText.replace(/src="(.*)"/g, 'src="' + filepath + '$1"');
+			pText = pText.replace(/href="(.*)"/g, 'href="' + filepath + '$1"');
 			*/
 
 			if (tb.browser.msie) {
-                css.styleSheet.cssText = pText;
-            }
-            else {
-                css.appendChild(document.createTextNode(pText));
-            }
+				css.styleSheet.cssText = pText;
+			}
+			else {
+				css.appendChild(document.createTextNode(pText));
+			}
 
-            //myHead.insertBefore(myCss, myHead.firstChild);
-            head.appendChild(css);
+			//myHead.insertBefore(myCss, myHead.firstChild);
+			head.appendChild(css);
 
-            //console.log('CSS loader execute: '+tb.serialize( pCb ) );
-            if (pCb) pCb();
-        	//console.log('css loader callback checkRg call');
-        	tb.require.checkGroups();
-        };
-    }
+			//console.log('CSS loader execute: '+tb.serialize( pCb ) );
+			if (pCb) pCb();
+			//console.log('css loader callback checkRg call');
+			tb.require.checkGroups();
+		};
+	}
 
-    /** @lends tb.loader.css */
-    return {
-        /** private */
-        cache: c,
+	/** @lends tb.loader.css */
+	return {
+		/** private */
+		cache: c,
 
 		/**
 		 * @function
 		 * @memberOf tb.loader.css
 		 */
-        load: function ( pPath, pCb ) {
-            var done = false,
-            	url = ( tb.loader.css['prefix'] || '') + pPath,
-                myCb = pCb || tb.nop; // CAUTION: see below, triggers loading via request
-            
-        	if ( !pPath ) return;
+		load: function ( pPath, pCb ) {
+			var done = false,
+				url = ( tb.loader.css['prefix'] || '') + pPath,
+				myCb = pCb || tb.nop; // CAUTION: see below, triggers loading via request
+			
+			if ( !pPath ) return;
 			tb.loader.count( 1, 'CSS: ' + pPath );
 
-            //console.log( 'loader.css.load', pPath, pCb );
-            c.set( pPath, 0 );
+			//console.log( 'loader.css.load', pPath, pCb );
+			c.set( pPath, 0 );
 
-            if ( pCb ) { // if callback load via request
-	            //console.log( 'loader.css.load METHOD xhr', pPath, pCb );
-                tb.request({
-                	method: 'GET',
-                    url: url,
-                    success: cb( pPath, url, pCb ),
-                    failure: tb.loader.errCb( url )
-                });
-            } else { // if no callback append link to head ( predictive load )
-	            //console.log( 'loader.css.load METHOD head.insertBefore', pPath, pCb );
-                var css = document.createElement('link');
-                css.setAttribute('rel', 'stylesheet');
-                css.setAttribute('type', 'text/css');
-                css.setAttribute('href', myUrl);
-                head.insertBefore(myCss, myHead.firstChild);
-            }
-        },
+			if ( pCb ) { // if callback load via request
+				//console.log( 'loader.css.load METHOD xhr', pPath, pCb );
+				tb.request({
+					method: 'GET',
+					url: url,
+					success: cb( pPath, url, pCb ),
+					failure: tb.loader.errCb( url )
+				});
+			} else { // if no callback append link to head ( predictive load )
+				//console.log( 'loader.css.load METHOD head.insertBefore', pPath, pCb );
+				var css = document.createElement('link');
+				css.setAttribute('rel', 'stylesheet');
+				css.setAttribute('type', 'text/css');
+				css.setAttribute('href', myUrl);
+				head.insertBefore(myCss, myHead.firstChild);
+			}
+		},
 
-        test: function( pPath ){
-        	var i = c.get( pPath );
-        	return !!i; // status 1 is done
-        }
-    };
+		test: function( pPath ){
+			var i = c.get( pPath );
+			return !!i; // status 1 is done
+		}
+	};
 })();
 
 /**
  * template file loader
- * @namespace tb.loader.tpl
+ * @namespace tb.loader.html
  */
 tb.loader.html = (function () {
-    var c = new tb.Cache();
-    
-    /** @private */
-    function cb( pPath, pUrl, pCb ) {
-    	//console.log('generate html callback');
-        return function (pXml, pText) {
-	    	pText = !pText ? '<div>template was an empty string</div>' : pText;
-            tb.loader.html.cache.set( pPath, pText );
-            //console.log('execute html callback', pPath, pUrl, pCb, tb.loader.html.cache.c );
-        	tb.loader.count( -1, 'HTML: ' + pPath );
-            if (pCb) pCb();
-        };
-    }
+	var c = new tb.Cache();
+	
+	/** @private */
+	function cb( pPath, pUrl, pCb ) {
+		//console.log('generate html callback');
+		return function (pXml, pText) {
+			pText = !pText ? '<div>template was an empty string</div>' : pText;
+			tb.loader.html.cache.set( pPath, pText );
+			//console.log('execute html callback', pPath, pUrl, pCb, tb.loader.html.cache.c );
+			tb.loader.count( -1, 'HTML: ' + pPath );
+			if (pCb) pCb();
+		};
+	}
 
-    /** @lends tb.loader.tpl */
-    return {
-    	/** @private */
-        cache: c,
+	/** @lends tb.loader.html */
+	return {
+		/** @private */
+		cache: c,
 
 		/**
 		 * @function
-		 * @memberOf tb.loader.tpl
+		 * @memberOf tb.loader.html
 		 */
-        load: function ( pPath, pCb ) {
-            var done = false,
-            	url = ( tb.loader.html['prefix'] || '') + pPath,
-                myCb = pCb || tb.nop; // CAUTION: see below, triggers loading via request
-            
-        	if ( !pPath ) return;
+		load: function ( pPath, pCb ) {
+			var done = false,
+				url = ( tb.loader.html['prefix'] || '') + pPath,
+				myCb = pCb || tb.nop; // CAUTION: see below, triggers loading via request
+			
+			if ( !pPath ) return;
 
 			tb.loader.count( 1, 'HTML: ' + pPath );
 
-            var options = {
-                    method: 'GET',
-                    url: url,
-                    success: cb( pPath, url, pCb )
-                };
+			var options = {
+					method: 'GET',
+					url: url,
+					success: cb( pPath, url, pCb )
+				};
 
-            c.set( pPath, 0 );
+			c.set( pPath, 0 );
 
-            tb.request( options );
+			tb.request( options );
 
-            return pPath;
-        },
+			return pPath;
+		},
 
-        test: function( pPath ){
-        	var i = c.get( pPath );
-        	return !!i; // status 1 is done
-        }
-    };
+		test: function( pPath ){
+			var i = c.get( pPath );
+			return !!i; // status 1 is done
+		}
+	};
+})();
+
+/**
+ * json file loader
+ * @namespace tb.loader.json
+ */
+tb.loader.json = (function () {
+	
+	/** @private */
+	function cb( pPath, pUrl, pCb ) {
+		//console.log('generate html callback');
+		return function (pXml, pText) {
+			pText = !pText ? '{ error: "empty text, expected JSON string?" }' : pText;
+			tb.loader.count( -1, 'JSON: ' + pPath );
+			var data = eval( '('+pText+')') || 'PARSE ERROR in JSON string: ' + pText;
+			if (pCb) pCb( { data: data } );
+		};
+	}
+
+	/** @lends tb.loader.tpl */
+	return {
+		/**
+		 * @function
+		 * @memberOf tb.loader.json
+		 */
+		load: function ( pPath, pCb ) {
+			var done = false,
+				url = ( tb.loader.json['prefix'] || '') + pPath,
+				myCb = pCb || tb.nop; // CAUTION: see below, triggers loading via request
+			
+			if ( !pPath ) return;
+
+			tb.loader.count( 1, 'JSON: ' + pPath );
+
+			var options = {
+					method: 'GET',
+					url: url,
+					success: cb( pPath, url, pCb )
+				};
+
+			c.set( pPath, 0 );
+
+			tb.request( options );
+
+			return pPath;
+		}
+	};
 })();
 

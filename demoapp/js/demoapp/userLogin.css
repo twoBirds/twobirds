@@ -1,6 +1,12 @@
 .userlogin .inputfield {
 	float: right;
 	margin-left: 1em;
+	background-color: rgba(0,0,0,0.05);
+}
+
+.userlogin .login-failed {
+	background-color: rgba(255,0,0,0.3);
+	border: 1px solid #CC0000;
 }
 
 .userlogin p {
