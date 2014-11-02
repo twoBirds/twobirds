@@ -25,7 +25,11 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				.on(
 					'click',
 					function(){
-						that.data = { usernick: that.usernick.val() }
+						that.data = { 
+							usernick: that.usernick.val(), 
+							userpass: that.userpass.val() 
+						};
+
 						that.trigger(':login:')
 					}
 				);
@@ -35,14 +39,20 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 		'login':  function userlogin_login(ev){
 			// convert pass to md5
-			var val = decodeURIComponent( this.userpass.val() );
-			this.userpass.val( tb.md5.hex_md5( val ) );
+			var val = decodeURIComponent( this.userpass.val() ),
+				md5 = tb.md5.hex_md5( val );
+
+			this.userpass.val( md5 );
+			this.data.userpass = md5;
+			
 			this.model.get( this.form.serialize() );
-			this.userpass.val(val); // not really necessary ;-)
+			this.userpass.val(val);
 		},
 
 		'tb.model.success': function userlogin_loginsuccess(ev){
-			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') );
+			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
+				that = this;
+
 			$( this.target ).html( html );
 
 			$( this.target )
@@ -51,15 +61,26 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 					'click',
 					function(){
 						that.data = {};
-						that.trigger(':tb.init:'); // a bit tricky I know but possible here
+						that.trigger(':tb.init:'); // a bit too easy. I know, but possible here
 					}
 				);
+
+			tb(/topMenu/).trigger( 
+				'loadmenu', 
+				that.data
+			);
 
 		},
 
 		'tb.model.failure': function userlogin_loginfailure(ev){
+			var that = this;
+
 			this.userpass.addClass( 'login-failed' );
+			this.userpass.one( 'focus', function(){
+				that.userpass.removeClass( 'login-failed' );
+			});
 		}
+
 	},
 
 	'tb.require': [

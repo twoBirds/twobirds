@@ -890,16 +890,20 @@ tb.Model.prototype = (function(){
 
 	return {
 
-		'get': function( pPara ){ // if parameter given, expects string of GET type parameters $a=...&b=... 
+		'get': function( pPara ){ // if parameter given, expects either hash object or string of GET type parameters like a=...&b=... 
 			// map in url
-			var myUrl = tb.parse( _convertToHash( pPara ), this.url );
+			var myUrl = tb.parse( $.isPlainObject( pPara ) ? pPara : _convertToHash( pPara ), this.url );
 
 			tb.request({
 				url:  myUrl,
 				method: 'GET',
 				cachable: true,
 				success: (function(that){ return function( pXml, pText ){
-						that.trigger( ':tb.model.success:', JSON.parse(pText) );
+						try {
+							pText = JSON.parse( pText );
+						} catch (e) {}
+
+						that.trigger( ':tb.model.success:', pText );
 					};})(this.tbo()),
 				failure: (function(that, myUrl){ return function( pXml, pText ){
 						that.trigger( ':tb.model.failure:', myUrl );
@@ -908,7 +912,9 @@ tb.Model.prototype = (function(){
 
 			//console.log( myUrl );
 		}
+
 	};
+
 })();
 
 /** 

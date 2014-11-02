@@ -218,4 +218,4 @@ tb.md5 = { // new object
 
 };
 
-console.log('md5 verify:', tb.md5.md5_vm_test() );
+//console.log('md5 verify:', tb.md5.md5_vm_test() );

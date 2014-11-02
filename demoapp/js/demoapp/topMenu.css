@@ -1,0 +1,55 @@
+ul#Navigation {
+	margin: 0;
+	padding: 0;
+}
+
+ul#Navigation li {
+	list-style: none;
+	float: left;  
+	position: relative;
+	padding: 0;
+}
+
+ul#Navigation a {
+	font-style: normal;
+	text-decoration: none;
+}
+
+ul#Navigation li:hover {
+	background-color: rgba(200,200,200, 0.9);
+}
+
+ul#Navigation li ul {
+	margin: 0; 
+	padding: 0;
+	position: absolute;
+	top: 1.2em; 
+	left: 0;
+	display: none;
+	border: 1px solid #999999;
+	background-color: rgba(255,255,255, 0.9);
+	z-index: 1000;
+}
+
+ul#Navigation li ul:hover,
+ul#Navigation li:hover ul {
+	display: block;
+}
+
+ul#Navigation li ul li {
+	float: none;
+	display: block;
+}
+
+ul#Navigation a, ul#Navigation span {
+	display: block;
+}
+
+ul#Navigation a:hover, ul#Navigation span, li a#aktuell {
+}
+
+li a#aktuell {
+}
+
+ul#Navigation li ul span {
+}

@@ -46,11 +46,11 @@ input, textarea, button {
   align:left;
 }
 
-a:link { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px;}
-a:visited { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px; } 
-a:active { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:4px; margin-right:4px; }
-a:hover { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:4px; margin-right:4px; }
-a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:4px; margin-right:4px; }
+a:link { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:1em; margin-right:1em;}
+a:visited { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:1em; margin-right:1em; } 
+a:active { color: #0000aa; font-weight:bold; font-style:italic; text-decoration:none; margin-left:1em; margin-right:1em; }
+a:hover { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:1em; margin-right:1em; }
+a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:underline; margin-left:1em; margin-right:1em; }
 
 .loading-indicator {
   display: inline;
@@ -140,27 +140,26 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
   #menuline {
     position: fixed;
-    padding: 0.1em;
-    padding-bottom: 0;
-    top: 4em;
+    top: 4.2em;
     left: 0;
     right: 0;
-    /*
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 0.8em; 
     border-top:1px solid #808080; 
     border-bottom:1px solid #808080; 
-    */
     background: #eeeefe;
   }
 
   .middlearea {
+    top: 7.5em;
+    bottom: 5.1em; 
     padding: 0.1em;
     font-size: 0.8em; 
   }
 
   #middleleft {
     position: fixed;
-    top: 6.1em;
-    bottom: 5.1em; 
     left: 0; 
     max-width: 15em;
     overflow:hidden;
@@ -168,8 +167,6 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
   #middlecenter {
     position: fixed;
-    top: 6.1em;
-    bottom: 5.1em;
     left: 15em; 
     right: 15em; 
     overflow:hidden;
@@ -177,8 +174,6 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
   #middleright {
     position: fixed;
-    top: 6.1em;
-    bottom: 5.1em; 
     right: 0; 
     max-width: 15em; 
     overflow:hidden;
