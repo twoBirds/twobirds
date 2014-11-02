@@ -868,7 +868,7 @@ tb.nameSpace = function( pString, pCreate ){
 	return e;
 }
 
-tb.Observable = function( pN, pV ){
+tb.observable = function( pN, pV ){
 
 	//console.log( 'new observable', pN, pV, 'in', this );
 

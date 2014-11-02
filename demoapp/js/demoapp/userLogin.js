@@ -2,7 +2,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 	name: 'demoapp.userLogin',
 
-	loginData: tb.Observable( 'loginData', {} ),
+	loginData: tb.observable( 'loginData', {} ),
 
 	handlers: {
 		
