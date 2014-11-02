@@ -20,10 +20,10 @@ ul#Navigation li:hover {
 }
 
 ul#Navigation li ul {
-	margin: 0; 
+	margin-top: 1.25em; 
 	padding: 0;
 	position: absolute;
-	top: 1.2em; 
+	top: 0; 
 	left: 0;
 	display: none;
 	border: 1px solid #999999;

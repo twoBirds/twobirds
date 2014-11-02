@@ -151,6 +151,10 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     background: #eeeefe;
   }
 
+  #menuline div {
+    margin: 0;
+  }
+
   .middlearea {
     top: 7.5em;
     bottom: 5.1em; 

@@ -355,7 +355,7 @@ if (!Array.prototype.indexOf)
 					ea[0] = 'this';	// only this (sub-)object
 				}
 				if ( ea[2].length === 0 ){ // no bubble behaviour defined
-					ea[2] = 'ld';	// assume local only
+					ea[2] = 'ld';	// assume local down only
 				}
 
 				// reassemble complete event name
@@ -364,11 +364,18 @@ if (!Array.prototype.indexOf)
 				// event structure:
 				var evt = {
 						name: pName, 			// must be overwritten
-						origin: this,			// tb object origin
+						origin: this,			// target tb object origin
 						target: ea[0], 			// jquery origin element
 						bubble: ea[2],			// do not bubble, other options 'l', u', 'd', and any combination of it
 						data: pData
 					};
+
+				if ( $.isPlainObject( pData ) ) $.extend( 
+					// if pData is object also merge it into evt object
+					// to allow for overloading of origin etc. 
+					evt,
+					pData
+				); 
 
 				var start;
 				switch ( ea[0] ){
@@ -386,6 +393,7 @@ if (!Array.prototype.indexOf)
 						break;
 				}
 
+				//console.log( 'TRIGGER', arguments, evt, 'ON', start );
 				if ( start !== false ) setTimeout( 
 					(function( start, evt ){ return function(){
 						handleEvent.apply( start, [ evt ] );
@@ -416,6 +424,8 @@ if (!Array.prototype.indexOf)
 					var root = this['_super'] !== undefined ? this._root() : this,
 						result = false,
 						names = [];
+
+					names.push( root.name );
 
 					function walk( pTb ){
 						$.each( pTb, function( i, v ){
@@ -840,6 +850,67 @@ tb.nameSpace = function( pString, pCreate ){
 	}
 
 	return e;
+}
+
+tb.Observable = function( pN, pV ){
+
+	console.log( 'new observable', pN, pV, 'in', this );
+
+	return function( pValue ){
+
+		if ( pValue !== undefined ){ // a "set" operation
+			if ( this instanceof tb ){ // on a tb object, first invocation will also add system handlers
+
+				console.log( 'observable set', pN, pV, 'in', this );
+
+				if ( this['handlers'] === undefined ) this.handler = {};
+
+				if ( this['handlers']['tb.notify'] === undefined ) this.addHandler( 'tb.notify', function(ev){
+					var list = this['handlers']['tb.notify']['list'];
+					console.log('observable notifier', ev, list);
+					$.each( list, function( i, v ){
+						var a = v.split(':'),
+							s = a[0],
+							n = a[1],
+							r = new RegExp( s );
+						console.log( 'observable trigger', n, 'on selector', s, '-->',  tb(r) );
+						if ( ev.varname === n ){
+							console.log( 'observable trigger execute', n, 'on', tb(r) );
+							tb( r ).trigger( ':tb.observable.notify:', { varname: ev.varname, value: ev.value } );
+						}
+					});
+				});
+
+				if ( this['handlers']['tb.notify']['list'] === undefined ) this['handlers']['tb.notify'].list = [];
+				if ( this['handlers']['tb.notify']['observable'] === undefined ) this['handlers']['tb.notify'].observable = true;
+
+				if (!this['handlers']['tb.watch']) this.addHandler( 'tb.watch', function(ev){
+					console.log( 'observable watch', ev );
+					if ( this[ ev.which ] ){
+						if ( $.isFunction( this[ ev.which ] ) ){ 
+							var id = ev.origin.name + ':' + ev.which;
+							if ( this['handlers']['tb.notify'].list.indexOf( id ) === -1 ){
+								this['handlers']['tb.notify'].list.push( id );
+							}
+						} else {
+							throw ( ev.data.toString() + ' is not an observable property!' );
+						}
+					} else {
+						throw ( 'requested observable ' + ev.data.toString() + ' doesnt exist!' );
+					}
+				});
+			}
+
+			pV = pValue;
+
+			if ( this instanceof tb ){ // on a tb object
+				this.trigger(':tb.notify:', { varname: pN, value: pV } );
+			}
+
+			return pV;
+		};
+	};
+
 }
 
 /** @memberOf tb

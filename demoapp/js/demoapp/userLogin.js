@@ -2,6 +2,8 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 	name: 'demoapp.userLogin',
 
+	loginData: tb.Observable( 'loginData', {} ),
+
 	handlers: {
 		
 		'tb.init': function userlogin_tb_init(ev){
@@ -34,6 +36,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 					}
 				);
 
+			this.loginData( {} );
 			return false; // break here
 		},
 
@@ -44,7 +47,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 			this.userpass.val( md5 );
 			this.data.userpass = md5;
-			
+
 			this.model.get( this.form.serialize() );
 			this.userpass.val(val);
 		},
@@ -53,23 +56,18 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
 
-			$( this.target ).html( html );
+			this.loginData( this.data ); // demoapp.topMenu watching this
 
 			$( this.target )
+				.html( html )
 				.find('.userlogin-logoutlink')
 				.on(
 					'click',
 					function(){
 						that.data = {};
-						that.trigger(':tb.init:'); // a bit too easy. I know, but possible here
+						that.trigger(':tb.init:'); // a bit too easy, I know, but possible here
 					}
 				);
-
-			tb(/topMenu/).trigger( 
-				'loadmenu', 
-				that.data
-			);
-
 		},
 
 		'tb.model.failure': function userlogin_loginfailure(ev){
