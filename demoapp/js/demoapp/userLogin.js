@@ -36,7 +36,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 					}
 				);
 
-			this.loginData( {} );
+			this.loginData({});
 			return false; // break here
 		},
 

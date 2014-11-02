@@ -19,13 +19,13 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 		},
 
 		'tb.idle': function topmenu_tb_idle(ev){
-			console.log( 'topmenu tb.idle', ev );
-			tb(/demoapp.userLogin/).trigger('tb.watch',  { which:'loginData', origin: this } );
+			//console.log( 'topmenu tb.idle', ev, tb( demoapp.userLogin ) );
+			tb( demoapp.userLogin ).loginData.observe( this );
 		},
 
 		'tb.observable.notify': function topmenu_observable_notify(ev){
-			console.log( 'topmenu observable', ev );
-			this.trigger(':loadmenu:', ev.value );
+			//console.log( 'topmenu observable', ev );
+			this.trigger(':loadmenu:', ev.data );
 		},
 
 		'loadmenu': function topmenu_load_menu(ev){

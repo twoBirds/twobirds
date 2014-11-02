@@ -137,9 +137,9 @@ if (!Array.prototype.indexOf)
 		if ( e === undefined || !e instanceof tb ) return false;
 		//console.log( 'selector _me', e, s );
 		
-		if ( typeof s === 'string' ){ // assume jquery selector
+		if ( typeof s === 'string' || s instanceof String ){ // assume jquery selector
 			return $(e.target).is(s);
-		} else if ( $.isPlainObject(s) ){ // a test object to match against
+		} else if ( $.isPlainObject(s) && !s instanceof tb ){ // a test object to match against
 			var match = true;
 			$.each( s, function( key, val){
 				if ( !e[key] || !( val === e[key] || typeof e[key] === val || (val instanceof RegExp && typeof e[key] === 'string' && val.test(e[key]) ) ) ) {
@@ -155,6 +155,11 @@ if (!Array.prototype.indexOf)
 			// shortcut for testing name against regexp, 
 			// e.g. tb(/body/) all tb objects that contain 'body' in their name
 			return s.test( e.instanceOf().join(',') );
+		} else { // assume object match
+			// this will return the exact sub object match
+			var i = e.instanceOf( s );
+			//if ( i !== false ) console.log('return subobject', i );
+			return i;
 		}
 		return false;
 	}
@@ -168,10 +173,12 @@ if (!Array.prototype.indexOf)
 				//console.log( 'selector _ma element', v, v instanceof HTMLElement, $(v).data('tbo') );
 				v = $(v).data('tbo');
 			}
-			if ( _me( v, s ) ){
-				r.push( v );
+			var e =  _me( v, s );
+			if ( e !== undefined && e !== false ){
+				r.push( e === true ? v : e );
 			}
 		});
+		//console.log( 'selector _ma', r );
 		$.extend(r, true, tb.prototype)
 		return r.length === 1 ? r[0] : r ;
 	}
@@ -180,8 +187,7 @@ if (!Array.prototype.indexOf)
 	function _se( s ){
 
 		var s = s || {}, // no selector --> everything matches
-			a = this === window ? $('[data-tb]') : this, // either jquery all tb DOM nodes array or assume result set
-			r = [];
+			a = this === window ? $('[data-tb]') : this; // either jquery all tb DOM nodes array or assume result set
 
 		//console.log( 'selector _se', a );
 
@@ -195,7 +201,7 @@ if (!Array.prototype.indexOf)
 
 	// explicit public part
 	window.tb = function( a ){
-		if( a && typeof a === 'object' && typeof a['nodeType'] !== 'undefined' ){ // a DOM node
+		if( a instanceof HTMLElement ){ // a DOM node
 			
 			this.target = a;
 			this.handlers = {};
@@ -413,41 +419,52 @@ if (!Array.prototype.indexOf)
 				if ( this instanceof Array && this[0] && this[0] instanceof tb ){ // chained method, filter result set
 					var r = [];
 					$.each( this, function(i,v){
-						if ( v.instanceOf( pObj ) ) {
-							r.push( v );
+						var t = v.instanceOf( pObj );
+						if ( t !== false ) {
+							r.push( t );
 						}
 					});
+					//console.log('instanceOf array result', r);
 					$.extend(r, true, tb.prototype);
 					return r.length === 1 ? r[0] : r;
 				
 				} else if ( this instanceof tb ) { // instanceof tb, normal method
 					var root = this['_super'] !== undefined ? this._root() : this,
 						result = false,
-						names = [];
+						names = [],
+						match;
 
 					names.push( root.name );
 
-					function walk( pTb ){
+					function walk( pTb, pObj ){
 						$.each( pTb, function( i, v ){
 							if ( v instanceof tb && v['_super'] !== undefined ){ // sub object, not handle to foreign tb element
 								names.push( v.name );
-								walk( v );
+								if ( pObj !== undefined && match === undefined && pObj.name === v.name ){ // sub object fit
+									//console.log( 'walk match', pTb[i] );
+									match = pTb[i];
+								}
+								walk( v, pObj );
 							}
 						});
 					}
 					
 					if ( pObj !== undefined ){
-						var a = root.instanceOf(); // all sub objects
-						if ( pObj instanceof String || typeof pObj === 'string' ) {
+						if ( pObj instanceof String || typeof pObj === 'string' ) { // exact match of namespace
+							var a = root.instanceOf(); // all sub objects
 							return a.indexOf( pObj ) > -1 ? true : false;
-						} else if ( pObj instanceof RegExp ) {
+						} else if ( pObj instanceof RegExp ) { // looking for regexp match in names
+							var a = root.instanceOf(); // all sub objects
 							$.each( a, function( i, v ){
 								if ( pObj.test( v ) ) {
 									result = true;
 								}
 							});
-						} else { // assume repo object
-							return a.indexOf( pObj.name ) > -1 ? true : false;
+						} else { // assume repo object or tb instance object --> return subobject if match
+							walk( root, pObj ); // recursively scan object
+							//if ( match !== undefined ) console.log( 'instanceOf match', match );
+							return match !== undefined ? match : false;
+							//return a.indexOf( pObj.name ) > -1 ? true : false;
 						}
 					} else {
 						walk( root ); // recursively scan object
@@ -503,7 +520,8 @@ if (!Array.prototype.indexOf)
 
 					case 'function':
 						if ( obj.prototype === Function.prototype ){
-							obj.apply( this['_root'] ? this._root() : this, [ this[namespace] ] );
+							console.log( 'inject function', obj );
+							obj.apply( this, [ this[namespace] ] );
 						} else { // a constructor
 							var c = tb.nameSpace(namespace), // constructor
 								r = new c( this[namespace] );
@@ -533,7 +551,6 @@ if (!Array.prototype.indexOf)
 						}
 
 						//console.log( 'inject walk object' );
-
 						// walk object, recursive inject tb objects
 						$.each( tbo, function( i, v ){
 							if ( tbo.hasOwnProperty( i ) ){
@@ -547,7 +564,7 @@ if (!Array.prototype.indexOf)
 						});
 
 						//console.log( 'inject special properties' );
-
+						// inject special properties
 						$.extend( // mix in special properties
 							true,
 							tbo,
@@ -567,7 +584,6 @@ if (!Array.prototype.indexOf)
 						);
 
 						//console.log( 'inject', tbo, ' INTO ', this);
-
 						this[namespace] = tbo;
 
 						//console.log( 'result after [' + namespace + '] is injected:', this );
@@ -854,63 +870,56 @@ tb.nameSpace = function( pString, pCreate ){
 
 tb.Observable = function( pN, pV ){
 
-	console.log( 'new observable', pN, pV, 'in', this );
+	//console.log( 'new observable', pN, pV, 'in', this );
 
-	return function( pValue ){
+	var f = function( pValue ){
 
 		if ( pValue !== undefined ){ // a "set" operation
-			if ( this instanceof tb ){ // on a tb object, first invocation will also add system handlers
-
-				console.log( 'observable set', pN, pV, 'in', this );
-
-				if ( this['handlers'] === undefined ) this.handler = {};
-
-				if ( this['handlers']['tb.notify'] === undefined ) this.addHandler( 'tb.notify', function(ev){
-					var list = this['handlers']['tb.notify']['list'];
-					console.log('observable notifier', ev, list);
-					$.each( list, function( i, v ){
-						var a = v.split(':'),
-							s = a[0],
-							n = a[1],
-							r = new RegExp( s );
-						console.log( 'observable trigger', n, 'on selector', s, '-->',  tb(r) );
-						if ( ev.varname === n ){
-							console.log( 'observable trigger execute', n, 'on', tb(r) );
-							tb( r ).trigger( ':tb.observable.notify:', { varname: ev.varname, value: ev.value } );
-						}
-					});
-				});
-
-				if ( this['handlers']['tb.notify']['list'] === undefined ) this['handlers']['tb.notify'].list = [];
-				if ( this['handlers']['tb.notify']['observable'] === undefined ) this['handlers']['tb.notify'].observable = true;
-
-				if (!this['handlers']['tb.watch']) this.addHandler( 'tb.watch', function(ev){
-					console.log( 'observable watch', ev );
-					if ( this[ ev.which ] ){
-						if ( $.isFunction( this[ ev.which ] ) ){ 
-							var id = ev.origin.name + ':' + ev.which;
-							if ( this['handlers']['tb.notify'].list.indexOf( id ) === -1 ){
-								this['handlers']['tb.notify'].list.push( id );
-							}
-						} else {
-							throw ( ev.data.toString() + ' is not an observable property!' );
-						}
-					} else {
-						throw ( 'requested observable ' + ev.data.toString() + ' doesnt exist!' );
-					}
-				});
-			}
 
 			pV = pValue;
 
 			if ( this instanceof tb ){ // on a tb object
-				this.trigger(':tb.notify:', { varname: pN, value: pV } );
+				if (!arguments.callee['tbo']) arguments.callee.tbo = (function( that ){ return function(){
+					return that;
+				};})(this);
+
+				//console.log( 'instance observable set', this, pN, pV, this[pN].tbo(), this[pN].tbo()['notify'] );
+				this[pN].notify();
 			}
 
 			return pV;
-		};
+		} 
+
 	};
 
+	f.list = [];
+
+	f.notify = function(){
+		//console.log( 'f notify', f['list'] );
+		$.each( f['list'], function( i, v ){
+			var a = v.split(':'),
+				s = a[0],
+				n = a[1],
+				r = new RegExp( s );
+			if ( pN === n ){
+				//console.log( 'observable trigger execute', n, 'with', pV, 'on', tb(r) );
+				tb( r ).trigger( ':tb.observable.notify:', pV );
+			}
+		});
+	};
+
+	f.observe = function( pO ){
+		var id = pO.name + ':' + pN;
+		if ( f.list.indexOf( id ) === -1 ){
+			f.list.push( id );
+		}	
+		//console.log( 'f observe', f.list );
+	};
+
+	//console.log( 'new observable', f, 'in', this );
+	console.debug( f );
+
+	return f;
 }
 
 /** @memberOf tb
@@ -1622,7 +1631,6 @@ tb.loader.js = (function () {
 			done = true;
 
 			c.set( pPath, 1 );
-			tb.loader.count( -1, 'JS: ' + pPath );
 			
 			// check for further requirements:
 			if ( ns && $.isPlainObject(ns) ){ 
@@ -1662,6 +1670,8 @@ tb.loader.js = (function () {
 
 			// now check groups
 			tb.require.checkGroups();
+
+			tb.loader.count( -1, 'JS: ' + pPath );
 		}
 		
 		script.onload = completed;
@@ -1732,7 +1742,6 @@ tb.loader.css = (function () {
 			if (pText.length === 0) pText = '/* empty css file */';
 
 			tb.loader.css.cache.set( pPath, pText );
-			tb.loader.count( -1, 'CSS: ' + pPath );
 
 			css.setAttribute('type', 'text/css');
 			css.setAttribute('filename', pPath);
@@ -1758,6 +1767,8 @@ tb.loader.css = (function () {
 			if (pCb) pCb();
 			//console.log('css loader callback checkRg call');
 			tb.require.checkGroups();
+
+			tb.loader.count( -1, 'CSS: ' + pPath );
 		};
 	}
 
@@ -1820,8 +1831,8 @@ tb.loader.html = (function () {
 			pText = !pText ? '<div>template was an empty string</div>' : pText;
 			tb.loader.html.cache.set( pPath, pText );
 			//console.log('execute html callback', pPath, pUrl, pCb, tb.loader.html.cache.c );
-			tb.loader.count( -1, 'HTML: ' + pPath );
 			if (pCb) pCb();
+			tb.loader.count( -1, 'HTML: ' + pPath );
 		};
 	}
 
