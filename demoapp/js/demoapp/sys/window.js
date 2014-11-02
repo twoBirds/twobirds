@@ -79,7 +79,7 @@ tb.nameSpace('demoapp.sys').window = {
 				var next = $( this.target ).next();
 				if ( next[0] ) next.data('tbo').trigger(':window.active:ld', true);
 				$( this.target ).detach();
-				tb(/windowController/).trigger(':scroll.update:ld');
+				tb(/demoapp.sys.windowController/).trigger(':scroll.update:ld');
 				return;
 			}
 			this.descendants().trigger({ name: ':window.closeRequested:' });
@@ -97,7 +97,7 @@ tb.nameSpace('demoapp.sys').window = {
 			var win = $( this.target ).find('.demoapp-window');
 			if ( this.active === true ){
 				win.addClass('_demoapp-window-active');
-                var windows = tb(/./).instanceOf( demoapp.window ),
+                var windows = tb(/demoapp.sys.window/),
                 	checkname = this._root().name;
 				if (windows instanceof Array) $.each( windows, function( i, v ){
 	                if( v.name !== checkname ){
