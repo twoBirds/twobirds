@@ -62,6 +62,15 @@ if (!Array.prototype.indexOf)
  */
 (function(){
 
+	// private persist twobirds objects in DOM
+	// args[0] is the tbo
+	_persist = function( that ){
+		if ( that['_super'] !== undefined ){
+			that = that._root();
+		}
+		$( that.target ).data( 'tbo', that );
+	}
+
 	// private init twobirds objects in DOM
 	// args[0] is DOM node or set to DOM body node if undefined
 	_init = function(){
@@ -235,14 +244,11 @@ if (!Array.prototype.indexOf)
 				}
 				
 				this['handlers'][pName].push( pFunction );
+				//_persist( this ); // save root object to DOM
 			},
 
 			removeHandler: function( pName, pFunction ){
-
-				if ( pName === undefined 
-					|| pFunction === undefined
-					|| typeof pName !== 'string'
-					|| typeof pFunction !== 'function'){
+				if ( pName === undefined || typeof pName !== 'string' ){
 					return;
 				}
 
@@ -252,11 +258,13 @@ if (!Array.prototype.indexOf)
 				
 				var a = [];
 
-				$.each( this['handlers'][pName], function( i, v ){
-					if ( v !== pFunction ){
-						a.push( v );
-					}
-				});
+				if ( pFunction !== undefined ){
+					$.each( this['handlers'][pName], function( i, v ){
+						if ( v !== pFunction ){
+							a.push( v );
+						}
+					});
+				}
 
 				if ( a.length > 0){
 					this['handlers'][pName] = a;
@@ -264,6 +272,7 @@ if (!Array.prototype.indexOf)
 					this['handlers'][pName] = null;			
 					delete this['handlers'][pName];			
 				}
+				//_persist( this ); // save root object to DOM
 			},
 
 			handle: function( evt ){
@@ -311,10 +320,10 @@ if (!Array.prototype.indexOf)
 						$.each( this, function( i, v ){
 							handleEvent.apply( v, [ evt ] );
 						});
-					} else {
-						if ( this['handlers'] ){
-							cont = this.handle.apply( this, [ evt ] ) === false ? false : true;
-						}
+					} 
+
+					if ( this['handlers'] ){
+						cont = this.handle.apply( this, [ evt ] ) === false ? false : true;
 					}
 
 					// bubble
@@ -335,6 +344,7 @@ if (!Array.prototype.indexOf)
 							}
 						}
 					}
+					//_persist( this ); // save root object to DOM
 					return cont;
 				}
 
@@ -917,7 +927,7 @@ tb.observable = function( pN, pV ){
 	};
 
 	//console.log( 'new observable', f, 'in', this );
-	console.debug( f );
+	//console.debug( f );
 
 	return f;
 }
