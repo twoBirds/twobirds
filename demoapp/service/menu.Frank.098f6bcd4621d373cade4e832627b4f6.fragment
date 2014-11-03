@@ -1,12 +1,20 @@
 <ul id="Navigation">
 	<li>
+		<a href="#">Frank</a>
+		<ul>
+			<li>
+				<a href="demoapp.userLogin:logout">logout</a>
+			</li>
+		</ul>
+	</li>
+	<li>
 		<a href="#">Test windows</a>
 		<ul>
 			<li>
-				<a href="#demoapp/infoWindow.js">Info&nbsp;window</a>
+				<a href="demoapp.windowController:addWindow:demoapp/infoWindow.js">Info&nbsp;window</a>
 			</li>
 			<li>
-				<a href="#demoapp/webglWindow.js">webGL&nbsp;window</a>
+				<a href="demoapp.windowController:addWindow:demoapp/webglWindow.js">webGL&nbsp;window</a>
 			</li>
 		</ul>
 	</li>

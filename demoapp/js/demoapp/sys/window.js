@@ -72,6 +72,7 @@ tb.nameSpace('demoapp.sys').window = {
 
 			this.trigger(':window.active:', true);
 			this._super().trigger(':window.ready:lu');
+			tb(/windowController/).trigger(':scroll.update:ld');
 		},
 
 		'window.close': function sys_window_close(ev){
@@ -79,7 +80,7 @@ tb.nameSpace('demoapp.sys').window = {
 				var next = $( this.target ).next();
 				if ( next[0] ) next.data('tbo').trigger(':window.active:ld', true);
 				$( this.target ).detach();
-				tb(/demoapp.sys.windowController/).trigger(':scroll.update:ld');
+				tb(/windowController/).trigger(':scroll.update:ld');
 				return;
 			}
 			this.descendants().trigger({ name: ':window.closeRequested:' });

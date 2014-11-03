@@ -31,6 +31,11 @@ tb.nameSpace( 'demoapp.sys', true ).windowController = {
 			this.trigger('this:scroll.update:ld');
 			this.trigger('this:scroll.scrollTo:ld', 0);
 			return false;
+		},
+
+		'closeAllWindows': function windowController_addWindow(ev){
+			this.children().trigger('window.close');
+			return false;
 		}
 
 	}

@@ -1,6 +1,12 @@
 ul#Navigation {
 	margin: 0;
 	padding: 0;
+	display: inline-block;
+}
+
+li ul li.topmenu-separator {
+	height:0px;
+	border-top: 1px solid #999999;
 }
 
 ul#Navigation li {
@@ -8,6 +14,7 @@ ul#Navigation li {
 	float: left;  
 	position: relative;
 	padding: 0;
+	display: inline-block;
 }
 
 ul#Navigation a {
