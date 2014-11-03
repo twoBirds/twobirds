@@ -22,6 +22,10 @@ ul#Navigation a {
 	text-decoration: none;
 }
 
+ul#Navigation a:hover {
+	border: 0px none;
+}
+
 ul#Navigation li:hover {
 	background-color: rgba(200,200,200, 0.9);
 }
