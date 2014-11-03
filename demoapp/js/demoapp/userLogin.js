@@ -65,6 +65,12 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			this.userpass.val(val);
 		},
 
+		'logout': function userlogin_logout(ev){
+			$( this.target )
+				.find('.userlogin-logoutlink')
+				.click();
+		},
+
 		'tb.model.success': function userlogin_loginsuccess(ev){
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
