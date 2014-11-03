@@ -35,7 +35,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 			$( this.target )
 				.on(
 					'click',
-					'li > ul > li',
+					'ul#Navigation > li > ul > li',
 					function( ev ){
 						var t = $(ev.currentTarget).find('a').attr('href');
 						t = t.split(':');
