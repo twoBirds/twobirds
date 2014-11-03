@@ -96,6 +96,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 			 -div = scroll bar
 			 --div = scroll handle
 			 */
+			var that = this;
 
 			if ( this.config.content ) {
 				this.target = $(this.config.content)[0] || this.target;
@@ -131,29 +132,27 @@ tb.nameSpace('tb.ui', true).scroll = {
 			this.scrollRoot.addClass( '_tb-ui-scroll-' + this.config.direction );
 
 			// this indicates the scroll is moving or has been activated
-			this.scrollOn = (function (that) {
-				return function () {
-					that.trigger(':scroll.scrolling:', true);
+			this.scrollOn = function () {
+				that.trigger(':scroll.scrolling:', true);
 
-					clearTimeout(this.scrollingClassTimeout);
+				clearTimeout(this.scrollingClassTimeout);
 
-					this.scrollingClassTimeout = setTimeout(
-						(function (that) {
-							return function () {
-								that.trigger(':scroll.scrolling:', false);
-							};
-						})(this),
-						500
-						);
-				};
-			})(this);
+				this.scrollingClassTimeout = setTimeout(
+					(function (that) {
+						return function () {
+							that.trigger(':scroll.scrolling:', false);
+						};
+					})(this),
+					500
+					);
+			};
 			
 			/*
 			ATTACH NATIVE HANDLERS
 			*/
 
 			// attach scroll handler
-			this.scrollRoot.on('scroll', (function(that){ return function (ev) {
+			this.scrollRoot.on('scroll', function (ev) {
 				// stop if not active and not a touch device, of scroll is frozen
 				if ( ( !that.isTouchDevice && !that.active ) || that.isScrollFrozen === true ){
 					//console.log( 'scroll td, a, f', that.isTouchDevice, that.active, that.isScrollFrozen );
@@ -178,11 +177,11 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 				ev.stopPropagation();
 
-			};})(this));
+			});
 
 			// attach mouseenter / mouseleave handler
 			this.root.hover(
-				(function(that){ return function (ev) {
+				function (ev) {
 					//console.log('HANDLER FUNCTION mouseenter', this, that);
 					//console.log( 'mouseenter events', $._data( that.scrollRoot[0], 'events') );
 
@@ -193,8 +192,8 @@ tb.nameSpace('tb.ui', true).scroll = {
 					}
 					that.trigger(':scroll.wheelHandlerTimeout:');
 					//ev.stopImmediatePropagation();
-				 };})(this),
-				(function(that){ return function (ev) {
+				},
+				function (ev) {
 					//console.log('HANDLER FUNCTION mouseleave', this, that);
 
 					if (that.mousedown === true || that.scrollBar.is(':hover')) {
@@ -205,67 +204,76 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 					// kill timeout, just to be sure
 					window.clearTimeout(this.attachWheelHandlerTimeout);
-					this.attachWheelHandlerTimeout = null;
+					that.attachWheelHandlerTimeout = null;
 
 					that.trigger(':scroll.detachWheelHandler:');
 					that.trigger(':scroll.active:', false);
 
-				};})(this)
+				}
 			);
 
 			this.scrollContainer.on(
 				'click',
-				(function(that){ return function(ev){
+				function(ev){
 					//console.log('scrollContainer click', that );
 					//that.trigger(':scroll.active:', true);
 					that.trigger(':scroll.attachWheelHandler:');
 					//ev.stopPropagation();
-				};})(this)
+				}
 			);
 
-			this.scrollHandle.on( 'click', (function(that){ return function (ev) {
-				//console.log('scrollHandle click', ev);
-				ev.stopImmediatePropagation(); // TBD: strange behaviour otherwise 
-				ev.stopPropagation();
-				ev.preventDefault();
-			};})(this));
-
-			this.scrollHandle.on( 'mousedown', (function(that){ return function (ev) {
-				//console.log('scrollHandle mousedown', ev, ev['client' + (that.direction === 'x' ? 'X' : 'Y')]);
-				if ( that.dragmode ) return;
-				that.dragmode = true;
-				that.dragstart = ev['client' + (that.direction === 'x' ? 'X' : 'Y')];
-				that.dragstarthandle = parseInt( that.scrollHandle.position()[ that.direction === 'x' ? 'left' : 'top'] );
-				that.scrollOn();
-				//console.log('scrollHandle dragstart', parseInt( that.scrollHandle.position()[ that.direction === 'x' ? 'left' : 'top'] ) ) ;
-
-				$('body').on( 'mousemove', (function(that){ return function (ev) {
-					//console.log('body mousemove', ev, ev['client' + (that.direction === 'x' ? 'X' : 'Y')]);
-					if ( that.dragmode ){
-						//console.log('scrollBar mousemove in dragmode', ev);
-						that.setNewOffset.apply( that, [ ev['client' + (that.direction === 'x' ? 'X' : 'Y')] - that.dragstart ] );
-					}
-				};})(that));
-
-				$('body').on( 'mouseup', (function(that){ return function (ev) {
-					//console.log('body mouseup', ev, that);
-					that.dragmode = false;
-					$('body').off( 'mousemove' );
-					$('body').off( 'mouseup' );
-				};})(that));
-
-				ev.stopPropagation();
-				ev.preventDefault();
-			};})(this));
-
-			this.scrollBar.on( 'click', (function(that){ return function (ev) {
-				//console.log('scrollBar click', ev);
-				if (that.isScrollFrozen) return;
-				if (ev.target.innerHTML) { // click on scrollBar but outside handle
-					that.setNewPosition.apply( that, [ ev.originalEvent['layer' + (that.direction === 'x' ? 'X' : 'Y')] ] );
+			this.scrollHandle.on( 
+				'click', 
+				function (ev) {
+					//console.log('scrollHandle click', ev);
+					ev.stopImmediatePropagation(); // TBD: strange behaviour otherwise 
+					ev.stopPropagation();
+					ev.preventDefault();
 				}
-				ev.stopPropagation();
-			};})(this));
+			);
+
+			this.scrollHandle.on(
+				'mousedown', 
+				function (ev) {
+					//console.log('scrollHandle mousedown', ev, ev['client' + (that.direction === 'x' ? 'X' : 'Y')]);
+					if ( that.dragmode ) return;
+					that.dragmode = true;
+					that.dragstart = ev['client' + (that.direction === 'x' ? 'X' : 'Y')];
+					that.dragstarthandle = parseInt( that.scrollHandle.position()[ that.direction === 'x' ? 'left' : 'top'] );
+					that.scrollOn();
+					//console.log('scrollHandle dragstart', parseInt( that.scrollHandle.position()[ that.direction === 'x' ? 'left' : 'top'] ) ) ;
+
+					$('body').on( 'mousemove', (function(that){ return function (ev) {
+						//console.log('body mousemove', ev, ev['client' + (that.direction === 'x' ? 'X' : 'Y')]);
+						if ( that.dragmode ){
+							//console.log('scrollBar mousemove in dragmode', ev);
+							that.setNewOffset.apply( that, [ ev['client' + (that.direction === 'x' ? 'X' : 'Y')] - that.dragstart ] );
+						}
+					};})(that));
+
+					$('body').on( 'mouseup', (function(that){ return function (ev) {
+						//console.log('body mouseup', ev, that);
+						that.dragmode = false;
+						$('body').off( 'mousemove' );
+						$('body').off( 'mouseup' );
+					};})(that));
+
+					ev.stopPropagation();
+					ev.preventDefault();
+				}
+			);
+
+			this.scrollBar.on(
+				'click',
+				function (ev) {
+					//console.log('scrollBar click', ev);
+					if (that.isScrollFrozen) return;
+					if (ev.target.innerHTML) { // click on scrollBar but outside handle
+						that.setNewPosition.apply( that, [ ev.originalEvent['layer' + (that.direction === 'x' ? 'X' : 'Y')] ] );
+					}
+					ev.stopPropagation();
+				}
+			);
 
 			this.scrollOn();
 
@@ -402,7 +410,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 			//console.log('attach');
 			// attach native handler
-			this.scrollRoot
+			this.root
 				.off('mousewheel')
 				.on('mousewheel', (function(that){ return function (ev, delta) {
 					// we need to preserve 'this' as 'that'
@@ -449,14 +457,15 @@ tb.nameSpace('tb.ui', true).scroll = {
 			this.attachWheelHandlerTimeout = null;
 
 			//console.log( 'dwh events', $._data( this.scrollRoot[0], 'events') );
-			this.scrollRoot.off('mousewheel');
+			this.root.off('mousewheel');
 		},
 
 		// destroy scroll
 		'destroy': function scroll_destroy(ev) {
 			this.root
 				.off('mouseenter')
-				.off('mouseleave');
+				.off('mouseleave')
+				.off('mousewheel');
 			$( this.target ).html( this.scrollContent.detach() );
 		}
 	
