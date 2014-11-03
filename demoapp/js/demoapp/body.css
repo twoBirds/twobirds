@@ -133,6 +133,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     position: fixed;
     top: 0; 
     right: 0; 
+    min-width: 15em; 
     max-width: 15em; 
     max-height: 4em; 
     overflow:hidden;
@@ -148,7 +149,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     font-size: 0.8em; 
     border-top:1px solid #808080; 
     border-bottom:1px solid #808080; 
-    background: #eeeefe;
+    background: rgba( 240, 240, 250, 0.5) ;
   }
 
   #menuline div {

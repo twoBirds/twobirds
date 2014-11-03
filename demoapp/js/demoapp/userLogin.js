@@ -36,6 +36,20 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 					}
 				);
 
+			// quirky behaviour fix for link instead of submit button, but ok for now:
+			$( this.target )
+				.find('input')
+				.on(
+					'keypress',
+					function(e) {
+						if(e.which == 13) {
+							$( that.target )
+								.find('.userlogin-loginlink')
+								.click();
+						}
+					}
+				);
+
 			this.loginData({});
 			return false; // break here
 		},
