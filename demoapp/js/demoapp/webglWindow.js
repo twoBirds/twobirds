@@ -85,7 +85,7 @@ demoapp.webglWindow = {
 			//camera.updateProjectionMatrix();
 
 			//renderer.setSize( window.innerWidth, window.innerHeight );
-			this.renderer.setSize( ev.origin.content.width(), ev.origin.content.height() ); 
+			//this.renderer.setSize( ev.origin.content.width(), ev.origin.content.height() ); 
 		}
 
 	}
