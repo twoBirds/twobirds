@@ -16,6 +16,10 @@
 			<li>
 				<a href="demoapp.windowController:addWindow:demoapp/webglWindow.js">webGL&nbsp;window</a>
 			</li>
+			<li class="topmenu-separator" />
+			<li>
+				<a href="demoapp.windowController:closeAllWindows">close&nbsp;all&nbsp;windows</a>
+			</li>
 		</ul>
 	</li>
 </ul>

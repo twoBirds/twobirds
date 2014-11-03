@@ -12,26 +12,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 				this
 			);
 
-			// load standard menu
-			this.trigger(':loadmenu:', { usernick: 'Guest', userpass: 'd41d8cd98f00b204e9800998ecf8427e' } );
-
-			return false; // break here
-		},
-
-		'tb.idle': function topmenu_tb_idle(ev){
-			var that = this;
-			tb( demoapp.userLogin ).loginData.observe( function( pParm ){
-				that.trigger(':loadmenu:', pParm );
-				that.removeHandler( 'tb.idle' );
-			});
-		},
-
-		'loadmenu': function topmenu_load_menu(ev){
-			this.model.get( ev.data );
-		},
-
-		'tb.model.success': function topmenu_load_success(ev){
-			$( this.target ).html( ev.data );
+			// behaviour
 			$( this.target )
 				.on(
 					'click',
@@ -58,6 +39,27 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 						ev.preventDefault();
 					}
 				);
+
+			// load standard menu
+			this.trigger(':loadmenu:', { usernick: 'Guest', userpass: 'd41d8cd98f00b204e9800998ecf8427e' } );
+
+			return false; // break here
+		},
+
+		'tb.idle': function topmenu_tb_idle(ev){
+			var that = this;
+			tb( demoapp.userLogin ).loginData.observe( function( pParm ){
+				that.trigger(':loadmenu:', pParm );
+				that.removeHandler( 'tb.idle' );
+			});
+		},
+
+		'loadmenu': function topmenu_load_menu(ev){
+			this.model.get( ev.data );
+		},
+
+		'tb.model.success': function topmenu_load_success(ev){
+			$( this.target ).html( ev.data );
 		},
 		
 		'tb.model.failure': function topmenu_load_failure(ev){
