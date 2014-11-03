@@ -19,12 +19,11 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 		},
 
 		'tb.idle': function topmenu_tb_idle(ev){
-			tb( demoapp.userLogin ).loginData.observe( this );
-			this.removeHandler( 'tb.idle' );
-		},
-
-		'tb.observable.notify': function topmenu_observable_notify(ev){
-			this.trigger(':loadmenu:', ev.data );
+			var that = this;
+			tb( demoapp.userLogin ).loginData.observe( function( pParm ){
+				that.trigger(':loadmenu:', pParm );
+				that.removeHandler( 'tb.idle' );
+			});
 		},
 
 		'loadmenu': function topmenu_load_menu(ev){

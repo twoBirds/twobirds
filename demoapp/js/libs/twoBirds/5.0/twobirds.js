@@ -878,56 +878,48 @@ tb.nameSpace = function( pString, pCreate ){
 	return e;
 }
 
+/** @memberOf tb
+ * @namespace tb.observable
+ * @function
+ * @description returns an observable type setter / getter function  
+ */
 tb.observable = function( pN, pV ){
 
-	//console.log( 'new observable', pN, pV, 'in', this );
-
 	var f = function( pValue ){
-
-		if ( pValue !== undefined ){ // a "set" operation
-
+		var that = this;
+		if ( pValue !== undefined ){
 			pV = pValue;
-
-			if ( this instanceof tb ){ // on a tb object
-				if (!arguments.callee['tbo']) arguments.callee.tbo = (function( that ){ return function(){
+			if ( this instanceof tb ){
+				if (!arguments.callee['tbo']) arguments.callee.tbo = function(){
 					return that;
-				};})(this);
-
-				//console.log( 'instance observable set', this, pN, pV, this[pN].tbo(), this[pN].tbo()['notify'] );
+				};
 				this[pN].notify();
 			}
-
 			return pV;
 		} 
-
 	};
 
 	f.list = [];
 
 	f.notify = function(){
-		//console.log( 'f notify', f['list'] );
 		$.each( f['list'], function( i, v ){
-			var a = v.split(':'),
-				s = a[0],
-				n = a[1],
-				r = new RegExp( s );
-			if ( pN === n ){
-				//console.log( 'observable trigger execute', n, 'with', pV, 'on', tb(r) );
-				tb( r ).trigger( ':tb.observable.notify:', pV );
+			if ( $.type(v) === 'string' ){
+				var r = new RegExp( s );
+			}
+			if ( $.isFunction(v) ){
+				v(pV) 
+			} else {
+				tb( r ).trigger( ':tb.observable.notify:', { varName: pN, value: pV } );
 			}
 		});
 	};
 
 	f.observe = function( pO ){
-		var id = pO.name + ':' + pN;
-		if ( f.list.indexOf( id ) === -1 ){
+		var id = pO instanceof tb ? pO.name : $.isFunction( pO ) === true ? pO : false; // id = tbo, function or false
+		if ( id !== false && f.list.indexOf( id ) === -1 ){
 			f.list.push( id );
 		}	
-		//console.log( 'f observe', f.list );
 	};
-
-	//console.log( 'new observable', f, 'in', this );
-	//console.debug( f );
 
 	return f;
 }

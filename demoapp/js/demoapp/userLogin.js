@@ -50,7 +50,6 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 					}
 				);
 
-			this.loginData({});
 			return false; // break here
 		},
 
@@ -78,7 +77,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				.on(
 					'click',
 					function(){
-						that.data = {};
+						that.loginData({ usernick: 'Guest', userpass: 'd41d8cd98f00b204e9800998ecf8427e' });
 						that.trigger(':tb.init:'); // a bit too easy, I know, but possible here
 					}
 				);
