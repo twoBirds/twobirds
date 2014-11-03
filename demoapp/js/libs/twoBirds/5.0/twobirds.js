@@ -61,16 +61,6 @@ if (!Array.prototype.indexOf)
  * @description 
  */
 (function(){
-
-	// private persist twobirds objects in DOM
-	// args[0] is the tbo
-	_persist = function( that ){
-		if ( that['_super'] !== undefined ){
-			that = that._root();
-		}
-		$( that.target ).data( 'tbo', that );
-	}
-
 	// private init twobirds objects in DOM
 	// args[0] is DOM node or set to DOM body node if undefined
 	_init = function(){

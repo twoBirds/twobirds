@@ -19,7 +19,6 @@ tb.nameSpace('demoapp.sys').window = {
 				true, 
 				{
 					title: '<title placeholder>',
-					height: '200px',
 					canClose: false,
 					status: '<status placeholder>',
 					scrollBar: true
@@ -35,22 +34,20 @@ tb.nameSpace('demoapp.sys').window = {
 					that.trigger(':window.active:', true);
 				};})(this) );
 
-			var content = $( this.target ).find('> div > div:nth-child(2)'),
-				title = $( this.target ).find('> div > div:nth-child(1)'),
-				status = $( this.target ).find('> div > div:nth-child(3)');
+			this.content = $( this.target ).find('> div > div:nth-child(2)'),
+			this.title = $( this.target ).find('> div > div:nth-child(1)'),
+			this.status = $( this.target ).find('> div > div:nth-child(3)');
 			
-			content.css('height', this.config.height );
-			title.text( this.config.title || '&nbsp;' );
-			status.text( this.config.status || '&nbsp;' );
+			if ( this.config['height'] !== undefined ) this.content.css('height', this.config.height );
+			this.title.text( this.config.title || '&nbsp;' );
+			this.status.text( this.config.status || '&nbsp;' );
 
-			this.content = content;
-			
 			if ( this.config.scrollBar === true ) {
 				// SPECIAL CASE: 
 				// no requirement loading necessary, 
 				// since parent() already has a scroll!
 				this['tb.ui.scroll'] = {
-					content: content[0],
+					content: this.content[0],
 					direction: 'y',
 			        bubbleUp: true,
 			        pixelsPerSecond: 2000,
@@ -71,8 +68,8 @@ tb.nameSpace('demoapp.sys').window = {
 			}
 
 			this.trigger(':window.active:', true);
-			this._super().trigger(':window.ready:lu');
-			tb(/windowController/).trigger(':scroll.update:ld');
+			this.trigger(':window.ready:lu');
+			tb(/windowController/).trigger('scroll.update');
 		},
 
 		'window.close': function sys_window_close(ev){

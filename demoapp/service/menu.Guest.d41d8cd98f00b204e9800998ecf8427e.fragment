@@ -11,6 +11,9 @@
 			<li>
 				<a href="demoapp.windowController:addWindow:demoapp/webglWindow.js">webGL&nbsp;window</a>
 			</li>
+			<li>
+				<a href="demoapp.windowController:addWindow:demoapp/adaptiveWindow.js">adaptive&nbsp;window</a>
+			</li>
 			<li class="topmenu-separator" />
 			<li>
 				<a href="demoapp.windowController:closeAllWindows">close&nbsp;all&nbsp;windows</a>
