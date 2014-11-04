@@ -6,7 +6,7 @@ $c = new MongoClient();
 $db = $c->demo_twobirds;
 
 // find in the collection
-$cursor = array( "error" => "action not found." );
+$cursor = array();
 switch ( $_GET["action"] || "" ) {
     case "login":
 		$collection = $db->users; // containing username(string)
@@ -18,5 +18,5 @@ switch ( $_GET["action"] || "" ) {
 }
 
 // iterate through the results
-echo json_encode(iterator_to_array($cursor, false));
+echo json_encode(iterator_to_array($cursor));
 ?>

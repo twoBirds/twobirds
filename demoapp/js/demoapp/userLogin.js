@@ -7,7 +7,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 	handlers: {
 		
 		'tb.init': function userlogin_tb_init(ev){
-			var that = this;
+			var that = this; // for later use in callbacks
 
 			$( this.target ).html( tb.loader.get('demoapp/userLogin.html') );
 
@@ -17,11 +17,14 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 			this.model = new tb.Model(
 				{
-					url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
-					//url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
-				},
-				this
+					//url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
+					url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
+				}
 			);
+
+			this.model.data.observe( function(){ // this way it is a custom event instead of 'tb.model.success'
+				that.trigger( 'userlogin.success', that.model.data() );
+			});
 
 			$( this.target )
 				.find('.userlogin-loginlink')
@@ -72,13 +75,11 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				.click();
 		},
 
-		'tb.model.success': function userlogin_loginsuccess(ev){
+		'userlogin.success': function userlogin_loginsuccess(ev){
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
 
-			console.log(ev);
-
-			if ( !ev.data[0] ){
+			if ( $.isEmptyObject( ev.data ) ){ // no record returned
 				this.trigger( ':tb.model.failure:l' );
 				return;
 			}
@@ -97,7 +98,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				);
 		},
 
-		'tb.model.failure': function userlogin_loginfailure(ev){
+		'tb.model.failure': function userlogin_loginfailure(ev){ // use system event so it also catches HTTP status errors
 			var that = this;
 
 			this.userpass.addClass( 'login-failed' );

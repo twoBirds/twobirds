@@ -883,10 +883,10 @@ tb.observable = function( pN, pV ){
 				if (!arguments.callee['tbo']) arguments.callee.tbo = function(){
 					return that;
 				};
-				this[pN].notify();
 			}
-			return pV;
+			this[pN].notify();
 		} 
+		return pV;
 	};
 
 	f.list = [];
@@ -897,7 +897,7 @@ tb.observable = function( pN, pV ){
 				var r = new RegExp( s );
 			}
 			if ( $.isFunction(v) ){
-				v(pV) 
+				v( pV );
 			} else {
 				tb( r ).trigger( ':tb.observable.notify:', { varName: pN, value: pV } );
 			}
@@ -937,9 +937,12 @@ tb.Model = function ( pOptions, pObject ) {
 	}
 
 	this.url = pOptions.url;
+
 	this.tbo = (function(that){ return function(){
 		return that;
 	};})(pObject)
+
+	this.data = tb.observable.apply( pObject, [ 'data', {} ] );
 };
 
 tb.Model.prototype = (function(){ 
@@ -964,22 +967,24 @@ tb.Model.prototype = (function(){
 
 		'get': function( pPara ){ // if parameter given, expects either hash object or string of GET type parameters like a=...&b=... 
 			// map in url
-			var myUrl = tb.parse( $.isPlainObject( pPara ) ? pPara : _convertToHash( pPara ), this.url );
+			var model = this, // the model
+				tbo = model['tbo'] ? this.tbo() : false, // the twobirds object the model is attached to
+				myUrl = tb.parse( $.isPlainObject( pPara ) ? pPara : _convertToHash( pPara ), this.url );
 
 			tb.request({
 				url:  myUrl,
 				method: 'GET',
 				cachable: true,
-				success: (function(that){ return function( pXml, pText ){
-						try {
-							pText = JSON.parse( pText );
-						} catch (e) {}
-
-						that.trigger( ':tb.model.success:', pText );
-					};})(this.tbo()),
-				failure: (function(that, myUrl){ return function( pXml, pText ){
-						that.trigger( ':tb.model.failure:', myUrl );
-					};})(this.tbo(), myUrl)
+				success: function( pXml, pText ){
+					try {
+						pText = JSON.parse( pText );
+					} catch (e) {} // otherwise it stays plain text result
+					model.data( pText ); // set model data
+					if ( tbo !== false ) tbo.trigger( ':tb.model.success:', pText );
+				},
+				failure: function( pXml, pText ){
+					if ( tbo !== false ) tbo.trigger( ':tb.model.failure:', myUrl );
+				}
 			});
 
 			//console.log( myUrl );
