@@ -17,7 +17,8 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 			this.model = new tb.Model(
 				{
-					url: 'service/login.{usernick}.{userpass}.json' // {...} being the placeholders for later get() invocation
+					url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
+					//url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
 				},
 				this
 			);
@@ -74,6 +75,13 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 		'tb.model.success': function userlogin_loginsuccess(ev){
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
+
+			console.log(ev);
+
+			if ( !ev.data[0] ){
+				this.trigger( ':tb.model.failure:l' );
+				return;
+			}
 
 			this.loginData( this.data ); // demoapp.topMenu watching this
 
