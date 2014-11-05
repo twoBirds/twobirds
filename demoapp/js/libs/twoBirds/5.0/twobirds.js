@@ -884,7 +884,7 @@ tb.observable = function( pN, pV ){
 					return that;
 				};
 			}
-			this[pN].notify();
+			f.notify();
 		} 
 		return pV;
 	};
@@ -1543,6 +1543,8 @@ tb.loader = (function(){
 		 * @private
 		 */
 		getType: getType,
+
+		loading: tb.observable( 'tb_loading', false ),
 		
 		/**
 		 * start or end of load trigger this function
@@ -1552,9 +1554,11 @@ tb.loader = (function(){
 		count: function( pInc, pPath ){
 			count += pInc;
 			if ( count === 0 ){
-				tb('*').trigger('tb.idle');
+				//tb('*').trigger('tb.idle');
+				tb.loader.loading( false );
 			} else if ( count === 1 && Math.abs( pInc ) === pInc ) {
-				tb('*').trigger('tb.loading');
+				//tb('*').trigger('tb.loading');
+				tb.loader.loading( true );
 			}
 		},
 

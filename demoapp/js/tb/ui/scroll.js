@@ -287,6 +287,11 @@ tb.nameSpace('tb.ui', true).scroll = {
 			this.trigger(':scroll.ready:lu');
 		},
 		
+		// attach scroll ready handler
+		'scroll.ready': function scroll_scrollReady(ev) {
+			this.ready = true;
+		},
+
 		// attach scrollTo handler
 		'scroll.scrollTo': function scroll_scrollTo(ev) {
 			//console.log('HANDLER FUNCTION scrollTo', ev.data, this);
@@ -320,14 +325,16 @@ tb.nameSpace('tb.ui', true).scroll = {
 				content = this.scrollContent,
 				scrollBar = this.scrollBar,
 				scrollHandle = this.scrollHandle,
-				parentSize = root['inner' + (dir === 'x' ? 'Width' : 'Height')](),
+				parentSize = root ? root['inner' + (dir === 'x' ? 'Width' : 'Height')]() : false,
 				scrollPos,
-				scrollBarSize = parentSize
+				scrollBarSize = parentSize ? parentSize
 					- scrollBar.cssPx('margin-' + (dir === 'x' ? 'left' : 'top'))
 					- scrollBar.cssPx('margin-' + (dir === 'x' ? 'right' : 'bottom'))
 					- scrollBar.cssPx('border' + (dir === 'x' ? 'Left' : 'Top') + 'Width')
 					- scrollBar.cssPx('border' + (dir === 'x' ? 'Right' : 'Bottom') + 'Width')
-				;
+				: false;
+
+			if ( !this['ready'] ) return;
 
 			// do not remove: if last element was deleted from DOM...
 			// ...native scrollPos is not updated correctly, but will be after setting it

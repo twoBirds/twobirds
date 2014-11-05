@@ -6,13 +6,20 @@ demoapp.globalSpinner = {
 
 	handlers: {
 
-		'tb.loading': function globalSpinner_tb_loading(ev){
-			this['tb.ui.spinner'].trigger(':tb.ui.spinner.on:');
-		},
+		'tb.init': function globalSpinner_tb_init(){
+			var that = this['tb.ui.spinner'];
 
-		'tb.idle': function globalSpinner_tb_idle(ev){
-			this['tb.ui.spinner'].trigger(':tb.ui.spinner.off:');
+			// observe loading status and trigger spinner accordingly
+			tb.loader.loading.observe( function( pBool ){ 
+				if ( pBool ){
+					that.trigger(':tb.ui.spinner.on:');
+				} else {
+					that.trigger(':tb.ui.spinner.off:');
+				}
+			});
+
 		}
+
 	}
 
 }
