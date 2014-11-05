@@ -15,12 +15,10 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			this.usernick = $('.userlogin input[name=usernick]');
 			this.userpass = $('.userlogin input[name=userpass]');
 
-			this.model = new tb.Model(
-				{
-					//url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
-					url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
-				}
-			);
+			this.model = new tb.Model({
+				//url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
+				url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
+			});
 
 			this.model.data.observe( function userlogin_success(){ // this way it is a custom event instead of 'tb.model.success'
 				that.trigger( 'userlogin.success', that.model.data() );
