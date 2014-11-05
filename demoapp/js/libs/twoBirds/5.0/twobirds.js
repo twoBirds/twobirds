@@ -893,13 +893,7 @@ tb.observable = function( pN, pV ){
 
 	f.notify = function(){
 
-		function clean( a ){ // remove null values from array
-			var b = [];
-			$.each( a, function( i, v ){
-				if ( a[i] !== null ) b.push( v );
-			});
-			return b;
-		}
+		var a = [];
 
 		$.each( f['list'], function( i, v ){
 			if ( $.type(v) === 'string' ){
@@ -907,12 +901,14 @@ tb.observable = function( pN, pV ){
 			}
 			if ( $.isFunction(v) ){
 				v( pV );
-				if ( v.once ) f['list'][i] = null;
+				if ( v.once == false ) a.push(v);
 			} else {
 				tb( r ).trigger( ':tb.observable.notify:', { varName: pN, value: pV } );
+				a.push(v)
 			}
 		});
-		f.list = clean( f['list'] );
+		
+		f.list = a;
 	};
 
 	f.observe = function( pO, pOnce ){
