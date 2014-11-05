@@ -14,8 +14,10 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 				this
 			);
 
-			tb.loader.loading.observe( function topmenu_loading_changed( data ){
-				if ( data === false ) tb( demoapp.userLogin ).loginData.observe( function topmenu_on_user_change( data ){
+			// observe loading status
+			tb.loader.loading.observe( function topmenu_loading_changed( loading ){
+				// if idle watch to userLogin data, on change trigger reload of menu
+				if ( loading === false ) tb( demoapp.userLogin ).loginData.observe( function topmenu_on_user_change( data ){
 					that.trigger(':loadmenu:', data );
 				}); // missing ,true => continous watch 
 			}, true ); // true => only once
