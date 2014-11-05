@@ -5,12 +5,20 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 	handlers: {
 		
 		'tb.init': function userlogin_tb_init(ev){
+			var that = this;
+
 			this.model = new tb.Model(
 				{
 					url: 'service/menu.{usernick}.{userpass}.fragment' // {...} being the placeholders for later get() invocation
 				},
 				this
 			);
+
+			tb.loader.loading.observe( function topmenu_loading_changed( data ){
+				if ( data === false ) tb( demoapp.userLogin ).loginData.observe( function topmenu_on_user_change( data ){
+					that.trigger(':loadmenu:', data );
+				}); // missing ,true => continous watch 
+			}, true ); // true => only once
 
 			// behaviour
 			$( this.target )
@@ -44,14 +52,6 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 			this.trigger(':loadmenu:', { usernick: 'Guest', userpass: 'd41d8cd98f00b204e9800998ecf8427e' } );
 
 			return false; // break here
-		},
-
-		'tb.idle': function topmenu_tb_idle(ev){
-			var that = this;
-			tb( demoapp.userLogin ).loginData.observe( function( pParm ){
-				that.trigger(':loadmenu:', pParm );
-				that.removeHandler( 'tb.idle' );
-			});
 		},
 
 		'loadmenu': function topmenu_load_menu(ev){

@@ -892,21 +892,33 @@ tb.observable = function( pN, pV ){
 	f.list = [];
 
 	f.notify = function(){
+
+		function clean( a ){ // remove null values from array
+			var b = [];
+			$.each( a, function( i, v ){
+				if ( a[i] !== null ) b.push( v );
+			});
+			return b;
+		}
+
 		$.each( f['list'], function( i, v ){
 			if ( $.type(v) === 'string' ){
 				var r = new RegExp( s );
 			}
 			if ( $.isFunction(v) ){
 				v( pV );
+				if ( v.once ) f['list'][i] = null;
 			} else {
 				tb( r ).trigger( ':tb.observable.notify:', { varName: pN, value: pV } );
 			}
 		});
+		f.list = clean( f['list'] );
 	};
 
-	f.observe = function( pO ){
+	f.observe = function( pO, pOnce ){
 		var id = pO instanceof tb ? pO.name : $.isFunction( pO ) === true ? pO : false; // id = tbo, function or false
 		if ( id !== false && f.list.indexOf( id ) === -1 ){
+			if ( $.isFunction( id ) ) id.once = pOnce || false;
 			f.list.push( id );
 		}	
 	};

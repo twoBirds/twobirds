@@ -10,7 +10,7 @@ demoapp.globalSpinner = {
 			var that = this['tb.ui.spinner'];
 
 			// observe loading status and trigger spinner accordingly
-			tb.loader.loading.observe( function( pBool ){ 
+			tb.loader.loading.observe( function globalSpinner_setSpinner( pBool ){ 
 				if ( pBool ){
 					that.trigger(':tb.ui.spinner.on:');
 				} else {

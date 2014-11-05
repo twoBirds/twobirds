@@ -22,7 +22,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				}
 			);
 
-			this.model.data.observe( function(){ // this way it is a custom event instead of 'tb.model.success'
+			this.model.data.observe( function userlogin_success(){ // this way it is a custom event instead of 'tb.model.success'
 				that.trigger( 'userlogin.success', that.model.data() );
 			});
 
