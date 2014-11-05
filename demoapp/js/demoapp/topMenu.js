@@ -7,6 +7,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 		'tb.init': function userlogin_tb_init(ev){
 			var that = this;
 
+			// menu model
 			this.model = new tb.Model(
 				{
 					url: 'service/menu.{usernick}.{userpass}.fragment' // {...} being the placeholders for later get() invocation
@@ -16,7 +17,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 
 			// observe loading status
 			tb.loader.loading.observe( function topmenu_loading_changed( loading ){
-				// if idle watch to userLogin data, on change trigger reload of menu
+				// if idle observe userLogin data, on change trigger reload of menu
 				if ( loading === false ) tb( demoapp.userLogin ).loginData.observe( function topmenu_on_user_change( data ){
 					that.trigger(':loadmenu:', data );
 				}); // missing ,true => continous watch 
@@ -62,9 +63,6 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 
 		'tb.model.success': function topmenu_load_success(ev){
 			$( this.target ).html( ev.data );
-		},
-		
-		'tb.model.failure': function topmenu_load_failure(ev){
 		}		
 
 	},
