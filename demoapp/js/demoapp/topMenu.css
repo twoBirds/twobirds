@@ -2,6 +2,7 @@ ul#Navigation {
 	margin: 0;
 	padding: 0;
 	display: inline-block;
+	z-index: 1;
 }
 
 li ul li.topmenu-separator {
@@ -39,10 +40,14 @@ ul#Navigation li ul {
 	display: none;
 	border: 1px solid #999999;
 	background-color: rgba(255,255,255, 0.9);
-	z-index: 1000;
+	z-index: 100000;
 }
 
-ul#Navigation li ul:hover,
+ul#Navigation li ul:before,
+ul#Navigation li ul:hover {
+	display: block;
+}
+
 ul#Navigation li:hover ul {
 	display: block;
 }

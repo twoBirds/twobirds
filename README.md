@@ -1,6 +1,6 @@
 twoBirds 5.0
 
-- a web component project started in 2005 (!)
+- a web component project started in 2005
 - first published 2007 tB v2 ( on ajaxian.com http://ajaxian.com/archives/twobirds-lib-20-released )
 - submerged shortly afterwards
 - stayed hidden during v3 & v4

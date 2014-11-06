@@ -28,7 +28,6 @@ demoapp.webglWindow = {
 			this.renderer = new THREE.WebGLRenderer( { alpha: true } );
 			this.renderer.setClearColor( 0x000000, 0 );
 
-			console.log(this);
 			this.renderer.setSize( width, height ); 
 			
 			//document.body.appendChild( renderer.domElement ); 
@@ -60,7 +59,6 @@ demoapp.webglWindow = {
 			
 			this.cameraMove = -0.02;
 
-			console.log( this );
 			this.render = (function(that){ return function () { 
 				requestAnimationFrame( that.render ); 
 				that.cube.rotation.x += 0.01; 
