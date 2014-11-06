@@ -382,8 +382,6 @@ tb.nameSpace('tb.ui', true).scroll = {
 				this.attachWheelHandlerTimeout = window.setTimeout(
 					(function (that) {
 						return function () {
-							//console.log('TIMEOUT CALLBACK FUNCTION scroll:wheelHandlerTimeout');
-							that.parents(/tb.ui.scroll/).trigger( 'this:scroll.detachWheelHandler:ld' );
 							that.attachWheelHandlerTimeout = null;
 							that.trigger(':scroll.attachWheelHandler:');
 						};
