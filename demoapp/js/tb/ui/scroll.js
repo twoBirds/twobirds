@@ -334,7 +334,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 					- scrollBar.cssPx('border' + (dir === 'x' ? 'Right' : 'Bottom') + 'Width')
 				: false;
 
-			if ( !this['ready'] ) return;
+			if ( !scrollBar ) return; // TBD hotfix
 
 			// do not remove: if last element was deleted from DOM...
 			// ...native scrollPos is not updated correctly, but will be after setting it

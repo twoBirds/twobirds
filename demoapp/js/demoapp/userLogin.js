@@ -9,21 +9,26 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 		'tb.init': function userlogin_tb_init(ev){
 			var that = this; // for later use in callbacks
 
+			// insert html
 			$( this.target ).html( tb.loader.get('demoapp/userLogin.html') );
 
+			// convenience vars
 			this.form = $('.userlogin form');
 			this.usernick = $('.userlogin input[name=usernick]');
 			this.userpass = $('.userlogin input[name=userpass]');
 
+			// model
 			this.model = new tb.Model({
-				//url: 'service/login.{usernick}.{userpass}.json' // for file service, use if no php/mongo installed
+				//url: 'service/login.{usernick}.{userpass}.json' // mock data
 				url: 'service.php?action=login&usernick={usernick}&userpass={userpass}' // php / mongo test
 			});
 
+			// on model data change
 			this.model.data.observe( function userlogin_success(){ // this way it is a custom event instead of 'tb.model.success'
 				that.trigger( 'userlogin.success', that.model.data() );
 			});
 
+			// behaviour
 			$( this.target )
 				.find('.userlogin-loginlink')
 				.on(
@@ -77,7 +82,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
 
-			if ( $.isEmptyObject( ev.data ) ){ // no record returned
+			if ( $.isEmptyObject( ev.data ) ){ // no record returned -> login failure
 				this.trigger( ':tb.model.failure:l' );
 				return;
 			}
