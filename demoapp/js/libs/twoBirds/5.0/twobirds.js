@@ -312,25 +312,25 @@ if (!Array.prototype.indexOf)
 						});
 					} 
 
-					if ( this['handlers'] ){
+					if ( this['handlers'] && bubble.indexOf('l') > -1 ){
 						cont = this.handle.apply( this, [ evt ] ) === false ? false : true;
 					}
 
 					// bubble
 					if ( cont === true ){
-						if ( bubble.indexOf('l') > -1 ){ // local
-							if ( bubble.indexOf('d') > -1 ){ // down
-								$.each( this, function( i, v ){
-									if ( /\./.test(i) && v instanceof tb ){ // this one is a subobject
-										cont = handleEvent.apply( that[i], [evt] ) === false ? false : true;
-									}
-								});
-							}
-							if ( bubble.indexOf('u') > -1 ){ // up
-								if ( this['_super'] !== undefined ){ // this one is a subobject
-									//console.log( 'bubble up', evt.name, evt.bubble, bubble, that.name, that._super().name );
-									cont = handleEvent.apply( that._super(), [evt] ) === false ? false : true;
+						if ( bubble.indexOf('d') > -1 ){ // down
+							if ( bubble.indexOf('l') === -1 ) evt.bubble += 'l';
+							$.each( this, function( i, v ){
+								if ( /\./.test(i) && v instanceof tb ){ // this one is a subobject
+									cont = handleEvent.apply( that[i], [evt] ) === false ? false : true;
 								}
+							});
+						}
+						if ( bubble.indexOf('u') > -1 ){ // up
+							if ( bubble.indexOf('l') === -1 ) evt.bubble += 'l';
+							if ( this['_super'] !== undefined ){ // this one is a subobject
+								//console.log( 'bubble up', evt.name, evt.bubble, bubble, that.name, that._super().name );
+								cont = handleEvent.apply( that._super(), [evt] ) === false ? false : true;
 							}
 						}
 					}
@@ -358,10 +358,10 @@ if (!Array.prototype.indexOf)
 				// now that we have the real expanded event name,
 				// set empty strings to standard behaviour
 				if ( ea[0].length === 0 ){ // no target selected
-					ea[0] = 'this';	// only this (sub-)object
+					ea[0] = 'this';	// this object
 				}
 				if ( ea[2].length === 0 ){ // no bubble behaviour defined
-					ea[2] = 'ld';	// assume local down only
+					ea[2] = 'l';	// assume local only
 				}
 
 				// reassemble complete event name
