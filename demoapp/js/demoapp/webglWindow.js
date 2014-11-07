@@ -78,7 +78,7 @@ demoapp.webglWindow = {
 		},
 
 		'window.resize': function webglWindow_tb_init(ev){
-			console.log( 'window.resize', this );
+			//console.log( 'window.resize', this );
 			//camera.aspect = window.innerWidth / window.innerHeight;
 			//camera.updateProjectionMatrix();
 
