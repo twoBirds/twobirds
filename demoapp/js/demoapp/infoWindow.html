@@ -31,7 +31,7 @@
 	I think it is more than obvious that these will be instance handler methods.<br /><br />
 	Now here is the catch:<br />
 	One of the events handlers is named 'tb.init'<br />
-	twoBirds will trigger this event automatically when requirement loading for the top level object as a whole has finished, and hence initialize the bootstrap handler 'tb.init' on the instance, bubbling down through all sub-objects. This way the object structure as a whole is bootstrapped / initialized.<br /><br />
+	twoBirds will trigger this event automatically when requirement loading for the top level object and all of its sub-instances has finished, and hence initialize the bootstrap handler 'tb.init' on the instance, bubbling down through all sub-objects. This way the object structure as a whole is bootstrapped / initialized.<br /><br />
 	In short, this is it.</p><br />
 	
 	<h2>How do I find twoBirds objects on my page?</h2>
@@ -61,12 +61,12 @@
 	Contrary to jQuery events twoBirds events are always asynchronous, meaning you will never experience a stack overflow in a ping-pong situation.<br /><br />
 	EXAMPLES:<br />
 	console: tb('body').trigger('&lt;myevent&gt;') get the body toplevel object, and trigger '&lt;myevent&gt;' on it, by default bubbling down the sub-instances and also the whole of the page structure.<br />
-	console: tb( tb.ui.scroll ).trigger(':&lt;update&gt;:l') get all sub-instances of tb.ui.scroll, and trigger ':&lt;update&gt;:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.<br /><br />
+	console: tb( tb.ui.scroll ).trigger(':scroll.update:l') get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.<br /><br />
 	EVEN MORE EXAMPLES:<br />
 	console: tb( demoapp.body ).trigger('root:&lt;myevent&gt;:ld') // find all body instances, select their root object, trigger &lt;myevent&gt; bubbling down locally.<br />
-	console: tb( tb.ui.scroll ).trigger('super:&lt;scroll.ready&gt;:lu') // find all tb.ui.scroll instances, select their super object, trigger &lt;scroll.ready&gt; bubbling up locally.<br />
-	console: tb( tb.ui.scroll ).trigger(':&lt;scroll.ready&gt;:u') // easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br />
-	console: tb( &lt;anyObject&gt; ).trigger(':&lt;tb.init&gt;:ld') // as you might have guessed - the infamous 'tb.init' system event<br />
+	console: tb( tb.ui.scroll ).trigger('super:scroll.ready:lu') // find all tb.ui.scroll instances, select their super object, trigger scroll.ready bubbling up locally.<br />
+	console: tb( tb.ui.scroll ).trigger(':scroll.ready:u') // easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br />
+	console: tb( &lt;anyObject&gt; ).trigger(':tb.init:ld') // as you might have guessed - the infamous 'tb.init' system event<br />
 
 	</p><br />
 
@@ -80,4 +80,11 @@
 	An internal object is created by recursively creating instances of the (loaded and now existing) repo objects.<br />
 	Finally, the event 'tb.init' is fired on the toplevel instance, bubbling down and therefore bootstrapping the object.<br /><br />
 	If any of the sub-objects inserts more HTML code containing nodes with a 'data-tb' attribute, it can run .initChildren() to perform the same operation on that subtree.</p><br />
+
+	<h2>Is that it?</h2>
+	<p>Yes. The rest is sugar like tb.observable()<br /><br />
+	If you look at a web application (no matter what framework) in general, what is it composed of?<br /><br />
+	- objects that are somehow attached to DOM nodes and ...<br />
+	- ... have to communicate with each other and internally<br /><br />
+	All of this you can do now in a nice and easy way.</p><br />
 </div>
