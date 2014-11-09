@@ -1,9 +1,9 @@
 <!-- top left -->
-<div id="topleftarea" class="toparea">
+<div id="topleft" class="toparea">
 	<div data-tb="demoapp/globalSpinner.js" style="display:none"></div>
 </div>
 <!-- top center -->
-<div id="topcenter">
+<div id="topcenter" class="toparea">
 	<div>
 		<img class="tbfontlogosmall" src="props/twobirdslogosmall.gif" alt="" />&nbsp;
 		<a class="thissitenamelink" href="http://www.two-birds.ch"></a>
@@ -24,7 +24,7 @@
 
 <!-- middle left -->
 <div id="middleleft" class="middlearea">
-	<div style="margin-top:5em;"><a href="#" onclick="var myWin = tb(/demoapp.windowController/).children(); if ( myWin instanceof tb || ( myWin[0] !== undefined ) ) myWin = myWin instanceof tb ? myWin : myWin[0]; myWin.trigger('this:window.close:ld'); return false;">remove top window</a></div>
+	<div data-tb="demoapp/contactWindow.js">&nbsp;</div>
 </div>
 <!-- middle center -->
 <div id="middlecenter" class="middlearea">
@@ -33,9 +33,7 @@
 </div>
 <!-- middle right -->
 <div id="middleright" class="middlearea">
-	<a href="https://github.com/FrankieTh-xx/twobirds">get this from github</a><br>
-	<a href="mailto:frank_thuerigen@yahoo.de?subject=RE: twoBirds">mail me</a><br>
-	<a href="skype:frank.thuerigen?chat">skype chat</a><br>
+	<div data-tb="demoapp/githubWindow.js">&nbsp;</div>
 </div>
 
 <!-- bottom left -->

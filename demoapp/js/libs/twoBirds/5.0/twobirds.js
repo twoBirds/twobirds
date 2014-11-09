@@ -1620,6 +1620,8 @@ tb.loader.js = (function () {
 			script = document.createElement('script'),
 			done = false;
 
+		tb.loader.count( 1, 'JS: ' + pPath );
+		
 		script.setAttribute('type', 'text/javascript');
 		script.setAttribute('src', pUrl);
 
@@ -1713,7 +1715,6 @@ tb.loader.js = (function () {
 
 			if ( !pPath ) return;
 			url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
-			tb.loader.count( 1, 'JS: ' + pPath );
 			c.set( pPath, 0 );  
 			addScript.apply( this, [ pPath, url, pCb, pId ] );
 		},

@@ -1,33 +1,51 @@
-.demoapp-window {
+._demoapp-window {
 	position: relative;
 	left: 0;
+	right: 0;
 	margin: 0;
 	margin-bottom: 4px;
-	margin-right: 10px;
+	/*margin-right: 10px;*/
 	border: 1px solid gray;
 	border-radius: 7px;
 }
 
 /* title line */
-.demoapp-window > div:nth-child(1) {
+._demoapp-window > div:nth-child(1) {
 	left: 0;
 	right: 0;
 	margin: 0;
 	padding: 3px;
 	background-color: rgba(0,0,0,0.1);
-	font-weight: bold;
-	font-style: italic;
 	text-align: center;
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
 }
 
-._demoapp-window-active > div:nth-child(1) {
+._demoapp-window > div:nth-child(1) > div.title {
+	left: 0;
+	right: 0;
+	margin: 0;
+	font-weight: bold;
+	font-style: italic;
+	text-align: center;
+}
+
+._demoapp-window._demoapp-window-active > div:nth-child(1) {
 	background-color: rgba(0,0,0,0.4);
 }
 
+._demoapp-window > div:nth-child(1) span {
+	float: right;
+}
+
+._demoapp-window > div:nth-child(1) span i {
+	cursor: pointer;
+	margin-left: 0.2em;
+	color: white;
+}
+
 /* content area */
-.demoapp-window > div:nth-child(2) {
+._demoapp-window > div:nth-child(2) {
 	position: relative;
 	left: 0;
 	right: 0;
@@ -36,25 +54,17 @@
 	background-color: rgba(255,255,255,0.5);
 }
 
-._demoapp-window-active > div:nth-child(2) {
+._demoapp-window._demoapp-window-active > div:nth-child(2) {
 	background-color: rgba(255,255,255,1);
 }
 
-/* overload scroll css */
-.demoapp-window > div:nth-child(2) > div > div > div {
-	margin: 10px;
-	margin-right: 50px;
-}
-
-.demoapp-window > div:nth-child(2) > div + div > div {
-	background-color: rgba(0,0,0,0.3);
-}
-
-.demoapp-window > div:nth-child(3){
+._demoapp-window > div:nth-child(3){
 	left: 0;
 	right: 0;
 	margin: 0;
-	padding: 3px;
+	margin-top: -3px;
+	padding-top: 5px;
+	padding-bottom: 3px;
 	background-color: rgba(0,0,0,0.05);
 	font-weight: bold;
 	font-style: italic;
@@ -63,7 +73,26 @@
 	border-bottom-right-radius: 6px;
 }
 
+._demoapp-window > div:nth-child(3) * {
+	padding: 3px;
+}
 ._demoapp-window-active > div:nth-child(3) {
 	background-color: rgba(0,0,0,0.2);
 }
+
+/* scrollBar css */
+._demoapp-window > div:nth-child(2) > div._tb-ui-scroll-on + div {
+	margin: 0px;
+	border-radius: 0px;
+	border: 0px none;
+	border-left: 1px solid gray;
+	width: 1.3em;
+}
+
+/* scrollHandle background, default: darkred */
+._demoapp-window > div:nth-child(2) > div._tb-ui-scroll-on + div > div {
+	left: 0px;
+	right: 1px;
+}
+
 

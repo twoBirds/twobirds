@@ -79,7 +79,37 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 }
 
 /* tiny devices (portrait and landscape) */
-@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+@media only screen and (min-width : 320px) and (max-width : 767px) {
+
+  .toparea {
+    display: none;
+  }
+
+  #menuline {
+    display: none;
+  }
+
+  .middlearea {
+    top: 0em;
+    bottom: 0em; 
+  }
+
+  #middlecenter {
+    display: none;
+  }
+
+  #middleright {
+    display: none;
+  }
+
+  #middleleft:nth-child(2) {
+    display: none;
+  }
+
+  .bottomarea {
+    display: none;
+  }
+
 }
 
 /* tiny devices (landscape)  */
@@ -92,10 +122,61 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
 /* tablets and small desktops (portrait and landscape)  */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+
+  .toparea {
+    display: normal;
+  }
+
+  #topright {
+    display: none;
+  }
+
+  #menuline {
+    display: normal;
+  }
+
+  .middlearea {
+    top: 0em;
+    bottom: 0em; 
+  }
+
+  #middleright {
+    display: none;
+  }
+
+  #bottomright {
+    display: none;
+  }
+
 }
 
 /* tablets and small desktops (landscape)  */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+@media only screen and (min-width : 768px) and (max-width : 1024px) and (orientation : landscape) {
+  .toparea {
+    display: normal;
+  }
+
+  #topright {
+    display: none;
+  }
+
+  #menuline {
+    display: normal;
+  }
+
+  .middlearea {
+    top: 0em;
+    bottom: 0em; 
+  }
+
+  #middleright {
+    display: none;
+  }
+
+  #bottomright {
+    display: none;
+  }
+
 }
 
 /* tablets and small desktops (portrait)  */
@@ -118,6 +199,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     position: fixed;
     top: 0; 
     left: 0; 
+    min-width: 15em; 
     max-width: 15em; 
     overflow:hidden;
   }
@@ -125,8 +207,8 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   #topcenter {
     position: fixed;
     top: 0; 
-    left: 15em; 
-    right: 15em; 
+    left: 16em; 
+    right: 16em; 
     max-height: 4em; 
     overflow:hidden;
   }
@@ -155,6 +237,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   }
 
   #menuline div {
+    font-size: 1.2em; 
     margin: 0;
   }
 
@@ -169,15 +252,16 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   #middleleft {
     position: fixed;
     left: 0; 
-    max-width: 15em;
+    min-width: 15em; 
+    max-width: 15em; 
     overflow:hidden;
     z-index: inherit;
   }
 
   #middlecenter {
     position: fixed;
-    left: 15em; 
-    right: 15em; 
+    left: 16em; 
+    right: 16em; 
     overflow:hidden;
     z-index: inherit;
   }
@@ -185,8 +269,9 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   #middleright {
     position: fixed;
     right: 0; 
+    min-width: 15em; 
     max-width: 15em; 
-    overflow:hidden;
+    overflow: hidden;
     z-index: inherit;
   }
 
@@ -201,6 +286,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     bottom: 0; 
     left: 0; 
     width: 100%; 
+    min-width: 15em; 
     max-width: 15em; 
     min-height: 4em; 
     max-height: 4em; 
@@ -210,8 +296,8 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   #bottomcenter {
     position: fixed;
     bottom: 0; 
-    left: 15em; 
-    right: 15em; 
+    left: 16em; 
+    right: 16em; 
     min-height: 4em; 
     max-height: 4em; 
     overflow:hidden;
@@ -222,6 +308,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     bottom: 0; 
     right: 0; 
     width: 100%; 
+    min-width: 15em; 
     max-width: 15em; 
     min-height: 4em; 
     max-height: 4em; 

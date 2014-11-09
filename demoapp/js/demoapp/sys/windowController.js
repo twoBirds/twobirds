@@ -21,20 +21,19 @@ tb.nameSpace( 'demoapp.sys', true ).windowController = {
 		},
 
 		'scroll.ready': function windowController_scroll_ready(ev){
-			this.trigger('this:scroll.update:ld');
+			this.trigger('this:scroll.scollTo:ld', 0);
 			return false;
 		},
 
 		'addWindow': function windowController_addWindow(ev){
 			$( this.target ).find('.__scroll-content:first').prepend( '<div data-tb="' + ev.data + '"></div>' );
 			this.initChildren();
-			this.trigger('this:scroll.update:ld');
 			this.trigger('this:scroll.scrollTo:ld', 0);
 			return false;
 		},
 
 		'closeAllWindows': function windowController_addWindow(ev){
-			this.children().trigger('window.close');
+			this.children().trigger(':window.close:ld');
 			return false;
 		}
 

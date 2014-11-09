@@ -10,13 +10,20 @@
 }
 
 .userlogin,
-.usergreeting {
+.usergreeting,
+.userlogin div {
 	min-width: 100%;
 }
+
+.userlogin div {
+	clear: both;
+}
+
 .userlogin p,
 .usergreeting p {
 	margin: 0.1em;
 	float: right;
+	clear: both;
 }
 
 .usergreeting div {

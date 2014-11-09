@@ -16,6 +16,9 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 	'tb.require': [
 		'demoapp/props/icomoon/style.css',
+		'demoapp/sys/window.html',
+		'demoapp/sys/window.css',
+		'demoapp/sys/window.js',
 		'demoapp/body.html',
 		'demoapp/body.css'
 	]

@@ -131,20 +131,18 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 			this.scrollRoot.addClass( '_tb-ui-scroll-' + this.config.direction );
 
-			// this indicates the scroll is moving or has been activated
+			// indicates the scroll is moving or has been activated
 			this.scrollOn = function () {
 				that.trigger(':scroll.scrolling:', true);
 
-				clearTimeout(this.scrollingClassTimeout);
+				clearTimeout(that.scrollingClassTimeout);
 
-				this.scrollingClassTimeout = setTimeout(
-					(function (that) {
-						return function () {
-							that.trigger(':scroll.scrolling:', false);
-						};
-					})(this),
+				that.scrollingClassTimeout = setTimeout(
+					function () {
+						that.trigger(':scroll.scrolling:', false);
+					},
 					500
-					);
+				);
 			};
 			
 			/*
@@ -153,7 +151,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 			// attach scroll handler
 			this.scrollRoot.on('scroll', function (ev) {
-				// stop if not active and not a touch device, of scroll is frozen
+				// stop if not active and not a touch device, or scroll is frozen
 				if ( ( !that.isTouchDevice && !that.active ) || that.isScrollFrozen === true ){
 					//console.log( 'scroll td, a, f', that.isTouchDevice, that.active, that.isScrollFrozen );
 					ev.stopImmediatePropagation();
@@ -172,7 +170,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 				if (!$._data( that.scrollRoot[0], "events").mousewheel ) {
 					// if no wheel handler attached here & not about to -> its a touch event
 					//console.log('touch event SCROLL');
-					that.scrollRoot.trigger(':scroll.active:', true);
+					that.trigger(':scroll.active:', true);
 				}
 
 				ev.stopPropagation();
@@ -208,7 +206,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 					that.trigger(':scroll.detachWheelHandler:');
 					that.trigger(':scroll.active:', false);
-
+					that.parents( tb.ui.scroll ).trigger( ':scroll.active:', true );
 				}
 			);
 
@@ -216,7 +214,6 @@ tb.nameSpace('tb.ui', true).scroll = {
 				'click',
 				function(ev){
 					//console.log('scrollContainer click', that );
-					//that.trigger(':scroll.active:', true);
 					that.trigger(':scroll.attachWheelHandler:');
 					//ev.stopPropagation();
 				}
@@ -271,6 +268,8 @@ tb.nameSpace('tb.ui', true).scroll = {
 					if (ev.target.innerHTML) { // click on scrollBar but outside handle
 						that.setNewPosition.apply( that, [ ev.originalEvent['layer' + (that.direction === 'x' ? 'X' : 'Y')] ] );
 					}
+					that.trigger(':scroll.active:', true);
+					that.trigger(':scroll.update:');
 					ev.stopPropagation();
 				}
 			);
@@ -355,8 +354,11 @@ tb.nameSpace('tb.ui', true).scroll = {
 				// //console.log( 'hide scrollbar' );
 				//console.log('=> no scroll bar needed.', parentSize, containerSize );
 				this.scrollRoot.removeClass('_tb-ui-scroll-on');
+				this.scrollVisible = false;
 				return;
 			}
+
+			this.scrollVisible = true;
 
 			var sbInnerSize = scrollBarSize - 2,
 				handleSize = sbInnerSize * ( parentSize / containerSize ),
@@ -372,7 +374,6 @@ tb.nameSpace('tb.ui', true).scroll = {
 
 			// finalize
 			this.scrollRoot.addClass('_tb-ui-scroll-on');
-			//tb.nop(this.scrollRoot[0].offsetHeight);
 		},
 
 		// attach wheel handler timeout
@@ -383,11 +384,15 @@ tb.nameSpace('tb.ui', true).scroll = {
 					(function (that) {
 						return function () {
 							that.attachWheelHandlerTimeout = null;
-							that.trigger(':scroll.attachWheelHandler:');
+							if ( that.root.is(':hover') ) that.trigger(':scroll.attachWheelHandler:');
 						};
 					})( this ),
 					// if parent scroll -> delay
-					this.config['attachDelay'] || 0
+					this.config['attachDelay'] > 0 
+							&& this.parents(tb.ui.scroll)['scrollVisible'] !== undefined 
+							&& this.parents(tb.ui.scroll).scrollVisible === true 
+						? this.config['attachDelay'] 
+						: 0
 				);
 			}
 		},
@@ -441,8 +446,10 @@ tb.nameSpace('tb.ui', true).scroll = {
 					// bubble wheel event up the dom, so outer container scrolls 
 					// when inner position reaches bounds
 					if ( that.config.bubbleUp === true && op === elm[0][which] ) {
-						if ($( that.root ).parents(/tb.ui.scroll/) ) {
-							$( that.root ).parents(/tb.ui.scroll/).trigger(ev, delta);
+						if ( that.parents(tb.ui.scroll) 
+								&& that.parents(tb.ui.scroll)['scrollVisible'] !== undefined 
+								&& that.parents(tb.ui.scroll).scrollVisible === true ) {
+							that.parents( tb.ui.scroll ).trigger(ev, delta);
 						} 
 					}
 

@@ -11,6 +11,8 @@ tb.nameSpace('demoapp.sys').window = {
 
 	handlers: {
 		'tb.init': function sys_window_tb_init(ev){
+			var that = this;
+
 			if ( this.ready ) return;
 			this.ready = true;
 			
@@ -18,9 +20,11 @@ tb.nameSpace('demoapp.sys').window = {
 			this.config = $.extend( 
 				true, 
 				{
-					title: '<title placeholder>',
-					canClose: false,
-					status: '<status placeholder>',
+					title: '-',
+					canClose: true,
+					canMove: true,
+					canCollapse: true,
+					status: '-',
 					scrollBar: true
 				}, 
 				this.config 
@@ -28,20 +32,35 @@ tb.nameSpace('demoapp.sys').window = {
 			this.canClose = this.config.canClose;
 
 			$( this.target )
-				.html( tb.loader.get('demoapp/sys/window.html') )
-				.on( 'click', (function(that){ return function(){
-					//console.log('onClick trigger window:active', true);
-					that.trigger(':window.active:', true);
-				};})(this) );
+				.html( tb.loader.get('demoapp/sys/window.html') );
 
+			this.title = $( this.target ).find('> div > div:nth-child(1) > div.title'),
 			this.content = $( this.target ).find('> div > div:nth-child(2)'),
-			this.title = $( this.target ).find('> div > div:nth-child(1)'),
 			this.status = $( this.target ).find('> div > div:nth-child(3)');
 			
-			if ( this.config['height'] !== undefined ) this.content.css('height', this.config.height );
-			this.title.text( this.config.title || '&nbsp;' );
-			this.status.text( this.config.status || '&nbsp;' );
+			if ( this.config.canClose === false ){
+				$( this.target )
+					.find('> div > div:nth-child(1) span i.close-icon')
+					.hide();
+			}
 
+			if ( this.config.canCollapse === false ){
+				$( this.target )
+					.find('> div > div:nth-child(1) span i.contract-icon')
+					.hide();
+			}
+
+			if ( this.config.canMove === false ){
+				$( this.target )
+					.find('> div > div:nth-child(1) span i[class*=" move"]')
+					.hide();
+			}
+
+			if ( this.config['height'] !== undefined ) this.content.css('height', this.config.height );
+			this.title.html( this.config.title );
+			this.status.html( this.config.status );
+
+			// if scrollBar attach it
 			if ( this.config.scrollBar === true ) {
 				// SPECIAL CASE: 
 				// no requirement loading necessary, 
@@ -67,9 +86,118 @@ tb.nameSpace('demoapp.sys').window = {
 				this.content = $(this.target).find('.__scroll-content');
 			}
 
+			// behaviour
+			$( this.target )
+				.on( 'click', function(){
+					that.trigger(':window.active:', true);
+					});
+				
+			this.title
+				.parent()
+				.on( 'mouseover', function(){
+					that.trigger(':window.active:', true);
+					});
+
+			this.status
+				.on( 'mouseover', function(){
+					that.trigger(':window.active:', true);
+					});
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.close-icon').on(
+				'click',
+				function(ev){
+					that.trigger(':window.close:');
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.contract-icon').on(
+				'click',
+				function(ev){
+					$( that.target )
+						.find('> div > div:nth-child(1) > span > i.contract-icon')
+						.hide();
+					$( that.target )
+						.find('> div > div:nth-child(1) > span > i.expand-icon')
+						.show();
+					$( that.target ).find('> div > div:nth-child(2)').hide();
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.expand-icon').on(
+				'click',
+				function(ev){
+					$( that.target )
+						.find('> div > div:nth-child(1) > span > i.expand-icon')
+						.hide();
+					$( that.target )
+						.find('> div > div:nth-child(1) > span > i.contract-icon')
+						.show();
+					$( that.target ).find('> div > div:nth-child(2)').show();
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.movetop-icon').on(
+				'click',
+				function(ev){
+					var windowController = tb(/demoapp.windowController/),
+						thisWindow = $( that._root().target ).detach(),
+						otherWindows = windowController.children(/demoapp.sys.window/);
+
+					if ( otherWindows instanceof tb || otherWindows instanceof Array && otherWindows.length > 0 ){
+						$( windowController.target )
+							.find( '> div > div > .__scroll-content' )
+							.prepend( thisWindow );
+					} else {
+						$( windowController.target )
+							.find( '> div > div > .__scroll-content' )
+							.append( thisWindow );
+					}
+
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.moveup-icon').on(
+				'click',
+				function(ev){
+					var previousWindow = $(  that._root().target ).prev();
+
+					if ( previousWindow[0] !== undefined ){
+						$( that._root().target )
+							.detach()
+							.insertBefore( previousWindow );
+					} 
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.movedown-icon').on(
+				'click',
+				function(ev){
+					var nextWindow = $(  that._root().target ).next();
+
+					if ( nextWindow[0] !== undefined ){
+						$( that._root().target )
+							.detach()
+							.insertAfter( nextWindow );
+					} 
+				}
+			);
+
+			$( this.target ).find('> div > div:nth-child(1) > span > i.movebottom-icon').on(
+				'click',
+				function(ev){
+					var windowController = tb(/demoapp.windowController/),
+						thisWindow = $( that.target ).detach(),
+						otherWindows = windowController.children();
+
+					$( windowController.target )
+						.find('> div > div > .__scroll-content')
+						.append( thisWindow );
+				}
+			);
+
 			this.trigger(':window.active:', true);
 			this.trigger(':window.ready:lu');
-			tb(/windowController/).trigger('scroll.update');
+			tb(/demoapp.windowController/).trigger('scroll.update');
 		},
 
 		'window.close': function sys_window_close(ev){
@@ -92,7 +220,7 @@ tb.nameSpace('demoapp.sys').window = {
 		'window.active': function sys_window_active(ev){
 			if ( this.active === ev.data ) return;
 			this.active = ev.data;
-			var win = $( this.target ).find('.demoapp-window');
+			var win = $( this.target ).find('._demoapp-window');
 			if ( this.active === true ){
 				win.addClass('_demoapp-window-active');
                 var windows = tb(/demoapp.sys.window/),
