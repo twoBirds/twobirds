@@ -286,8 +286,8 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     bottom: 0; 
     left: 0; 
     width: 100%; 
-    min-width: 15em; 
-    max-width: 15em; 
+    min-width: 16em; 
+    max-width: 16em; 
     min-height: 4em; 
     max-height: 4em; 
     overflow:hidden;
@@ -308,8 +308,8 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     bottom: 0; 
     right: 0; 
     width: 100%; 
-    min-width: 15em; 
-    max-width: 15em; 
+    min-width: 16em; 
+    max-width: 16em; 
     min-height: 4em; 
     max-height: 4em; 
     overflow:hidden;
