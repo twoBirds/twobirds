@@ -29,11 +29,17 @@ tb.nameSpace( 'demoapp.sys', true ).windowController = {
 			$( this.target ).find('.__scroll-content:first').prepend( '<div data-tb="' + ev.data + '"></div>' );
 			this.initChildren();
 			this.trigger('this:scroll.scrollTo:ld', 0);
+			this.trigger(':updateBehaviour:l');
 			return false;
 		},
 
-		'closeAllWindows': function windowController_addWindow(ev){
+		'closeAllWindows': function windowController_closeWindow(ev){
 			this.children().trigger(':window.close:ld');
+			return false;
+		},
+
+		'updateBehaviour': function windowController_updateBehaviour(ev){
+			this.children().trigger(':window.updateBehaviour:ld');
 			return false;
 		}
 

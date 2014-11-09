@@ -34,6 +34,7 @@ tb.nameSpace('demoapp.sys').window = {
 			$( this.target )
 				.html( tb.loader.get('demoapp/sys/window.html') );
 
+			this.win = $( this.target ).find('> div');
 			this.title = $( this.target ).find('> div > div:nth-child(1) > div.title'),
 			this.content = $( this.target ).find('> div > div:nth-child(2)'),
 			this.status = $( this.target ).find('> div > div:nth-child(3)');
@@ -106,6 +107,7 @@ tb.nameSpace('demoapp.sys').window = {
 			$( this.target ).find('> div > div:nth-child(1) > span > i.close-icon').on(
 				'click',
 				function(ev){
+					that.parent().trigger(':updateBehaviour:ld'); // must come first, otherwise reference is gone
 					that.trigger(':window.close:');
 				}
 			);
@@ -153,6 +155,7 @@ tb.nameSpace('demoapp.sys').window = {
 							.append( thisWindow );
 					}
 
+					that.parent().trigger(':updateBehaviour:ld');
 				}
 			);
 
@@ -165,6 +168,9 @@ tb.nameSpace('demoapp.sys').window = {
 						$( that._root().target )
 							.detach()
 							.insertBefore( previousWindow );
+
+						that.parent().trigger(':updateBehaviour:ld');
+
 					} 
 				}
 			);
@@ -178,6 +184,8 @@ tb.nameSpace('demoapp.sys').window = {
 						$( that._root().target )
 							.detach()
 							.insertAfter( nextWindow );
+
+						that.parent().trigger(':updateBehaviour:ld');
 					} 
 				}
 			);
@@ -192,12 +200,32 @@ tb.nameSpace('demoapp.sys').window = {
 					$( windowController.target )
 						.find('> div > div > .__scroll-content')
 						.append( thisWindow );
+
+					that.parent().trigger(':updateBehaviour:ld');
 				}
 			);
 
+			this.trigger(':window.updateBehaviour:');
 			this.trigger(':window.active:', true);
 			this.trigger(':window.ready:lu');
 			tb(/demoapp.windowController/).trigger('scroll.update');
+		},
+
+
+		'window.updateBehaviour': function sys_window_update_behaviour(ev){
+			var previousWindow = $(  this._root().target ).prev(),
+				nextWindow = $(  this._root().target ).next();
+			
+			if ( previousWindow[0] === undefined ){ // this is the topmost window
+				this.win.addClass( '_demoapp-window-topwindow' );
+			}  else {
+				this.win.removeClass( '_demoapp-window-topwindow' );
+			}
+			if ( nextWindow[0] === undefined ){ // this is the topmost window
+				this.win.addClass( '_demoapp-window-bottomwindow' );
+			}  else {
+				this.win.removeClass( '_demoapp-window-bottomwindow' );
+			} 
 		},
 
 		'window.close': function sys_window_close(ev){

@@ -44,6 +44,21 @@
 	color: white;
 }
 
+._demoapp-window > div:nth-child(1) span i.close-icon,
+._demoapp-window > div:nth-child(1) span i.expand-icon,
+._demoapp-window > div:nth-child(1) span i.contract-icon {
+	margin-left: 1em;
+}
+._demoapp-window._demoapp-window-topwindow > div:nth-child(1) span i.movetop-icon,
+._demoapp-window._demoapp-window-topwindow > div:nth-child(1) span i.moveup-icon {
+	visibility: hidden;
+}
+
+._demoapp-window._demoapp-window-bottomwindow > div:nth-child(1) span i.movedown-icon,
+._demoapp-window._demoapp-window-bottomwindow > div:nth-child(1) span i.movebottom-icon {
+	visibility: hidden;
+}
+
 /* content area */
 ._demoapp-window > div:nth-child(2) {
 	position: relative;
@@ -64,11 +79,12 @@
 	margin: 0;
 	margin-top: -3px;
 	padding-top: 5px;
+	padding-left: 3px;
 	padding-bottom: 3px;
 	background-color: rgba(0,0,0,0.05);
 	font-weight: bold;
 	font-style: italic;
-	text-align: center;
+	text-align: left;
 	border-bottom-left-radius: 6px;
 	border-bottom-right-radius: 6px;
 }
