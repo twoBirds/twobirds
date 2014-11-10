@@ -112,8 +112,8 @@
 ._tb-ui-scroll-y {
     overflow-x: hidden;
     overflow-y: scroll;
-    margin-right: -30px;
-    padding-right: 30px;
+    margin-right: -2em;
+    padding-right: 2em;
 }
 
 /*scroll container*/
@@ -125,19 +125,18 @@
     position:absolute;
 }
 
-/*scroll content*/
-._tb-ui-scroll-y > div:first-child > div {
-    margin-right: 30px;
+/*parent scroll element when scrollbar on*/
+._tb-ui-scroll-y._tb-ui-scroll-on > div {
+    margin-right: 3em;
 }
 
-/*scroll bar on*/
-._tb-ui-scroll-y._tb-ui-scroll-on > div {
-    margin-right: 30px;
+/*scroll content*/
+._tb-ui-scroll-y > div:first-child > div {
+    margin-right: 1em;
 }
 
 /*scroll bar on and active*/
 ._tb-ui-scroll-y._tb-ui-scroll-on._tb-ui-scroll-active > div {
-    margin-right: 30px;
 }
 
 /*scroll bar element*/

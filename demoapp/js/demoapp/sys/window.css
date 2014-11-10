@@ -4,7 +4,7 @@
 	right: 0;
 	margin: 0;
 	margin-bottom: 4px;
-	/*margin-right: 10px;*/
+	/*margin-right: 1em;*/
 	border: 1px solid gray;
 	border-radius: 7px;
 }
@@ -27,7 +27,9 @@
 	margin: 0;
 	font-weight: bold;
 	font-style: italic;
-	text-align: center;
+	text-align: left;
+	color: white;
+	border-color: white;
 }
 
 ._demoapp-window._demoapp-window-active > div:nth-child(1) {
@@ -35,6 +37,7 @@
 }
 
 ._demoapp-window > div:nth-child(1) span {
+	display: none;
 	float: right;
 }
 
@@ -44,19 +47,28 @@
 	color: white;
 }
 
-._demoapp-window > div:nth-child(1) span i.close-icon,
 ._demoapp-window > div:nth-child(1) span i.expand-icon,
 ._demoapp-window > div:nth-child(1) span i.contract-icon {
 	margin-left: 1em;
 }
+
+._demoapp-window > div:nth-child(1) span ._tb-ui-simpleTooltip:hover > ._tb-ui-simpleTooltipContent {
+	margin-left: -3em; /* otherwise rightmost icon tooltips would underflow */
+}
+
 ._demoapp-window._demoapp-window-topwindow > div:nth-child(1) span i.movetop-icon,
 ._demoapp-window._demoapp-window-topwindow > div:nth-child(1) span i.moveup-icon {
-	visibility: hidden;
+	display: none;
 }
 
 ._demoapp-window._demoapp-window-bottomwindow > div:nth-child(1) span i.movedown-icon,
 ._demoapp-window._demoapp-window-bottomwindow > div:nth-child(1) span i.movebottom-icon {
-	visibility: hidden;
+	display: none;
+}
+
+._demoapp-window._demoapp-window-active > div:nth-child(1) span,
+._demoapp-window > div:nth-child(1) span:hover {
+	display: block;
 }
 
 /* content area */
@@ -87,6 +99,7 @@
 	text-align: left;
 	border-bottom-left-radius: 6px;
 	border-bottom-right-radius: 6px;
+	color: white;
 }
 
 ._demoapp-window > div:nth-child(3) * {
@@ -105,7 +118,7 @@
 	width: 1.3em;
 }
 
-/* scrollHandle background, default: darkred */
+/* scrollHandle fix */
 ._demoapp-window > div:nth-child(2) > div._tb-ui-scroll-on + div > div {
 	left: 0px;
 	right: 1px;

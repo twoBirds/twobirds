@@ -5,6 +5,7 @@ tb.nameSpace('demoapp.sys').window = {
 	active: false, // indicates this is the active window 
 
 	'tb.require': [
+		'tb/ui/simpleTooltip.css',
 		'demoapp/sys/window.html',
 		'demoapp/sys/window.css'
 	],
@@ -142,73 +143,65 @@ tb.nameSpace('demoapp.sys').window = {
 				'click',
 				function(ev){
 					var windowController = tb(/demoapp.windowController/),
-						thisWindow = $( that._root().target ).detach(),
-						otherWindows = windowController.children(/demoapp.sys.window/);
+						thisWindow = $( that._root().target ),
+						firstWindow = windowController.children(/demoapp.sys.window/)[0],
+						previousWindow = thisWindow.prev();
 
-					if ( otherWindows instanceof tb || otherWindows instanceof Array && otherWindows.length > 0 ){
-						$( windowController.target )
-							.find( '> div > div > .__scroll-content' )
-							.prepend( thisWindow );
-					} else {
-						$( windowController.target )
-							.find( '> div > div > .__scroll-content' )
-							.append( thisWindow );
-					}
+					$( previousWindow[0] ).data('tbo').trigger(':window.active:ld', true );
 
-					that.parent().trigger(':updateBehaviour:ld');
+					$( firstWindow.target )
+						.parent()
+						.prepend( thisWindow.detach() );
+
 				}
 			);
 
 			$( this.target ).find('> div > div:nth-child(1) > span > i.moveup-icon').on(
 				'click',
 				function(ev){
-					var previousWindow = $(  that._root().target ).prev();
+					var thisWindow = $( that._root().target ),
+						previousWindow = thisWindow.prev();
 
-					if ( previousWindow[0] !== undefined ){
-						$( that._root().target )
-							.detach()
-							.insertBefore( previousWindow );
+					$( previousWindow[0] ).data('tbo').trigger(':window.active:ld', true );
 
-						that.parent().trigger(':updateBehaviour:ld');
-
-					} 
+					thisWindow
+						.detach()
+						.insertBefore( previousWindow );
 				}
 			);
 
 			$( this.target ).find('> div > div:nth-child(1) > span > i.movedown-icon').on(
 				'click',
 				function(ev){
-					var nextWindow = $(  that._root().target ).next();
+					var thisWindow = $( that._root().target ),
+						nextWindow = thisWindow.next();
 
-					if ( nextWindow[0] !== undefined ){
-						$( that._root().target )
-							.detach()
-							.insertAfter( nextWindow );
+					$( nextWindow[0] ).data('tbo').trigger(':window.active:ld', true );
 
-						that.parent().trigger(':updateBehaviour:ld');
-					} 
+					thisWindow
+						.detach()
+						.insertAfter( nextWindow );
 				}
 			);
 
 			$( this.target ).find('> div > div:nth-child(1) > span > i.movebottom-icon').on(
 				'click',
 				function(ev){
-					var windowController = tb(/demoapp.windowController/),
-						thisWindow = $( that.target ).detach(),
-						otherWindows = windowController.children();
+					var thisWindow = $( that._root().target ),
+						nextWindow = thisWindow.next();
+					
+					$( nextWindow[0] ).data('tbo').trigger(':window.active:ld', true);
 
-					$( windowController.target )
-						.find('> div > div > .__scroll-content')
-						.append( thisWindow );
-
-					that.parent().trigger(':updateBehaviour:ld');
+					thisWindow
+						.parent()
+						.append( thisWindow.detach() );
 				}
 			);
 
-			this.trigger(':window.updateBehaviour:');
 			this.trigger(':window.active:', true);
 			this.trigger(':window.ready:lu');
 			tb(/demoapp.windowController/).trigger('scroll.update');
+			tb(/demoapp.windowController/).trigger(':updateBehaviour:ld');
 		},
 
 
@@ -226,6 +219,14 @@ tb.nameSpace('demoapp.sys').window = {
 			}  else {
 				this.win.removeClass( '_demoapp-window-bottomwindow' );
 			} 
+		},
+
+		'window.setStatus': function sys_window_set_status(ev){
+			this.status.html( ev.data );
+		},
+
+		'window.setTitle': function sys_window_set_title(ev){
+			this.title.html( ev.data );
 		},
 
 		'window.close': function sys_window_close(ev){
@@ -251,6 +252,7 @@ tb.nameSpace('demoapp.sys').window = {
 			var win = $( this.target ).find('._demoapp-window');
 			if ( this.active === true ){
 				win.addClass('_demoapp-window-active');
+	            this.trigger(':window.updateBehaviour:l');
                 var windows = tb(/demoapp.sys.window/),
                 	checkname = this._root().name;
 				if (windows instanceof Array) $.each( windows, function( i, v ){

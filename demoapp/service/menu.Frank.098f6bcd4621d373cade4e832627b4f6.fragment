@@ -8,16 +8,10 @@
 		</ul>
 	</li>
 	<li>
-		<a href="#">Test windows</a>
+		<a href="#">Edit Database</a>
 		<ul>
 			<li>
-				<a href="demoapp.windowController:addWindow:demoapp/infoWindow.js">Info&nbsp;window</a>
-			</li>
-			<li>
-				<a href="demoapp.windowController:addWindow:demoapp/webglWindow.js">webGL&nbsp;window</a>
-			</li>
-			<li>
-				<a href="demoapp.windowController:addWindow:demoapp/adaptiveWindow.js">adaptive&nbsp;window</a>
+				<a href="demoapp.windowController:addWindow:demoapp/editDbKnowledge.js">knowledge&nbsp;table</a>
 			</li>
 			<li class="topmenu-separator" />
 			<li>

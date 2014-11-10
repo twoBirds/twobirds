@@ -29,7 +29,6 @@ tb.nameSpace( 'demoapp.sys', true ).windowController = {
 			$( this.target ).find('.__scroll-content:first').prepend( '<div data-tb="' + ev.data + '"></div>' );
 			this.initChildren();
 			this.trigger('this:scroll.scrollTo:ld', 0);
-			this.trigger(':updateBehaviour:l');
 			return false;
 		},
 

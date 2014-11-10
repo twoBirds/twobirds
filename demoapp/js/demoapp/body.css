@@ -188,6 +188,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
   body {
     font-size: 0.9em; 
+    background: #e7e7e7;
   }
 
   .toparea {
@@ -224,6 +225,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
   }
 
   #menuline {
+    text-align: center;
     position: fixed;
     top: 4.2em;
     left: 0;
@@ -233,7 +235,7 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
     font-size: 0.8em; 
     border-top:1px solid #808080; 
     border-bottom:1px solid #808080; 
-    background: rgba( 240, 240, 250, 0.5) ;
+    background: rgba( 220, 220, 220, 0.5) ;
   }
 
   #menuline div {
@@ -322,8 +324,10 @@ a:focus { color: #0000ff; font-weight:bold; font-style:italic; text-decoration:u
 
   body  { 
     font-size: 0.9em; 
+    /*
     background: url(props/twobirds_2.jpg) no-repeat center center fixed; 
     background-size: cover;
+    */
   }
 
 }

@@ -1,0 +1,26 @@
+._tb-ui-simpleTooltip {
+	text-decoration: none;
+	position: relative;
+}
+
+._tb-ui-simpleTooltip > ._tb-ui-simpleTooltipContent {
+	display: none !important;
+}
+
+._tb-ui-simpleTooltip > ._tb-ui-simpleTooltipContent img {
+	float: left;
+}
+
+._tb-ui-simpleTooltip:hover > ._tb-ui-simpleTooltipContent {
+	z-index: 1000000;
+	background: #eeeeee;
+	color: #666666;
+	border: 1px solid grey;
+	font-weight: bold;
+	margin-top: 2em;
+	margin-left: 1em;
+	padding: 0.2em;
+	display: inline-block !important;
+	position: absolute;
+	overflow: hidden;
+}

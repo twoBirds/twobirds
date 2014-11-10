@@ -32,10 +32,10 @@ tb.nameSpace('tb.ui', true).scroll = {
 				// now activate this one
 				this.scrollRoot.addClass('_tb-ui-scroll-active');
 				this.parents(/tb.ui.scroll/).trigger('this:scroll.active:ld', false);
-				this.scrollRoot.css('overflow-'+this.config.direction, 'scroll');
+				//this.scrollRoot.css('overflow-'+this.config.direction, 'scroll');
 				this.active = true;
 			} else {
-				this.scrollRoot.css('overflow', 'hidden');
+				//this.scrollRoot.css('overflow', 'hidden');
 				this.scrollRoot.removeClass('_tb-ui-scroll-active');
 				this.active = false;
 			}
@@ -194,7 +194,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 				function (ev) {
 					//console.log('HANDLER FUNCTION mouseleave', this, that);
 
-					if (that.mousedown === true || that.scrollBar.is(':hover')) {
+					if ( that.dragmode === true || that.mousedown === true || that.scrollBar.is(':hover')) {
 						ev.stopPropagation();
 						ev.preventDefault();
 						return false;
@@ -449,7 +449,7 @@ tb.nameSpace('tb.ui', true).scroll = {
 						if ( that.parents(tb.ui.scroll) 
 								&& that.parents(tb.ui.scroll)['scrollVisible'] !== undefined 
 								&& that.parents(tb.ui.scroll).scrollVisible === true ) {
-							that.parents( tb.ui.scroll ).trigger(ev, delta);
+							that.parent( tb.ui.scroll ).root.trigger(ev, delta); // jQuery event
 						} 
 					}
 
