@@ -13,8 +13,6 @@ jQuery is needed, but is not absolutely essential. You can replace it with other
 
 ## Examples
 
-A simple example of a Flight component.
-
 ```html
 <html>
 	<head>
