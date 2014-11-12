@@ -2,8 +2,8 @@
 
 [twoBirds](https://github.com/FrankieTh-xx/twobirds) is a lightweight, component-based,
 event-driven JavaScript framework that maps nested objects to DOM nodes. 
-It was created 2006 by the [repo owner](http://http://frank.thuerigen.two-birds.ch) to able to build a web application for an insurance company.
-It was first made public in 2007 ( [Ajaxian](http://http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
+It was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to able to build a web application for an insurance company.
+It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
 It stayed submerged for the next years, though it was constantly under development. 
 
 jQuery is needed, but is not absolutely essential. You can replace it with other selector libs.
