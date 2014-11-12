@@ -8,7 +8,7 @@ It stayed submerged for the next years, though it was constantly under developme
 
 jQuery is needed, but is not absolutely essential. You can replace it with other selector libs.
 
-* [Tech demo](http://demo.two-birds.ch/) Code is included in this repo.
+* [Tech demo](http://demo.two-birds.ch/) Desktop only. Code is included in this repo.
 * [API documentation](doc/README.md) only this so far, but it will get you going. The demo page contains an info window that explains a bit more.
 
 ## Examples
