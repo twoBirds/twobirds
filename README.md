@@ -116,6 +116,8 @@ tb( demoapp.infoWindow ).parents() // array of all parent tB objects, nearest fi
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
 
+
+
 When on the demoapp, and the info window is on page, enter this in console...
 ```js 
 tb( demoapp.infoWindow ).structure()
@@ -127,6 +129,8 @@ demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow
 	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
 		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
 ```
+
+
 
 To see the complete structure attached to this DOM node, enter this in console...
 ```js 
