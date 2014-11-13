@@ -89,7 +89,7 @@ As you see, it is a consistent nested structure of instances, looking all the sa
 You can access every object on the page via tb( selector ), as shown in the trigger examples below.
 
 
-### tb($lt;selector$gt;).trigger($lt;event$gt;)
+### tb( selector$ ).trigger( event )
 - communication between object instances on the page
 
 some trigger snippets from demoapp:
