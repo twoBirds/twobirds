@@ -60,24 +60,74 @@ If the corresponding repo object doesnt exist, on-demand loading is performed re
 
 ### tb() selector and inner structure example
 
-when on the demoapp, and the info window is on page, enter this in console:
+All possible selectors:
+```js 
+// tb() SELECTOR ALWAYS RETURNS ONE OF...
+// - an empty array ( indicating there is no match )
+// - a single tB object ( one match )
+// - an array containing tB objects ( more than one match )
+
+// PARAMETER TYPES
+
+// STRING: jQuery select DOM node and return tB object(s)
+
+// get the $('body') DOM node, 
+// retrieve its tB toplevel object
+tb('body')
+// string selectors will be treated as jQuery DOM selectors, 
+// but only select DOM nodes that have twoBirds objects attached to them
+
+// OBJECT: instances of a repo object inside page structure
+
+// find all demoapp.body sub-instances ( only one )
+tb( demoapp.body )
+
+// find all tb.ui.scroll sub-instances ( may return many )
+tb( tb.ui.scroll )
+
+// REGEXP: as object, but matching to instance 'name' property 
+
+// always returns the root object
+tb( /app.bod/ ) // returns the demoapp.body root object, its 'name' matches
+
+
+
+// THIS:
+
+this // in handler code, this always points to the current sub-instance
+
+// CHAINING:
+
+// currently these chained selectors exist,
+// and can be used to get other page objects,
+// positioned relatively to a selector result or 'this'
+
+tb('body').children('div') // all children of body tB object that reside inside a div HTML element
+tb('body').descendants() // all descendants of body tB object
+tb( demoapp.infoWindow ).parent() // closest parent, in this case the windowController
+tb( 'div' ).parents() // array of all parent tB objects, nearest first
+
+// CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
+```
+
+When on the demoapp, and the info window is on page, enter this in console...
 ```js 
 tb( demoapp.infoWindow ).structure()
 ```
 
-the console will come up with its inner structure, much as expected it looks like:
+... and console will come up with its inner structure, much as expected it looks like:
 ```js 
 demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
 	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
 		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
 ```
 
-to see the complete structure attached to this DOM node, enter this in console:
+To see the complete structure attached to this DOM node, enter this in console...
 ```js 
 tb( demoapp.infoWindow )._root().structure()
 ```
 
-and the response will be:
+... and the response will be:
 ```js 
 _1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_1415886556968_036833262191511307", mehr...}
 	['demoapp.infoWindow']: demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
@@ -123,6 +173,7 @@ tb( tb.ui.scroll ).trigger(':scroll.ready:u')
 // as you might have guessed - the infamous 'tb.init' system event<br />	
 tb( <anyObject> ).trigger(':tb.init:ld')				
 ```
+
 
 ## Installation
 
