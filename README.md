@@ -13,6 +13,8 @@ jQuery is needed, but is not absolutely essential. You can replace it with other
 
 ## Examples
 
+### tb Objects
+
 ```html
 <html>
 	<head>
@@ -35,7 +37,7 @@ tb.nameSpace( 'demoapp', true ).body = {
 			$(this.target).html( tb.loader.get('demoapp/body.html') );
 
 			// ... 
-			
+
 			this.initChildren();
 		}
 	},
@@ -49,23 +51,61 @@ tb.nameSpace( 'demoapp', true ).body = {
 }
 ```
 
+### Selector (and inner structure example)
+
+when on the demoapp, and the info window is on page, enter this in console:
+```js 
+tb( demoapp.infoWindow ).structure()
+```
+
+the console will come up with its inner structure, much as expected it looks like:
+```js 
+demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
+	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
+		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
+```
+
+to see the complete structure attached to this DOM node, enter this in console:
+```js 
+tb( demoapp.infoWindow )._root().structure()
+```
+
+and the response will be:
+```js 
+_1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_1415886556968_036833262191511307", mehr...}
+	['demoapp.infoWindow']: demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
+		['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
+			['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
+
+```
+
+As you see, it is a consistent nested structure of instances, looking all the same codewise.
+You can access every object on the page via tb( <mySelector> ), as shown in the trigger examples below.
+
+
+### .trigger
+
 some trigger snippets from demoapp:
 ```js 
-// get the body toplevel object, and trigger '<myevent>' on it, 
-// by default bubbling down the sub-instances.
+// get the $('body') DOM node, 
+// retrieve its tB toplevel object, 
+// and trigger '<myevent>' on it, 
+// ( by default ) bubbling down the sub-instances attached within.
 tb('body').trigger('<myevent>')
 
-// find all body instances, select their root object, 
-// trigger <myevent> bubbling down locally.<br />
+// find all body instances, 
+// select their root object, 
+// trigger <myevent> bubbling down locally.
 tb( demoapp.body ).trigger('root:<myevent>:ld')	
 
-// get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, 
-// meaning its a local event that doesnt bubble. As for this special event, 
-// all scrollBar handles will be resized and repositioned to reflect their inner content.
+// get all sub-instances of tb.ui.scroll, 
+// and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. 
+// As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.
 tb( tb.ui.scroll ).trigger(':scroll.update:l')			
 
-// find all tb.ui.scroll instances, select their super object, 
-// trigger scroll.ready bubbling up locally.<br />
+// find all tb.ui.scroll instances, 
+// select their super object, 
+// trigger scroll.ready bubbling up locally.
 tb( tb.ui.scroll ).trigger('super:scroll.ready:lu')		
 
 // same as above, but easier. 
