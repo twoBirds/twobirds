@@ -26,6 +26,7 @@ jQuery is needed, but is not absolutely essential. You can replace it with other
 </html>
 ```
 
+
 Client repo object: simple requirement loading, inserting and recursively init children
 
 demoapp/body.js 
@@ -86,10 +87,10 @@ _1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_14
 ```
 
 As you see, it is a consistent nested structure of instances, looking all the same codewise.
-You can access every object on the page via tb( selector ), as shown in the trigger examples below.
+You can access every object on the page via tb(selector), as shown in the trigger examples below.
 
 
-### tb( selector$ ).trigger( event )
+### tb(selector).trigger(event)
 - communication between object instances on the page
 
 some trigger snippets from demoapp:
