@@ -106,7 +106,7 @@ tb( demoapp.body ).trigger('root:<myevent>:ld')
 
 // get all sub-instances of tb.ui.scroll, 
 // and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. 
-// As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.
+// As for this special event, all scrollBar handles will be resized and repositioned.
 tb( tb.ui.scroll ).trigger(':scroll.update:l')			
 
 // find all tb.ui.scroll instances, 
