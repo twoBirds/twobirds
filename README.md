@@ -53,12 +53,23 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 some trigger snippets from demoapp:
 ```js 
-tb('body').trigger('<myevent>') 						// get the body toplevel object, and trigger '<myevent>' on it, by default bubbling down the sub-instances.
-tb( tb.ui.scroll ).trigger(':scroll.update:l')			// get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.
-tb( demoapp.body ).trigger('root:<myevent>:ld')	// find all body instances, select their root object, trigger <myevent> bubbling down locally.<br />
-tb( tb.ui.scroll ).trigger('super:scroll.ready:lu')		// find all tb.ui.scroll instances, select their super object, trigger scroll.ready bubbling up locally.<br />
-tb( tb.ui.scroll ).trigger(':scroll.ready:u')			// easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br />
-tb( <anyObject> ).trigger(':tb.init:ld')				// as you might have guessed - the infamous 'tb.init' system event<br />
+// get the body toplevel object, and trigger '<myevent>' on it, by default bubbling down the sub-instances.
+tb('body').trigger('<myevent>')
+
+// find all body instances, select their root object, trigger <myevent> bubbling down locally.<br />
+tb( demoapp.body ).trigger('root:<myevent>:ld')	
+
+// get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.
+tb( tb.ui.scroll ).trigger(':scroll.update:l')			
+
+// find all tb.ui.scroll instances, select their super object, trigger scroll.ready bubbling up locally.<br />
+tb( tb.ui.scroll ).trigger('super:scroll.ready:lu')		
+
+// easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br />
+tb( tb.ui.scroll ).trigger(':scroll.ready:u')		
+
+// as you might have guessed - the infamous 'tb.init' system event<br />	
+tb( <anyObject> ).trigger(':tb.init:ld')				
 ```
 
 ## Installation
