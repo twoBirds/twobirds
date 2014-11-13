@@ -155,29 +155,29 @@ some trigger snippets from demoapp:
 // retrieve its tB toplevel object, 
 // and trigger '<myevent>' on it, 
 // ( by default ) bubbling down the sub-instances attached within.
-tb('body').trigger('<myevent>')
+tb('body').trigger('<myevent>' [, data])
 
 // find all demoapp.body instances, 
 // select their root object, 
 // trigger <myevent> bubbling down locally.
-tb( demoapp.body ).trigger('root:<myevent>:ld')	
+tb( demoapp.body ).trigger('root:<myevent>:ld' [, data] )	
 
 // find all tb.ui.scroll instances, 
 // and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. 
 // As for this special event, all scrollBar handles will be resized and repositioned.
-tb( tb.ui.scroll ).trigger(':scroll.update:l')			
+tb( tb.ui.scroll ).trigger(':scroll.update:l' [, data] )			
 
 // find all tb.ui.scroll instances, 
 // select their super object, 
 // trigger scroll.ready bubbling up locally.
-tb( tb.ui.scroll ).trigger('super:scroll.ready:lu')		
+tb( tb.ui.scroll ).trigger('super:scroll.ready:lu' [, data] )		
 
 // same as above, but easier. 
 // Missing 'l' indicates not to trigger it locally.<br />
-tb( tb.ui.scroll ).trigger(':scroll.ready:u')		
+tb( tb.ui.scroll ).trigger(':scroll.ready:u' [, data ] )		
 
 // as you might have guessed - the infamous 'tb.init' system event<br />	
-tb( <anyObject> ).trigger(':tb.init:ld')				
+tb( <anyObject> ).trigger(':tb.init:ld' )				
 ```
 
 
