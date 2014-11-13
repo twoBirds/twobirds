@@ -111,7 +111,7 @@ this // in handler code, this always points to the current sub-instance
 tb('body').children('div') // all children of body tB object that reside inside a div HTML element
 tb('body').descendants() // all descendants of body tB object
 tb( demoapp.infoWindow ).parent() // closest parent, in this case the windowController
-tb( 'div' ).parents() // array of all parent tB objects, nearest first
+tb( demoapp.infoWindow ).parents() // array of all parent tB objects, nearest first
 
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
