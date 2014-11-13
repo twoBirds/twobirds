@@ -26,7 +26,7 @@ jQuery is needed, but is not absolutely essential. You can replace it with other
 </html>
 ```
 
-demoapp/body.js ( simple requirement loading, inserting and recursively init children )
+demoapp/body.js client repo object ( simple requirement loading, inserting and recursively init children )
 ```js 
 tb.nameSpace( 'demoapp', true ).body = {
 
@@ -50,6 +50,9 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 }
 ```
+By default upon startuptwoBirds will lookup DOM nodes containing a "data-tb" attribute, 
+and treats them as a white-space delimited list of twoBirds instances to attach there.
+If the corresponding repo object doesnt exist, on-demand loading is performed recursively.
 
 ### Selector (and inner structure example)
 
