@@ -27,6 +27,7 @@ jQuery is needed, but is not absolutely essential. You can replace it with other
 ```
 
 Client repo object: simple requirement loading, inserting and recursively init children
+
 demoapp/body.js 
 ```js 
 tb.nameSpace( 'demoapp', true ).body = {
