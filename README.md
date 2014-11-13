@@ -9,7 +9,7 @@ It stayed submerged for the next years, though it was constantly under developme
 jQuery is needed, but is not absolutely essential. You can replace it with other selector libs.
 
 * [Tech demo](http://demo.two-birds.ch/) Desktop only. Code is included in this repo.
-* [API documentation](doc/README.md) only this so far, but it will get you going. The demo page contains an info window that explains a bit more.
+* [API documentation](doc/README.md) only this so far, but it will get you going. 
 
 ## Examples
 
@@ -140,7 +140,7 @@ As you see, it is a consistent nested structure of instances, looking all the sa
 You can access every object on the page via tb(selector), as shown in the trigger examples below.
 
 
-### tb(selector).trigger(event)
+### tb(selector).trigger(event, data)
 - communication between object instances on the page
 
 some trigger snippets from demoapp:
