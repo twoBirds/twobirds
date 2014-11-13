@@ -86,7 +86,7 @@ _1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_14
 ```
 
 As you see, it is a consistent nested structure of instances, looking all the same codewise.
-You can access every object on the page via tb( $lt;selector$gt; ), as shown in the trigger examples below.
+You can access every object on the page via tb( selector ), as shown in the trigger examples below.
 
 
 ### tb($lt;selector$gt;).trigger($lt;event$gt;)
