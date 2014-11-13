@@ -88,9 +88,15 @@ tb( tb.ui.scroll )
 // REGEXP: as object, but matching to instance 'name' property 
 
 // always returns the root object
+
 tb( /app.bod/ ) // returns the demoapp.body root object, its 'name' matches
 
+// OTHER:
 
+// both of the following return all toplevel objects in the current DOM, as expected.
+
+tb( /./ ) 
+tb( '*' )
 
 // THIS:
 
