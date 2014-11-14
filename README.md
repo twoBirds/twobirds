@@ -4,7 +4,7 @@
 event-driven JavaScript framework that maps nested objects to DOM nodes. 
 
 twoBirds is the minimum possible solution for an application framework, it consists of only 3 parts:
-- a simple client repository object structure
+- a simple client repository object structure + instanciation mechanism
 - a selector to adress instances of these objects on the page
 - a trigger to communicate with the selected instance on the page
 
