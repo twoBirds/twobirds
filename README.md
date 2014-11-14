@@ -10,9 +10,11 @@ twoBirds is the minimum possible solution for an application framework, it consi
 
 twoBirds builds nested structures of instances of repo objects that all look the same codewise, but add up to complex functionality like in this structural example:
 
-*myWindow* contains
-    *system window* to display contents, which contains
-        a *scollBar* to scroll the window contents
+```
+myWindow contains
+    a system window to display contents, which contains
+        a scollBar to scroll the window contents
+```
 
 All instances inside this example are loose coupled by the selector-trigger mechanism.
 
