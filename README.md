@@ -77,7 +77,7 @@ If the corresponding repo object doesnt exist, on-demand loading is performed re
 
 demoapp/globalSpinner.js 
 ```js 
-demoapp.globalSpinner = {
+tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 	name: 'demoapp.globalSpinner',
 
