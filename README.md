@@ -254,4 +254,4 @@ twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.c
 It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
 It stayed submerged for the next years, though it was constantly under development. 
 
-In case of questions contact me.
+In case of questions contact [me](http://frank.thuerigen.two-birds.ch).
