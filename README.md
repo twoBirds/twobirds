@@ -69,9 +69,9 @@ tb.nameSpace( 'demoapp', true ).body = {
 ```
 
 By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
-and treats them as a white-space delimited list of twoBirds instances to attach there.
-If the corresponding repo object doesnt exist, on-demand loading is performed recursively.
-
+and treats them as a white-space delimited list of twoBirds instances to attach there. 
+If the corresponding repo object doesnt exist, on-demand loading is performed recursively. 
+.initChildren() will do run this initialization on newly inserted DOM content.
 
 #### Client repo object: simple sub-instance, tb.observe example
 
