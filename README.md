@@ -162,40 +162,6 @@ tb( demoapp.infoWindow ).parents() // array of all parent tB objects, nearest fi
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
 
-
-
-When on the demoapp, and the info window is on page, enter this in console...
-```js 
-tb( demoapp.infoWindow ).structure()
-```
-
-... and console will come up with its inner structure, much as expected it looks like:
-```js 
-demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
-	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
-		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
-```
-
-
-
-To see the complete structure attached to this DOM node, enter this in console...
-```js 
-tb( demoapp.infoWindow )._root().structure()
-```
-
-... and the response will be:
-```js 
-_1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_1415886556968_036833262191511307", mehr...}
-	['demoapp.infoWindow']: demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
-		['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
-			['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
-
-```
-
-As you see, it is a consistent nested structure of instances, looking all the same codewise.
-You can access every object on the page via tb(selector), as shown in the trigger examples below.
-
-
 ### tb(selector).trigger(event, data)
 - communication between object instances on the page
 
@@ -230,6 +196,38 @@ tb( tb.ui.scroll ).trigger(':scroll.ready:u' [, data ] )
 tb( <anyObject> ).trigger(':tb.init:ld' )				
 ```
 
+## Reflection
+
+When on the demoapp, and the info window is on page, enter this in console...
+```js 
+tb( demoapp.infoWindow ).structure()
+```
+
+... and console will come up with its inner structure, much as expected it looks like:
+```js 
+demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
+	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
+		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
+```
+
+
+
+To see the complete structure attached to this DOM node, enter this in console...
+```js 
+tb( demoapp.infoWindow )._root().structure()
+```
+
+... and the response will be:
+```js 
+_1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_1415886556968_036833262191511307", mehr...}
+	['demoapp.infoWindow']: demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
+		['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
+			['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
+
+```
+
+As you see, it is a consistent nested structure of instances, looking all the same codewise.
+You can access every object on the page via tb(selector), as shown in the trigger examples below.
 
 ## Installation
 
