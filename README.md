@@ -104,7 +104,7 @@ demoapp.globalSpinner = {
 }
 ```
 
-### tb() selector and inner structure example
+### tb() Selector and inner structure example
 
 All possible selectors:
 ```js 
