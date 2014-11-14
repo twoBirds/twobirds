@@ -58,36 +58,36 @@ tb.nameSpace( 'demoapp', true ).body = {
 }
 ```
 
-Client repo object: simple requirement loading, inserting and recursively init children
+Client repo object: simple sub-instance, tb.observe example
 
-demoapp/body.js 
+demoapp/globalSpinner.js 
 ```js 
-tb.nameSpace( 'demoapp', true ).body = {
+demoapp.globalSpinner = {
 
-	name: 'demoapp.body',
+	name: 'demoapp.globalSpinner',
+
+	'tb.ui.spinner': {},
 
 	handlers: {
-		'tb.init': function body_init(ev){
-			$(this.target).html( tb.loader.get('demoapp/body.html') );
 
-			// ... 
+		'tb.init': function globalSpinner_tb_init(){
+			var that = this['tb.ui.spinner'];
 
-			this.initChildren();
+			// observe loading status and trigger spinner accordingly
+			tb.loader.loading.observe( function globalSpinner_setSpinner( pBool ){ 
+				if ( pBool ){
+					that.trigger(':tb.ui.spinner.on:');
+				} else {
+					that.trigger(':tb.ui.spinner.off:');
+				}
+			});
+
 		}
-	},
 
-	'tb.require': [
-		'demoapp/props/icomoon/style.css',
-		'demoapp/body.html',
-		'demoapp/body.css'
-	]
+	}
 
 }
 ```
-
-By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
-and treats them as a white-space delimited list of twoBirds instances to attach there.
-If the corresponding repo object doesnt exist, on-demand loading is performed recursively.
 
 ### tb() selector and inner structure example
 
