@@ -6,7 +6,7 @@ It was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to 
 It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
 It stayed submerged for the next years, though it was constantly under development. 
 
-jQuery is needed, but is not absolutely essential. You can replace it with other selector libs.
+twoBirds utilizes jQuery.
 
 * [Tech demo](http://demo.two-birds.ch/) Desktop only. Code is included in this repo.
 * [API documentation](doc/README.md) only this so far, but it will get you going. 
