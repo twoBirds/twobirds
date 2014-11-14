@@ -41,7 +41,7 @@ twoBirds utilizes jQuery.
 ```
 
 
-Client repo object: simple requirement loading, inserting and recursively init children
+#### Client repo object: simple requirement loading, inserting and recursively init children
 
 demoapp/body.js 
 ```js 
@@ -73,7 +73,7 @@ and treats them as a white-space delimited list of twoBirds instances to attach 
 If the corresponding repo object doesnt exist, on-demand loading is performed recursively.
 
 
-Client repo object: simple sub-instance, tb.observe example
+#### Client repo object: simple sub-instance, tb.observe example
 
 demoapp/globalSpinner.js 
 ```js 
