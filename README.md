@@ -2,9 +2,13 @@
 
 [twoBirds](https://github.com/FrankieTh-xx/twobirds) is a lightweight, component-based,
 event-driven JavaScript framework that maps nested objects to DOM nodes. 
-It was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to able to build a web application for an insurance company.
-It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
-It stayed submerged for the next years, though it was constantly under development. 
+
+twoBirds is the minimum possible solution for an application framework, it consists of only 3 parts:
+- a simple client repository object structure
+- a selector to adress instances of these objects on the page
+- a trigger to communicate with the selected object
+
+twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch).
 
 twoBirds utilizes jQuery.
 
@@ -26,6 +30,33 @@ twoBirds utilizes jQuery.
 </html>
 ```
 
+
+Client repo object: simple requirement loading, inserting and recursively init children
+
+demoapp/body.js 
+```js 
+tb.nameSpace( 'demoapp', true ).body = {
+
+	name: 'demoapp.body',
+
+	handlers: {
+		'tb.init': function body_init(ev){
+			$(this.target).html( tb.loader.get('demoapp/body.html') );
+
+			// ... 
+
+			this.initChildren();
+		}
+	},
+
+	'tb.require': [
+		'demoapp/props/icomoon/style.css',
+		'demoapp/body.html',
+		'demoapp/body.css'
+	]
+
+}
+```
 
 Client repo object: simple requirement loading, inserting and recursively init children
 
@@ -205,5 +236,10 @@ copy twoBirds.js from demoapp and insert into your project
 # Status:
 - preliminary stable
 - will be updated w/ new functionality as needed
+
+# History
+twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to able to build a web application for an insurance company.
+It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
+It stayed submerged for the next years, though it was constantly under development. 
 
 In case of questions contact me.
