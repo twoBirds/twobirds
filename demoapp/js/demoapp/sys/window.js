@@ -200,6 +200,7 @@ tb.nameSpace('demoapp.sys').window = {
 
 			this.trigger(':window.active:', true);
 			this.trigger(':window.ready:lu');
+			this.trigger(':scroll.update:d');
 			tb(/demoapp.windowController/).trigger('scroll.update');
 			tb(/demoapp.windowController/).trigger(':updateBehaviour:ld');
 		},

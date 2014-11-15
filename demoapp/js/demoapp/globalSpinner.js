@@ -1,4 +1,4 @@
-demoapp.globalSpinner = {
+tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 	name: 'demoapp.globalSpinner',
 
