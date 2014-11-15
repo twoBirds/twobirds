@@ -103,6 +103,7 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 }
 ```
+(named callback functions aid in debugging if necessary)
 
 ### tb() Selector and inner structure example
 
