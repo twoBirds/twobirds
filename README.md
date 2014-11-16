@@ -251,7 +251,7 @@ copy twoBirds.js from demoapp and insert into your project
 - will be updated w/ new functionality as needed
 
 # History
-twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to able to build a web application for an insurance company.
+twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to be able to build a complex web application for an insurance company.
 It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
 It stayed submerged for the next years, though it was constantly under development. 
 
