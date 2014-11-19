@@ -25,6 +25,8 @@ twoBirds utilizes jQuery.
 * [Tech demo](http://demo.two-birds.ch/) Desktop only. Code is included in this repo.
 * [API documentation](doc/README.md) only this so far, but it will get you going. 
 
+Comparision: twoBirds can be compared to both twitters Flight and googles et.al. Web Components. Like Flight it is Javascript centric, as opposed to web components. Unlike both of these it allows for complete separation of code and design. It makes nesting of loose coupled objects into complex structures much easier than both of the above.
+
 ## Examples
 
 ### tb Objects
