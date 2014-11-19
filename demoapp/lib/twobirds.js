@@ -410,7 +410,7 @@ if (!Array.prototype.indexOf)
 
 			is: function( s ){ // selector match
 				var o = this instanceof Array ? this[0] : this;
-				if (!s) return true;
+				if ( s === undefined ) return true;
 				return _me( o, s );
 			},
 
@@ -603,7 +603,7 @@ if (!Array.prototype.indexOf)
 				if ( this instanceof Array ){
 					$.each( this, function( i, v ){
 						var p = v.parents(s);
-						$.extend(r, true, p instanceof tb ? [p] : p );
+						$.extend( true, r, p instanceof tb ? [p] : p );
 					});
 				} else if ( this instanceof tb ){
 					if ( this['_super'] !== undefined ) {
@@ -616,7 +616,7 @@ if (!Array.prototype.indexOf)
 						}
 					});
 				}
-				$.extend(r, true, tb.prototype)
+				$.extend( true, r, tb.prototype)
 				if (s) r = r.filter(s);
 				return r.length === 1 ? r[0] : r;
 			},
@@ -626,7 +626,7 @@ if (!Array.prototype.indexOf)
 				if ( typeof this === 'array' || this instanceof Array ){
 					$.each( this, function( i, v ){
 						var p = v.parent(s);
-						$.extend(r, true, p instanceof tb ? [p] : p );
+						$.extend( true, r, p instanceof tb ? [p] : p );
 					});
 				} else if ( this instanceof tb ){
 					if ( this['_super'] !== undefined ) {
@@ -636,7 +636,7 @@ if (!Array.prototype.indexOf)
 						t = p[0] ? $( p[0] ).data('tbo') : null; 
 					r =  t ? [ t ] : [];
 				}
-				$.extend(r, true, tb.prototype)
+				$.extend( true, r, tb.prototype)
 				if (s) r = r.filter(s);
 				return r.length === 1 ? r[0] : r;
 			},
@@ -647,7 +647,7 @@ if (!Array.prototype.indexOf)
 				if ( this instanceof Array ){
 					$.each( this, function( i, v ){
 						var c = v.children(s);
-						$.extend(r, true, c instanceof tb ? [c] : c );
+						$.extend( true, r, c instanceof tb ? [c] : c );
 					});
 				} else if ( this instanceof tb ){
 					if ( this['_super'] !== undefined ) {
@@ -660,7 +660,7 @@ if (!Array.prototype.indexOf)
 						}
 					});
 				}
-				$.extend(r, true, tb.prototype)
+				$.extend( true, r, tb.prototype)
 				if (s) r = r.filter(s);
 				return r.length === 1 ? r[0] : r;
 			},
@@ -677,12 +677,76 @@ if (!Array.prototype.indexOf)
 				} else if ( this instanceof Array ){
 					$.each( this, function( i, v ){
 						var d = v.descendants(s)
-						$.extend(r, true, d instanceof tb ? [d] : d );
+						$.extend( true, r, d instanceof tb ? [d] : d );
+					});
+				}
+				$.extend( true, r, tb.prototype)
+				if (s) r = r.filter(s);
+				return r.length === 1 ? r[0] : r;
+			},
+
+			prev: function(){
+				var r = [];
+				if ( this instanceof tb ){
+					var all = this.parent().children(),
+						i = all.indexOf( this._root ? this._root() : this ),
+						c = i-1;
+					if ( i > 0 ){
+						r.push( all[ i-1 ] );
+					};
+				} else if ( this instanceof Array ){
+					$.each( this, function( i, v ){
+						var p = v.prev()
+						if ( p instanceof tb ){
+							if ( r.indexOf( p ) === -1 ){
+								r.push( p );
+							}
+						};
 					});
 				}
 				$.extend(r, true, tb.prototype)
-				if (s) r = r.filter(s);
 				return r.length === 1 ? r[0] : r;
+			},
+
+			next: function(){
+				var r = [];
+				if ( this instanceof tb ){
+					var all = this.parent().children(),
+						i = all.indexOf( this._root ? this._root() : this ),
+						l = all.length;
+					if ( i < l - 1 ){
+						r.push( all[ i + 1 ] );
+					};
+				} else if ( this instanceof Array ){
+					$.each( this, function( i, v ){
+						var p = v.next()
+						if ( p instanceof tb ){
+							if ( r.indexOf( p ) === -1 ){
+								r.push( p );
+							}
+						};
+					});
+				}
+				$.extend(r, true, tb.prototype)
+				return r.length === 1 ? r[0] : r;
+			},
+
+			describe: function(){
+				if ( this instanceof tb && this['handlers'] !== undefined && this.handlers.length !== 0 ) {
+					console.log( '[' + this.name + '] describe handlers:');				
+					$.each( this.handlers, function( i, h ){
+						var fText = h.toString(),
+							m = fText.match( /\.\s*trigger\s*\(\s*[^\)]*\)/g );
+						console.log( ' -> ' + i );
+						if ( m ) $.each( m, function( i, v ){
+							console.log( '    <- ' + v );				
+						})
+					});
+				} else if ( this instanceof Array ){
+					$.each( this, function( i, v ){
+						v.describe();
+					});
+				}
 			},
 
 			structure: function( pIndent, pPropName, pOrigin ){

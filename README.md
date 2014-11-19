@@ -161,6 +161,8 @@ tb('body').children('div') // all children of body tB object that reside inside 
 tb('body').descendants() // all descendants of body tB object
 tb( demoapp.infoWindow ).parent() // closest parent, in this case the windowController
 tb( demoapp.infoWindow ).parents() // array of all parent tB objects, nearest first
+tb( demoapp.infoWindow ).prev() // the previous tb instance in this.parent().children()
+tb( demoapp.infoWindow ).next() // the next tb instance in this.parent().children()
 
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
