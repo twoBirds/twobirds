@@ -11,11 +11,11 @@
 		<a href="#">Edit Database</a>
 		<ul>
 			<li>
-				<a href="demoapp.windowController:addWindow:demoapp/editDbKnowledge.js">knowledge&nbsp;table</a>
+				<a href="demoapp.sys.windowController:addWindow:demoapp/editDbKnowledge.js">knowledge&nbsp;table</a>
 			</li>
 			<li class="topmenu-separator" />
 			<li>
-				<a href="demoapp.windowController:closeAllWindows">close&nbsp;all&nbsp;windows</a>
+				<a href="demoapp.sys.windowController:closeAllWindows">close&nbsp;all&nbsp;windows</a>
 			</li>
 		</ul>
 	</li>

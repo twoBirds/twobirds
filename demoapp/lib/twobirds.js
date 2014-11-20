@@ -300,6 +300,15 @@ if (!Array.prototype.indexOf)
 				'*:eventName' => '*:eventName:ld'
 				*/
 
+				if ( this instanceof Array && this[0] && this[0] instanceof tb ){ // chained method, filter result set
+					$.each( this, function(i,v){
+						if ( v instanceof tb ) {
+							v.trigger( pName, pData );
+						}
+					});
+					return this;				
+				}
+
 				function handleEvent( evt ){
 					var bubble = evt.bubble,
 						cont = true,
@@ -341,7 +350,7 @@ if (!Array.prototype.indexOf)
 				// recover full event description
 				if ( pName.indexOf(':') === -1 ){
 					// simple tlo event
-					pName = '*:' + pName + ':ld'; // standard = starting at every tlo object, bubble down inside tlo
+					pName = ':' + pName + ':ld'; // standard = starting at every tlo object, bubble down inside tlo
 				}
 
 				var ea = pName.split(':');
@@ -406,6 +415,7 @@ if (!Array.prototype.indexOf)
 					};})( start, evt ),
 					0 // as instantaneous as possible
 				);
+				return this;
 			},
 
 			is: function( s ){ // selector match

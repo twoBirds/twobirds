@@ -32,7 +32,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 						var t = $(ev.currentTarget).find('a').attr('href');
 						t = t.split(':');
 						if ( !t[1] ) return;
-						tb( t[0] ).trigger( t[1], t[2] || '' );
+						tb( tb.nameSpace( t[0] ) ).trigger( t[1], t[2] || '' );
 					}
 				)
 				.on(
