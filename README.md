@@ -260,6 +260,28 @@ tb( demoapp.userLogin ).describe()
 ```
 This helps in following the asynchronous event flow.
 
+### .structure( true )
+
+When on the demoapp, enter this in console...
+```js 
+tb( demoapp.globalSpinner ).structure( true )
+```
+
+... and console will show both structure, handlers and triggers:
+```js 
+demoapp.globalSpinner Object { target=div, handlers={...}, name="demoapp.globalSpinner", mehr...}
+[demoapp.globalSpinner] describe handlers:
+-> tb.init
+    <- .trigger(':tb.ui.spinner.on:d')
+    <- .trigger(':tb.ui.spinner.off:d')
+	['tb.ui.spinner']: tb.ui.spinner Object { target=div, handlers={...}, name="tb.ui.spinner", mehr...}
+	[tb.ui.spinner] describe handlers:
+	 -> tb.init
+	 -> tb.ui.spinner.on
+	 -> tb.ui.spinner.off
+```
+
+
 ## Installation
 
 copy twoBirds.js from demoapp and insert into your project
