@@ -206,6 +206,8 @@ tb( <anyObject> ).trigger(':tb.init:ld' )
 
 ## Reflection
 
+### .structure()
+
 When on the demoapp, and the info window is on page, enter this in console...
 ```js 
 tb( demoapp.infoWindow ).structure()
@@ -235,6 +237,29 @@ _1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_14
 ```
 
 As you see, it is a consistent nested structure of instances, looking all the same codewise.
+
+### .describe()
+
+When on the demoapp, enter this in console...
+```js 
+tb( demoapp.userLogin ).describe()
+```
+
+... and console will come up with the events it handles, and the events:
+```js 
+[demoapp.userLogin] describe handlers:
+-> tb.init
+    <- .trigger( 'userlogin.success', that.model.data()
+    <- .trigger(':login:')
+-> login
+-> logout
+-> userlogin.success
+    <- .trigger( ':tb.model.failure:l' )
+    <- .trigger(':tb.init:')
+-> tb.model.failure
+
+```
+
 
 ## Installation
 
