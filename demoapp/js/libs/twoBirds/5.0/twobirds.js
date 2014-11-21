@@ -745,13 +745,13 @@ if (!Array.prototype.indexOf)
 			describe: function(pIndent){
 				pIndent = pIndent || '';
 				if ( this instanceof tb && this['handlers'] !== undefined && this.handlers.length !== 0 ) {
-					console.log( pIndent + '[' + this.name + '] describe handlers:');				
+					//console.log( pIndent + '[' + this.name + '] describe handlers:');				
 					$.each( this.handlers, function( i, h ){
 						var fText = h.toString(),
 							m = fText.match( /\.\s*trigger\s*\(\s*[^\)]*\)/g );
-						console.log( pIndent + ' -> ' + i );
+						console.log( pIndent + '-> ' + i );
 						if ( m ) $.each( m, function( i, v ){
-							console.log( pIndent + '    <- ' + v );				
+							console.log( pIndent + '   <- ' + v );				
 						})
 					});
 				} else if ( this instanceof Array ){
@@ -777,7 +777,7 @@ if (!Array.prototype.indexOf)
 				} else if ( this instanceof tb ) {
 					console.log( indentString + ( propName.length > 0 ? '[\'' + propName + '\']: ' : '') + this['name'] || '<no name>', this);
 					if ( doDescribe ) {
-						this.describe( indentString );
+						this.describe( indentString + '\t' );
 					}
 					$.each( this, function( i, v ){
 						if ( /^_/.test( i ) ) {  // ignore internal values
