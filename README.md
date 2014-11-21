@@ -107,7 +107,8 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 }
 ```
-(named callback functions aid in debugging if necessary)
+* Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
+* Named callback functions aid in debugging of asynchronous systems
 
 ### tb() Selector and inner structure example
 
