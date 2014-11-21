@@ -245,7 +245,7 @@ When on the demoapp, enter this in console...
 tb( demoapp.userLogin ).describe()
 ```
 
-... and console will come up with the events it handles, and the events:
+... and console will come up with the events it handles, and the events it triggers inside these handlers:
 ```js 
 [demoapp.userLogin] describe handlers:
 -> tb.init
@@ -257,9 +257,8 @@ tb( demoapp.userLogin ).describe()
     <- .trigger( ':tb.model.failure:l' )
     <- .trigger(':tb.init:')
 -> tb.model.failure
-
 ```
-
+This helps in following the asynchronous event flow.
 
 ## Installation
 
