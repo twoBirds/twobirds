@@ -742,15 +742,16 @@ if (!Array.prototype.indexOf)
 				return r.length === 1 ? r[0] : r;
 			},
 
-			describe: function(){
+			describe: function(pIndent){
+				pIndent = pIndent || '';
 				if ( this instanceof tb && this['handlers'] !== undefined && this.handlers.length !== 0 ) {
-					console.log( '[' + this.name + '] describe handlers:');				
+					console.log( pIndent + '[' + this.name + '] describe handlers:');				
 					$.each( this.handlers, function( i, h ){
 						var fText = h.toString(),
 							m = fText.match( /\.\s*trigger\s*\(\s*[^\)]*\)/g );
-						console.log( ' -> ' + i );
+						console.log( pIndent + ' -> ' + i );
 						if ( m ) $.each( m, function( i, v ){
-							console.log( '    <- ' + v );				
+							console.log( pIndent + '    <- ' + v );				
 						})
 					});
 				} else if ( this instanceof Array ){
@@ -760,12 +761,13 @@ if (!Array.prototype.indexOf)
 				}
 			},
 
-			structure: function( pIndent, pPropName, pOrigin ){
+			structure: function( pIndent, pPropName, pOrigin, pDescribe ){
 				var origin = pOrigin instanceof tb ? pOrigin : this,
 					name = this.name,
 					indent = typeof pIndent === 'number' ? pIndent : 0,
 					indentString = (new Array( indent + 1 )).join( '\t' ),
-					propName = pPropName || '';
+					propName = pPropName || '',
+					doDescribe = pDescribe || arguments.length === 1 && pIndent === true ? true : false;
 				if ( this instanceof Array || typeof this === 'array' ){
 					$.each( this, function( i, v ){
 						if ( v && $.type(v) != 'null' ) if ( v instanceof tb ){
@@ -774,6 +776,9 @@ if (!Array.prototype.indexOf)
 					});
 				} else if ( this instanceof tb ) {
 					console.log( indentString + ( propName.length > 0 ? '[\'' + propName + '\']: ' : '') + this['name'] || '<no name>', this);
+					if ( doDescribe ) {
+						this.describe( indentString );
+					}
 					$.each( this, function( i, v ){
 						if ( /^_/.test( i ) ) {  // ignore internal values
 							//console.log( indentString + i + ': <internal property>' );
@@ -782,7 +787,7 @@ if (!Array.prototype.indexOf)
 							var p = origin.parents(),
 								p = typeof p === 'array' ? p : [p];
 							if ( p.indexOf(v) === -1 ){
-								v.structure.apply( v, [ indent + 1, i, origin ] );
+								v.structure.apply( v, [ indent + 1, i, origin, doDescribe ] );
 							} else {
 								//console.log( indentString + '\t<element is anchestor of origin tbo, recursion warning>');
 							}
