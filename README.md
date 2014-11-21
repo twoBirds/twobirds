@@ -267,18 +267,16 @@ When on the demoapp, enter this in console...
 tb( demoapp.globalSpinner ).structure( true )
 ```
 
-... and console will show both structure, handlers and triggers:
+... and console will show both structure and handlers/triggers:
 ```js 
 demoapp.globalSpinner Object { target=div, handlers={...}, name="demoapp.globalSpinner", mehr...}
-[demoapp.globalSpinner] describe handlers:
--> tb.init
-    <- .trigger(':tb.ui.spinner.on:d')
-    <- .trigger(':tb.ui.spinner.off:d')
+	-> tb.init
+	   <- .trigger(':tb.ui.spinner.on:d')
+	   <- .trigger(':tb.ui.spinner.off:d')
 	['tb.ui.spinner']: tb.ui.spinner Object { target=div, handlers={...}, name="tb.ui.spinner", mehr...}
-	[tb.ui.spinner] describe handlers:
-	 -> tb.init
-	 -> tb.ui.spinner.on
-	 -> tb.ui.spinner.off
+		-> tb.init
+		-> tb.ui.spinner.on
+		-> tb.ui.spinner.off
 ```
 
 
