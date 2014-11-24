@@ -251,8 +251,8 @@ tb( demoapp.userLogin ).describe()
 -> tb.init
     <- .trigger( 'userlogin.success', that.model.data()
     <- .trigger(':login:')
--> login
--> logout
+-> userlogin.login
+-> userlogin.logout
 -> userlogin.success
     <- .trigger( ':tb.model.failure:l' )
     <- .trigger(':tb.init:')
