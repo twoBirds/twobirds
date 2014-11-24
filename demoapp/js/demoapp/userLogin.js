@@ -39,7 +39,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 							userpass: that.userpass.val() 
 						};
 
-						that.trigger(':login:')
+						that.trigger(':userlogin.login:')
 					}
 				);
 
@@ -60,7 +60,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			return false; // break here
 		},
 
-		'login':  function userlogin_login(ev){
+		'userlogin.login':  function userlogin_login(ev){
 			// convert pass to md5
 			var val = decodeURIComponent( this.userpass.val() ),
 				md5 = tb.md5.hex_md5( val );
@@ -72,7 +72,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			this.userpass.val(val);
 		},
 
-		'logout': function userlogin_logout(ev){
+		'userlogin.logout': function userlogin_logout(ev){
 			$( this.target )
 				.find('.userlogin-logoutlink')
 				.click();
