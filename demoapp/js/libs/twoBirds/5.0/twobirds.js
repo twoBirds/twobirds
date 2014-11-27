@@ -1163,7 +1163,7 @@ tb.Cache.prototype = (function () {
 		 * 
 		 */
 		get: function (pId) {
-			return this.c[pId] !== undefined ? this.c[pId] : false;
+			return this.c[pId] || false;
 		},
 
 		extract: function (pId) {
@@ -1709,7 +1709,6 @@ tb.loader.js = (function () {
 			$.each( tb.require.groups, function( i, v ){
 				if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
 					tb.require.groups[i].push( pPath );
-					return false; // break each
 				}
 			});
 		}
@@ -1796,21 +1795,8 @@ tb.loader.js = (function () {
 
 			if ( !pPath ) return;
 			url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
-			if ( c.get( pPath ) === false ){ // not loading yet
-				c.set( pPath, 0 );  
-				addScript.apply( this, [ pPath, url, pCb, pId ] );
-			} else if ( c.get( pPath ) === 0 ){ // already loading, but not finished
-				if ( pId !== undefined ){
-					$.each( tb.require.groups, function( i, v ){
-						if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
-							tb.require.groups[i].push( pPath );
-							return false; // break each
-						}
-					});
-				}
-			} else { // already loaded
-				pCb();
-			}
+			c.set( pPath, 0 );  
+			addScript.apply( this, [ pPath, url, pCb, pId ] );
 		},
 
 		test: function( pPath ){
