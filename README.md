@@ -250,7 +250,7 @@ tb( demoapp.userLogin ).describe()
 [demoapp.userLogin] describe handlers:
 -> tb.init
     <- .trigger( 'userlogin.success', that.model.data()
-    <- .trigger(':login:')
+    <- .trigger(':userLogin.login:')
 -> userlogin.login
 -> userlogin.logout
 -> userlogin.success
