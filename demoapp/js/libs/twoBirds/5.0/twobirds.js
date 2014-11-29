@@ -816,7 +816,7 @@ tb.require = function( pA, pCb, pId ){
 	var myCb = pCb || tb.nop,
 		id = pId || tb.getid(),
 		myA = typeof pA === 'string' || pA instanceof String ? [pA] : pA,
-		lA = []; // array of files that need to be loaded
+		lA = []; // array of files that need to be loaded or are loading
 
 	if ( ! ( typeof myA === Array || myA instanceof Array ) ) return;
 
@@ -832,12 +832,13 @@ tb.require = function( pA, pCb, pId ){
 	}
 
 	$.each( myA, function( i, v ){
-		if ( !tb.loader.test( v ) ) { // not loading or not finished loading
+		if ( tb.loader.test( v ) === false || tb.loader.test( v ) === 0 ) { // not loading or not finished loading
 			lA.push( v );
 		}
 	});
 
 	if ( lA.length === 0 ) { // all requirements met
+		console.log('CB pA done:', myA, pId);
 		myCb();
 		return;
 	} else { // open requirements: add to requirements group object
@@ -883,7 +884,7 @@ tb.require.checkGroups = function(){ // check all requirement groups
 		aLeft.id = pV.id || null;
 		
 		$.each( pV, function( i, v ){
-			if ( !tb.loader.test( v ) ){
+			if ( tb.loader.test( v ) === false || tb.loader.test( v ) === 0 ){
 				aLeft.push(v);
 				done = false;
 			}
@@ -1163,7 +1164,7 @@ tb.Cache.prototype = (function () {
 		 * 
 		 */
 		get: function (pId) {
-			return this.c[pId] || false;
+			return this.c[pId] !== undefined ? this.c[pId] : false;
 		},
 
 		extract: function (pId) {
@@ -1700,15 +1701,19 @@ tb.loader.js = (function () {
 			script = document.createElement('script'),
 			done = false;
 
-		tb.loader.count( 1, 'JS: ' + pPath );
+		if ( c.get( pPath ) === false ){
+			tb.loader.count( 1, 'JS: ' + pPath );
+			script.setAttribute('type', 'text/javascript');
+			script.setAttribute('src', pUrl);
+		} else {
+			console.log( 'already loading ', pPath, ' in ', tb.require.groups.toString() );
+		}
 		
-		script.setAttribute('type', 'text/javascript');
-		script.setAttribute('src', pUrl);
-
 		if ( pId !== undefined ){
 			$.each( tb.require.groups, function( i, v ){
 				if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
 					tb.require.groups[i].push( pPath );
+					return false; // break each
 				}
 			});
 		}
@@ -1722,12 +1727,22 @@ tb.loader.js = (function () {
 			done = true;
 
 			c.set( pPath, 1 );
+			//console.log( 'finished loading ', pPath, c.get( pPath ) );
 			
 			// check for further requirements:
 			if ( ns && $.isPlainObject(ns) ){ 
 				$.each( ns, function( i, v ){
 					if ( (/\./).test(i) ){ // a 'dotted' property
 						if ( i === 'tb.require' ){
+							//console.log( 'followup require: ', v );
+							$.each( tb.require.groups, function( j, w ){
+								if ( w.indexOf( pPath ) !== -1 ){
+									$.each( v, function( k, x ){
+										tb.require.groups[j].push( x );
+									});
+									//console.log( 'fu:require > ', tb.require.groups[j], v );
+								}
+							});
 							tb.require( // load requirement array into existing requirement group
 								v, 
 								(function(o, pCb){ return function(){
@@ -1741,8 +1756,17 @@ tb.loader.js = (function () {
 							);
 						} else { // other dotted property
 							var o = tb.nameSpace( i, true ); // create empty object if nothing present
+							//console.log( 'followup namespace: ', i );
 							if ( $.isPlainObject( o ) && $.isEmptyObject( o ) ){ // no content in this namespace 
 								var fn = i.replace( /\./g, '/' ) + '.js';
+								$.each( tb.require.groups, function( j, w ){
+									if ( w.indexOf( pPath ) !== -1 ){
+										$.each( v, function( k, x ){
+											tb.require.groups[j].push( fn );
+										});
+										//console.log( 'fu:load > ', tb.require.groups[j], fn );
+									}
+								});
 								tb.loader.load( // load js file 
 									fn, 
 									(function(o, pCb){ return function(){ // load requirement array
@@ -1765,18 +1789,21 @@ tb.loader.js = (function () {
 			tb.loader.count( -1, 'JS: ' + pPath );
 		}
 		
-		script.onload = completed;
-		script.addEventListener('load', completed, false);
+		if ( c.get( pPath ) === false ){
+			c.set( pPath, 0 );
+			script.onload = completed;
+			script.addEventListener('load', completed, false);
 
-		script.onreadyStatechange = function () {
-			var state = script.readyState;
-			if (state === 'loaded' || state === 'complete') {
-				script.onreadyStatechange = null;
-				completed();
+			script.onreadyStatechange = function () {
+				var state = script.readyState;
+				if (state === 'loaded' || state === 'complete') {
+					script.onreadyStatechange = null;
+					completed();
+				}
 			}
-		}
 
-		head.appendChild(script);
+			head.appendChild(script);
+		}
 	}
 
 	/** @lends tb.loader.js */
@@ -1794,14 +1821,31 @@ tb.loader.js = (function () {
 				pCb = pCb || tb.nop;
 
 			if ( !pPath ) return;
-			url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
-			c.set( pPath, 0 );  
-			addScript.apply( this, [ pPath, url, pCb, pId ] );
+			if ( c.get( pPath ) === false ){ // not loaded or loading yet
+				//console.log( 'START LOADING: ', pPath, c.get( pPath ) );
+				url =  tb.loader.js.prefix + pPath + '?' + tb.getid();
+				addScript.apply( this, [ pPath, url, pCb, pId ] );
+			} else if ( c.get( pPath ) === 0 ){ // already loading
+				//console.log( 'already loading: ', pPath );
+				if ( pId !== undefined ) {
+					$.each( tb.require.groups, function( i, v ){
+						if ( v.id === pId && tb.require.groups[i].indexOf( pPath ) === -1 ){
+							tb.require.groups[i].push( pPath );
+							//console.log( 'added to requirement group: ', v );
+							return false; // break each loop
+						}
+					});
+				}
+			} else { // c.get(pPath) === 1    ==>    already loaded
+				//console.log( 'already loaded: ', pPath, ' in ', tb.require.groups.toString() );
+				if (pCb) {
+					pCb();
+				}
+			}
 		},
 
 		test: function( pPath ){
-			var i = c.get( pPath );
-			return !!i; // status 1 is done
+			return c.get( pPath ); // status 1 is done
 		}
 	};
 })();
@@ -1902,7 +1946,7 @@ tb.loader.css = (function () {
 
 		test: function( pPath ){
 			var i = c.get( pPath );
-			return !!i; // status 1 is done
+			return i; // if string => done
 		}
 	};
 })();
@@ -1959,7 +2003,7 @@ tb.loader.html = (function () {
 
 		test: function( pPath ){
 			var i = c.get( pPath );
-			return !!i; // status 1 is done
+			return i; // if string => done
 		}
 	};
 })();
