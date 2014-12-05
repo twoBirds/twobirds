@@ -160,10 +160,10 @@ You can also insert a twoBirds instance into an already existing instance at run
 this['tb.ui.scroll'] = {
 	content: this.content[0],
 	direction: 'y',
-        bubbleUp: true,
-        pixelsPerSecond: 2000,
-        attachDelay: 2000,
-        easing: 'swing'
+	bubbleUp: true,
+	pixelsPerSecond: 2000,
+	attachDelay: 2000,
+	easing: 'swing'
 };
 
 this.inject( 'tb.ui.scroll' );
