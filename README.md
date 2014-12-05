@@ -51,7 +51,7 @@ In twoBirds, on the client side you have a repository of plain JS objects. These
 
 There are 3 property names in repository objects that are reserved:
 
-* *target*: ... is the DOM node the tB instance is attached to. In nested objects it is inherited from the parent, but can be set to another DOM node as well if necessary. You cannot set this property in a repo object, since it would make no sense.
+* *target*: ... is the DOM node the tB instance is attached to. In nested objects it is inherited from the parent, but AT RUNTIME can be set to another DOM node as well if necessary. You cannot set this property in a repo object, since it would make no sense.
 
 * *name*: ... is the namespace of the repo object, and should be set accordingly, since both the regEx selector tb(/.../) is checked against the name, as well as the .instanceOf("namespace") method checks against the "name" property.
 
