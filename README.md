@@ -109,6 +109,7 @@ tb.nameSpace( 'demoapp', true ).body = {
 ```
 * "tb.require" is a dotted property
 * also it is a function
+
 The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. "tb.init" will fire then.
 
 ### Nesting instances
