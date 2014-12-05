@@ -146,9 +146,9 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 }
 ```
 * "tb.ui.spinner" is a dotted property
-* it doesnt exist in the namespace when the instanciation of "demoapp.gloabalSpinner" is done
+* it doesnt exist in the namespace when the instanciation of "demoapp.globalSpinner" is done
 * instanciation halts until "tb/ui/spinner.js" is loaded (and also all nested requirements)
-* when  its loaded, twoBirds detects that tb.ui.spinner is a plain object
+* when everything is loaded, twoBirds detects that tb.ui.spinner is a plain object
 * the object is then inserted into the "tb.ui.spinner" property
 * "tb.init" is fired, with the empty object {} as a single parameter
 
@@ -156,30 +156,25 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code (example taken from demoapp/sys/window.js ):
 ```
-// if scrollBar attach it
-			if ( this.config.scrollBar === true ) {
-				// SPECIAL CASE: 
-				// no requirement loading necessary, 
-				// since parent() already has a scroll!
-				this['tb.ui.scroll'] = {
-					content: this.content[0],
-					direction: 'y',
-			        bubbleUp: true,
-			        pixelsPerSecond: 2000,
-			        attachDelay: 2000,
-			        easing: 'swing'
-    			};
+this['tb.ui.scroll'] = {
+	content: this.content[0],
+	direction: 'y',
+        bubbleUp: true,
+        pixelsPerSecond: 2000,
+        attachDelay: 2000,
+        easing: 'swing'
+};
 
-    			this.inject( 'tb.ui.scroll' );
+this.inject( 'tb.ui.scroll' );
 
-    			this['tb.ui.scroll'].addHandler(
-    				'scroll.active', 
-    				function(){
-    					this._super().trigger(':window.active:', true); // make window active when scroll becomes active
-    				}
-    			);
+this['tb.ui.scroll'].addHandler(
+	'scroll.active', 
+    	function(){
+    		this._super().trigger(':window.active:', true); // make window active when scroll becomes active
+    	}
+);
 ```
-
+* on a sidenote you can also see here how to add a custom handler to a subinstance at runtime
 
 ## Examples
 
