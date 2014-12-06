@@ -84,8 +84,10 @@ If it is a plain object, the property value will be replaced with it, and when "
 Now lets see all of this in context:
 
 demoapp/body.js 
-```js 
-tb.nameSpace( 'demoapp', true ).body = {
+```js
+demoapp = {}; // declare namespace once
+
+demoapp.body = {
 
 	name: 'demoapp.body',
 
@@ -112,7 +114,7 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. "tb.init" will fire then.
 
-* HINT: named callback functions ( *body_init* ) aid in debugging.
+* HINT: named callback functions ( *body_init* ) for event handlers aid in debugging.
 * HINT: .initChildren() will run initialization on newly inserted DOM content.
 
 ### Nesting instances
