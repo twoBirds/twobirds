@@ -112,6 +112,9 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. "tb.init" will fire then.
 
+* HINT: named callback functions ( *body_init* ) aid in debugging.
+* HINT: .initChildren() will run initialization on newly inserted DOM content.
+
 ### Nesting instances
 
 There are 2 ways of nesting subinstances into another instance:
@@ -153,7 +156,9 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 * the object is then inserted into the "tb.ui.spinner" property
 * "tb.init" is fired, with the empty object {} as a single parameter
 
-#### ON EVENT:
+* HINT: Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
+
+#### ON EVENT / AT RUNTIME:
 
 You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code (example taken from demoapp/sys/window.js ):
 ```
@@ -177,9 +182,9 @@ this['tb.ui.scroll'].addHandler(
 ```
 * on a sidenote you can also see here how to add a custom handler to a subinstance at runtime
 
-## Examples
+## API / Examples
 
-### tb Objects
+### ON BOOT:
 
 ```html
 <html>
@@ -194,67 +199,6 @@ this['tb.ui.scroll'].addHandler(
 By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
 and treats them as a white-space delimited list of twoBirds instances to attach there. 
 If the corresponding repo object doesnt exist, on-demand loading is performed recursively. 
-
-#### Client repo object: simple requirement loading, inserting and recursively init children
-
-demoapp/body.js 
-```js 
-tb.nameSpace( 'demoapp', true ).body = {
-
-	name: 'demoapp.body',
-
-	handlers: {
-		'tb.init': function body_init(ev){
-			$(this.target).html( tb.loader.get('demoapp/body.html') );
-
-			// ... 
-
-			this.initChildren();
-		}
-	},
-
-	'tb.require': [
-		'demoapp/props/icomoon/style.css',
-		'demoapp/body.html',
-		'demoapp/body.css'
-	]
-
-}
-```
-.initChildren() will run this initialization on newly inserted DOM content.
-
-#### Client repo object: simple sub-instance, tb.observe example
-
-demoapp/globalSpinner.js 
-```js 
-tb.nameSpace( 'demoapp', true ).globalSpinner = {
-
-	name: 'demoapp.globalSpinner',
-
-	'tb.ui.spinner': {},
-
-	handlers: {
-
-		'tb.init': function globalSpinner_tb_init(){
-			var that = this['tb.ui.spinner'];
-
-			// observe loading status and trigger spinner accordingly
-			tb.loader.loading.observe( function globalSpinner_setSpinner( pBool ){ 
-				if ( pBool ){
-					that.trigger(':tb.ui.spinner.on:');
-				} else {
-					that.trigger(':tb.ui.spinner.off:');
-				}
-			});
-
-		}
-
-	}
-
-}
-```
-* Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
-* Named callback functions aid in debugging of asynchronous systems
 
 ### tb() Selector and inner structure example
 
