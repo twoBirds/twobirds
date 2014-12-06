@@ -49,7 +49,7 @@ In twoBirds, on the client side you have a repository of plain JS objects. These
 
 ### Repository Objects
 
-There are 3 property names in repository objects that are reserved:
+There are 3 property names in twoBirds objects that are reserved:
 
 * *target*: ... is the DOM node the tB instance is attached to. In nested objects it is inherited from the parent, but AT RUNTIME can be set to another DOM node as well if necessary. You cannot set this property in a repo object, since it would make no sense.
 
