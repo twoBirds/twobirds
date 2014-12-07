@@ -29,27 +29,65 @@ twoBirds utilizes jQuery.
 
 Comparision: twoBirds can be compared to twitters Flight and googles Polymer / Web Components. Like Flight it is Javascript centric, as opposed to Web Components. Unlike both of these it allows for complete separation of code and design. As mentioned it aims at making nesting of loose coupled objects into complex structures easier and more transparent. Unlike Flight requirement loading is inherent part of the system.
 
-## Examples
+## Description
 
-### tb Objects
+### General
 
-```html
-<html>
-	<head>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-		<script src="http://<yourPathTo>/twobirds.js"></script>
-	</head>
-    <body data-tb="demoapp/body.js">
-    </body>
-</html>
+As seen from a twoBirds perspective, a website / webapp consists of the HTML DOM and twoBirds JS objects attached to DOM nodes. Not every DOM node necessarily has a tB object attached to it, usually the tB objects reflect the higher order elements of a site, like "header", "login", "footer".
+
+Also, twoBirds objects can be nested into each other, like in this structural example:
 ```
+myWindow contains
+    a system window to display contents, which contains
+        a scollBar to scroll the window contents
+```
+Each of the nested instances may or may not add additional HTML / DOM nodes to the element, but together they form a logical unit. As shown later in the examples, you can find and address all these objects on the current page displayed, and trigger events on each element.
 
+### Repository
 
-#### Client repo object: simple requirement loading, inserting and recursively init children
+In twoBirds, on the client side you have a repository of plain JS objects. These are the copy sources of the instances you later create on DOM nodes. In general this follows a mixin pattern.
+
+### Repository Objects
+
+There are 3 property names in twoBirds objects that are reserved:
+
+* *target*: ... is the DOM node the tB instance is attached to. In nested objects it is inherited from the parent, but AT RUNTIME can be set to another DOM node as well if necessary. You cannot set this property in a repo object, since it would make no sense.
+
+* *name*: ... is the namespace of the repo object, and should be set accordingly, since both the regEx selector tb(/.../) is checked against the name, as well as the .instanceOf("namespace") method checks against the "name" property.
+
+* *handlers*: ... is a plain object, where { key: value } is { eventName: function( params ){ /\*...\*/ } }. If for some reasons you need more than one handler for an eventName, eventName also can be an array of callback functions.
+
+As for handlers, there currently is 1 event name that is reserved:
+
+* *tb.init*: function(){ /* all requirement loading for all nestings is done, now construct the object as necessary */ }
+
+This event bubbles down the nested structure, when all required files have been loaded, hereby initializing the object.
+
+There is a special convention inside twoBirds instances:
+
+* If a property name contains a dot ("."), it is treated as a namepace which should contain a JS object or function. twoBirds will check whether this namespace already exists, then ...
+
+IF NOT: twoBirds will convert the property name to a subdir string like so
+
+"tb.ui.scroll" ==> "/tb/ui/scroll.js"
+
+...and starts loading the file.
+
+IF IT EXISTS OR WHEN ITS LOADED:
+
+twoBirds will check whether the namespace points to a function or a plain object.
+
+If it is a function, it will be executed in the context of the current instance (this), and given the property value as a single parameter.
+
+If it is a plain object, the property value will be replaced with it, and when "tb.init" fires the handler will receive the previous contents of the property as a single parameter.
+
+Now lets see all of this in context:
 
 demoapp/body.js 
-```js 
-tb.nameSpace( 'demoapp', true ).body = {
+```js
+demoapp = {}; // declare namespace once
+
+demoapp.body = {
 
 	name: 'demoapp.body',
 
@@ -71,13 +109,19 @@ tb.nameSpace( 'demoapp', true ).body = {
 
 }
 ```
+* "tb.require" is a dotted property
+* also it is a function
 
-By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
-and treats them as a white-space delimited list of twoBirds instances to attach there. 
-If the corresponding repo object doesnt exist, on-demand loading is performed recursively. 
-.initChildren() will run this initialization on newly inserted DOM content.
+The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. "tb.init" will fire then.
 
-#### Client repo object: simple sub-instance, tb.observe example
+* HINT: named callback functions ( *body_init* ) for event handlers aid in debugging.
+* HINT: .initChildren() will run initialization on newly inserted DOM content.
+
+### Nesting instances
+
+There are 2 ways of nesting subinstances into another instance:
+
+#### ON LOAD / WHEN INSTANCIATING:
 
 demoapp/globalSpinner.js 
 ```js 
@@ -107,8 +151,56 @@ tb.nameSpace( 'demoapp', true ).globalSpinner = {
 
 }
 ```
-* Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
-* Named callback functions aid in debugging of asynchronous systems
+* "tb.ui.spinner" is a dotted property
+* it doesnt exist in the namespace when the instanciation of "demoapp.globalSpinner" is done
+* instanciation halts until "tb/ui/spinner.js" is loaded (and also all nested requirements)
+* when everything is loaded, twoBirds detects that tb.ui.spinner is a plain object
+* the object is then inserted into the "tb.ui.spinner" property
+* "tb.init" is fired, with the empty object {} as a single parameter
+
+* HINT: Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
+
+#### ON EVENT / AT RUNTIME:
+
+You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code (example taken from demoapp/sys/window.js ):
+```
+this['tb.ui.scroll'] = {
+	content: this.content[0],
+	direction: 'y',
+	bubbleUp: true,
+	pixelsPerSecond: 2000,
+	attachDelay: 2000,
+	easing: 'swing'
+};
+
+this.inject( 'tb.ui.scroll' );
+
+this['tb.ui.scroll'].addHandler(
+	'scroll.active', 
+    	function(){
+    		this._super().trigger(':window.active:', true); // make window active when scroll becomes active
+    	}
+);
+```
+* on a sidenote you can also see here how to add a custom handler to a subinstance at runtime
+
+## API / Examples
+
+### ON BOOT:
+
+```html
+<html>
+	<head>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="http://<yourPathTo>/twobirds.js"></script>
+	</head>
+    <body data-tb="demoapp/body.js">
+    </body>
+</html>
+```
+By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
+and treats them as a white-space delimited list of twoBirds instances to attach there. 
+If the corresponding repo object doesnt exist, on-demand loading is performed recursively. 
 
 ### tb() Selector and inner structure example
 
