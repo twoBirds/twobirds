@@ -25,7 +25,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 			// on model data change
 			this.model.data.observe( function userlogin_response(){ // this way it is a custom event instead of 'tb.model.success'
-				that.trigger( 'userLogin.loginResponse', that.model.data() );
+				that.trigger( ':userLogin.loginResponse:', that.model.data() );
 			});
 
 			// behaviour
