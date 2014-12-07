@@ -24,8 +24,8 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			});
 
 			// on model data change
-			this.model.data.observe( function userlogin_success(){ // this way it is a custom event instead of 'tb.model.success'
-				that.trigger( 'userlogin.success', that.model.data() );
+			this.model.data.observe( function userlogin_response(){ // this way it is a custom event instead of 'tb.model.success'
+				that.trigger( 'userLogin.loginResponse', that.model.data() );
 			});
 
 			// behaviour
@@ -39,7 +39,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 							userpass: that.userpass.val() 
 						};
 
-						that.trigger(':userlogin.login:')
+						that.trigger(':userLogin.loginClicked:')
 					}
 				);
 
@@ -60,7 +60,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			return false; // break here
 		},
 
-		'userlogin.login':  function userlogin_login(ev){
+		'userLogin.loginClicked':  function userlogin_login(ev){
 			// convert pass to md5
 			var val = decodeURIComponent( this.userpass.val() ),
 				md5 = tb.md5.hex_md5( val );
@@ -72,18 +72,18 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			this.userpass.val(val);
 		},
 
-		'userlogin.logout': function userlogin_logout(ev){
+		'userLogin.logoutClicked': function userlogin_logout(ev){
 			$( this.target )
 				.find('.userlogin-logoutlink')
 				.click();
 		},
 
-		'userlogin.success': function userlogin_loginsuccess(ev){
+		'userLogin.loginResponse': function userlogin_loginsuccess(ev){
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
 
 			if ( $.isEmptyObject( ev.data ) ){ // no record returned -> login failure
-				this.trigger( ':tb.model.failure:l' );
+				this.trigger( ':userLogin.loginFailure:' );
 				return;
 			}
 
@@ -101,7 +101,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				);
 		},
 
-		'tb.model.failure': function userlogin_loginfailure(ev){ // use system event so it also catches HTTP status errors
+		'userLogin.loginFailure': function userlogin_loginfailure(ev){ // use system event so it also catches HTTP status errors
 			var that = this;
 
 			this.userpass.addClass( 'login-failed' );

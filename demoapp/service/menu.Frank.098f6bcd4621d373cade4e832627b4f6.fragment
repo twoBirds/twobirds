@@ -3,7 +3,7 @@
 		<a href="#">Frank</a>
 		<ul>
 			<li>
-				<a href="demoapp.userLogin:userlogin.logout">logout</a>
+				<a href="demoapp.userLogin:userLogin.logoutClicked">logout</a>
 			</li>
 		</ul>
 	</li>
