@@ -60,7 +60,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			return false; // break here
 		},
 
-		'userLogin.loginClicked':  function userlogin_login(ev){
+		'userLogin.loginClicked':  function userlogin_loginclicked(ev){
 			// convert pass to md5
 			var val = decodeURIComponent( this.userpass.val() ),
 				md5 = tb.md5.hex_md5( val );
@@ -72,13 +72,13 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 			this.userpass.val(val);
 		},
 
-		'userLogin.logoutClicked': function userlogin_logout(ev){
+		'userLogin.logoutClicked': function userlogin_logoutclicked(ev){
 			$( this.target )
 				.find('.userlogin-logoutlink')
 				.click();
 		},
 
-		'userLogin.loginResponse': function userlogin_loginsuccess(ev){
+		'userLogin.loginResponse': function userlogin_loginresponse(ev){
 			var html = tb.parse( this.data, tb.loader.get('demoapp/userGreeting.html') ),
 				that = this;
 
