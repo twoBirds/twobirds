@@ -6,7 +6,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 
 	handlers: {
 		
-		'tb.init': function userlogin_tb_init(ev){
+		'tb.init': function userlogin_tbinit(ev){
 			var that = this; // for later use in callbacks
 
 			// insert html
@@ -49,7 +49,7 @@ tb.nameSpace( 'demoapp', true ).userLogin = {
 				.on(
 					'keypress',
 					function(e) {
-						if(e.which == 13) {
+						if(e.which === 13) {
 							$( that.target )
 								.find('.userlogin-loginlink')
 								.click();
