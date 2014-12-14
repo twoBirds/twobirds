@@ -14,9 +14,9 @@ demoapp.githubWindow = {
 	handlers: {
 		'window.ready': function imageWindow_window_ready(ev){
 			this['demoapp.sys.window'].content.html( 
-				'<br>'+
-				'<a href="https://github.com/FrankieTh-xx/twobirds" target="_blank">get system from github</a><br>'+
-				'<br>'
+				'<br />'+
+				'<a href="https://github.com/FrankieTh-xx/twobirds" target="_blank">get system from github</a><br />'+
+				'<br />'
 			);
 		}
 	}

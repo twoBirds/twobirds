@@ -1438,7 +1438,7 @@ tb.request = (function () {
 	/**
 	 * @name tb.request
 	 * @function
-	 * @param pOptions { object } a hash object containing these options:<br><br><br>
+	 * @param pOptions { object } a hash object containing these options:<br /><br /><br />
 	 * @returns a twoBirds request object
 	 * 
 	 * @param pOptions.url: (string, omitted) the URL to call
@@ -1448,8 +1448,8 @@ tb.request = (function () {
 	 * @param pOptions.success: (function, optional) the function to call with the request result
 	 * @param pOptions.failure: (function, optional) the function to call if request status not in 200...299
 	 * @param pOptions.statechange: (function, deprecated, optional) the function to call when readyState changes
-	 * @param pOptions.timeout: (object, optional ) structure sample: { cb: myFunction, ms:10000 }<br>
-	 * cb: callback to run when timeout occurs<br>
+	 * @param pOptions.timeout: (object, optional ) structure sample: { cb: myFunction, ms:10000 }<br />
+	 * cb: callback to run when timeout occurs<br />
 	 * ms: number of milliseconds the request will run before being terminated
 	 * @param pOptions.cachable: (boolean, deprecated, optional) defaults to true, indicates whether or not to include a unique id in URL
 	 * @param pOptions.async: (boolean, optional, defaults to true) whether or not to make an asynchronous request

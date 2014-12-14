@@ -1,91 +1,91 @@
 <div>
 	<h2>What is twoBirds?</h2>
-	<p>It is the fifth evolution of a javascript client framework that first appeared in 2006.<br>
-	twoBirds is intended to make complex app development easy. It uses modules and completely separates code and design.<br>
-	twoBirds provides much less abstraction than e.g. ember or angularJS, but is more flexible and a real hands-on approach.<br><br>
-	twoBirds is the minimum possible for an app framework, it consists of only three parts:<br><br>
-	- an app object chained selector<br>
-	- a .trigger() to communicate with the selected instance ( also locally up and down its sub-instances )<br>
-	- and a minimal repository object structure<br><br>
+	<p>It is the fifth evolution of a javascript client framework that first appeared in 2006.<br />
+	twoBirds is intended to make complex app development easy. It uses modules and completely separates code and design.<br />
+	twoBirds provides much less abstraction than e.g. ember or angularJS, but is more flexible and a real hands-on approach.<br /><br />
+	twoBirds is the minimum possible for an app framework, it consists of only three parts:<br /><br />
+	- an app object chained selector<br />
+	- a .trigger() to communicate with the selected instance ( also locally up and down its sub-instances )<br />
+	- and a minimal repository object structure<br /><br />
 	The best description for this would probably be 'jQuery on app level'. Once you have read this text, and maybe looked at the scripts of this site, you know 95% about it and you are perfectly able to start developing your own one page app (or maybe try it out in an existing app, it doesnt interfere with it).
-	</p><br>
+	</p><br />
 	<h2>Are there any limitations?</h2>
-	<p>None that I know of... </p><br>
+	<p>None that I know of... </p><br />
 	
 	<h2>How does it work?</h2>
-	<p>twoBirds asynchrounous loads requirements, and does so recursively.<br>It has a namespaced application repository in the client, and constructs a full-page application by placing instances of repo objects inside the DOM.<br>These DOM tbo objects can be accessed via a selector tb(...) and controlled via tb(...).trigger(...)<br>twoBirds completely separates code and design, making both development processes easier and more robust.</p><br>
+	<p>twoBirds asynchrounous loads requirements, and does so recursively.<br />It has a namespaced application repository in the client, and constructs a full-page application by placing instances of repo objects inside the DOM.<br />These DOM tbo objects can be accessed via a selector tb(...) and controlled via tb(...).trigger(...)<br />twoBirds completely separates code and design, making both development processes easier and more robust.</p><br />
 	
 	<h2>How are twoBirds objects created?</h2>
-	<p>Look up the code of body.js in your browsers development tool. In general you see that it is a plain object, but contains some weird named properties (namespaced, containing a "."), like 'tb.require', which obviously is an array containing filenames<br><br>
-	twoBirds will now construct an internal object, copying the props of the namespaced object.<br><br>
-	The internal object is then stored in the DOM element as $.data('tbo'), with an additional property 'target' which points to the DOM element.<br><br>
-	If twoBirds stumbles upon one of the 'weird' names, it will look up the namespace. If the result is a function, it will execute it in the scope of the internal object, and with the 'weird' property as a parameter.<br>
-	In the case of 'tb.require', obviously the files are loaded.<br><br>
-	Also in body.js, you see a 'handlers' property. This is a hash object, like { '&lt;evtName&gt;': function &lt;handlerFunctionName&gt;( ev ){ //code... } }.<br>
-	I think it is more than obvious that these will be instance handler methods.<br><br>
-	Now here is the catch:<br>
-	One of the events handlers is named 'tb.init'<br>
-	twoBirds will trigger this event automatically when requirement loading for the top level object and all of its sub-instances has finished, and hence initialize the bootstrap handler 'tb.init' on the instance, bubbling down through all sub-objects. This way the object structure as a whole is bootstrapped / initialized.<br><br>
-	In short, this is it.</p><br>
+	<p>Look up the code of body.js in your browsers development tool. In general you see that it is a plain object, but contains some weird named properties (namespaced, containing a "."), like 'tb.require', which obviously is an array containing filenames<br /><br />
+	twoBirds will now construct an internal object, copying the props of the namespaced object.<br /><br />
+	The internal object is then stored in the DOM element as $.data('tbo'), with an additional property 'target' which points to the DOM element.<br /><br />
+	If twoBirds stumbles upon one of the 'weird' names, it will look up the namespace. If the result is a function, it will execute it in the scope of the internal object, and with the 'weird' property as a parameter.<br />
+	In the case of 'tb.require', obviously the files are loaded.<br /><br />
+	Also in body.js, you see a 'handlers' property. This is a hash object, like { '&lt;evtName&gt;': function &lt;handlerFunctionName&gt;( ev ){ //code... } }.<br />
+	I think it is more than obvious that these will be instance handler methods.<br /><br />
+	Now here is the catch:<br />
+	One of the events handlers is named 'tb.init'<br />
+	twoBirds will trigger this event automatically when requirement loading for the top level object and all of its sub-instances has finished, and hence initialize the bootstrap handler 'tb.init' on the instance, bubbling down through all sub-objects. This way the object structure as a whole is bootstrapped / initialized.<br /><br />
+	In short, this is it.</p><br />
 	
 	<h2>How do I find twoBirds objects on my page?</h2>
-	<p>You have a selector tb(), which works like jQuery, but returns twoBirds objects only.<br>
-	So, tb('body') will give you the twoBirds Object that is associated with the DOM node body<br>
-	In addition, you can use a regEx as selector, which will work on the name property of the twoBirds (sub-)instances.<br>
-	So, tb(/body/) will give you same object as above, but matched by its name: 'demoapp.body' property since it contains 'body' (...and as well any other instance that has it in its name). Its a real regEx, tb(/app\.bo/) would have worked as well...<br>
-	The selector can also select nested objects in their surroundings like so:<br>
-	console: tb( demoapp.body )<br>
-	you may notice here that the result this time is the reference to the inner instance of said repo definition, as opposed to the root instance you have seen before.<br><br>
-	OTHER EXAMPLES:<br>
-	console: tb('body').children('div') will return all children of the body tb, that are attached to a div DOM node<br>
-	console: tb('body').children('div').parent('div') will return an empty array. --> .parent('body') would have been better ;-)<br>
-	console: tb('*') will return an array containing all tb objects in the current DOM.</p><br>
+	<p>You have a selector tb(), which works like jQuery, but returns twoBirds objects only.<br />
+	So, tb('body') will give you the twoBirds Object that is associated with the DOM node body<br />
+	In addition, you can use a regEx as selector, which will work on the name property of the twoBirds (sub-)instances.<br />
+	So, tb(/body/) will give you same object as above, but matched by its name: 'demoapp.body' property since it contains 'body' (...and as well any other instance that has it in its name). Its a real regEx, tb(/app\.bo/) would have worked as well...<br />
+	The selector can also select nested objects in their surroundings like so:<br />
+	console: tb( demoapp.body )<br />
+	you may notice here that the result this time is the reference to the inner instance of said repo definition, as opposed to the root instance you have seen before.<br /><br />
+	OTHER EXAMPLES:<br />
+	console: tb('body').children('div') will return all children of the body tb, that are attached to a div DOM node<br />
+	console: tb('body').children('div').parent('div') will return an empty array. --> .parent('body') would have been better ;-)<br />
+	console: tb('*') will return an array containing all tb objects in the current DOM.</p><br />
 	
 	<h2>How do I inspect twoBirds objects on my page?</h2>
-	<p>Also you can inspect an instances inner structure. Since you see this text, let us inspect this info window:<br><br>
-	console: tb(/infoWindow/).structure()<br>
-	as you will notice (and might have expected), the inner structure pretty well reflects what you see on the page.<br><br>
-	As stated before, the selector can also select nested objects in their surroundings like so:<br>
-	console: tb( demoapp.infoWindow )<br>
-	you may notice here that the result this time is the reference to the inner instance of said repo definition, as opposed to the root instance you have seen before.<br>
-	console: tb( demoapp.infoWindow ).structure() will therefore return only the inner structure starting with said instance.</p><br>
+	<p>Also you can inspect an instances inner structure. Since you see this text, let us inspect this info window:<br /><br />
+	console: tb(/infoWindow/).structure()<br />
+	as you will notice (and might have expected), the inner structure pretty well reflects what you see on the page.<br /><br />
+	As stated before, the selector can also select nested objects in their surroundings like so:<br />
+	console: tb( demoapp.infoWindow )<br />
+	you may notice here that the result this time is the reference to the inner instance of said repo definition, as opposed to the root instance you have seen before.<br />
+	console: tb( demoapp.infoWindow ).structure() will therefore return only the inner structure starting with said instance.</p><br />
 
 	<h2>How do I work with twoBirds objects</h2>
-	<p>All communication with and between tb(..) objects is done via tb(...).trigger('event'[, data]).<br>
-	Contrary to jQuery events twoBirds events are always asynchronous, meaning you will never experience a stack overflow in a ping-pong situation.<br><br>
-	EXAMPLES:<br>
-	console: tb('body').trigger('&lt;myevent&gt;') get the body toplevel object, and trigger '&lt;myevent&gt;' on it, by default bubbling down the sub-instances and also the whole of the page structure.<br>
-	console: tb( tb.ui.scroll ).trigger(':scroll.update:l') get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.<br><br>
-	EVEN MORE EXAMPLES:<br>
-	console: tb( demoapp.body ).trigger('root:&lt;myevent&gt;:ld') // find all body instances, select their root object, trigger &lt;myevent&gt; bubbling down locally.<br>
-	console: tb( tb.ui.scroll ).trigger('super:scroll.ready:lu') // find all tb.ui.scroll instances, select their super object, trigger scroll.ready bubbling up locally.<br>
-	console: tb( tb.ui.scroll ).trigger(':scroll.ready:u') // easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br>
-	console: tb( &lt;anyObject&gt; ).trigger(':tb.init:ld') // as you might have guessed - the infamous 'tb.init' system event<br>
+	<p>All communication with and between tb(..) objects is done via tb(...).trigger('event'[, data]).<br />
+	Contrary to jQuery events twoBirds events are always asynchronous, meaning you will never experience a stack overflow in a ping-pong situation.<br /><br />
+	EXAMPLES:<br />
+	console: tb('body').trigger('&lt;myevent&gt;') get the body toplevel object, and trigger '&lt;myevent&gt;' on it, by default bubbling down the sub-instances and also the whole of the page structure.<br />
+	console: tb( tb.ui.scroll ).trigger(':scroll.update:l') get all sub-instances of tb.ui.scroll, and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. As for this special event, all scrollBar handles will be resized and repositioned to reflect their inner content.<br /><br />
+	EVEN MORE EXAMPLES:<br />
+	console: tb( demoapp.body ).trigger('root:&lt;myevent&gt;:ld') // find all body instances, select their root object, trigger &lt;myevent&gt; bubbling down locally.<br />
+	console: tb( tb.ui.scroll ).trigger('super:scroll.ready:lu') // find all tb.ui.scroll instances, select their super object, trigger scroll.ready bubbling up locally.<br />
+	console: tb( tb.ui.scroll ).trigger(':scroll.ready:u') // easier, but the same as above. Missing 'l' indicates not to trigger it locally.<br />
+	console: tb( &lt;anyObject&gt; ).trigger(':tb.init:ld') // as you might have guessed - the infamous 'tb.init' system event<br />
 
-	</p><br>
+	</p><br />
 
 	<h2>How does twoBirds boot an application?</h2>
-	<p>I suggest you look at the soucecode of this page now. It is as short as it can get:<br><br>
-	&lt;body data-tb="demoapp/body.js"&gt;&lt;/body&gt;<br><br>
-	By default, upon page load tB checks the DOM for elements that contain a data-tb attribute. This must contain a space separated list of javascript file names. For each of these files, twoBirds performs the following steps:<br><br>
-	- extract a namespace from the filename,like demoapp/body.js becomes 'demoapp.body'<br>
-	- look up the namespace to detect whether the object already exists<br>
-	- if not, load the file.<br><br>
-	An internal object is created by recursively creating instances of the (loaded and now existing) repo objects.<br>
-	Finally, the event 'tb.init' is fired on the toplevel instance, bubbling down and therefore bootstrapping the object.<br><br>
-	If any of the sub-objects inserts more HTML code containing nodes with a 'data-tb' attribute, it can run .initChildren() to perform the same operation on that subtree.</p><br>
+	<p>I suggest you look at the soucecode of this page now. It is as short as it can get:<br /><br />
+	&lt;body data-tb="demoapp/body.js"&gt;&lt;/body&gt;<br /><br />
+	By default, upon page load tB checks the DOM for elements that contain a data-tb attribute. This must contain a space separated list of javascript file names. For each of these files, twoBirds performs the following steps:<br /><br />
+	- extract a namespace from the filename,like demoapp/body.js becomes 'demoapp.body'<br />
+	- look up the namespace to detect whether the object already exists<br />
+	- if not, load the file.<br /><br />
+	An internal object is created by recursively creating instances of the (loaded and now existing) repo objects.<br />
+	Finally, the event 'tb.init' is fired on the toplevel instance, bubbling down and therefore bootstrapping the object.<br /><br />
+	If any of the sub-objects inserts more HTML code containing nodes with a 'data-tb' attribute, it can run .initChildren() to perform the same operation on that subtree.</p><br />
 
 	<h2>Is that it?</h2>
-	<p>Yes. The rest is sugar like tb.observable()<br><br>
-	If you look at a web application (no matter what framework) in general, what is it composed of?<br><br>
-	- objects that are somehow attached to DOM nodes and ...<br>
-	- ... have to communicate with each other and internally<br><br>
-	All of this you can do now in a nice and easy way.</p><br>
+	<p>Yes. The rest is sugar like tb.observable()<br /><br />
+	If you look at a web application (no matter what framework) in general, what is it composed of?<br /><br />
+	- objects that are somehow attached to DOM nodes and ...<br />
+	- ... have to communicate with each other and internally<br /><br />
+	All of this you can do now in a nice and easy way.</p><br />
 
 	<h2>Why should I use it?</h2>
 	<p>'Management': Less TCO. Much less.</p>
 	<p>'Project Lead': Because hands-on javascript application development becomes faster and more robust, especially in big environments.</p>
 	<p>'Programmer': Because after reading this you know almost everything there is to know about twoBirds. There is no massive abstraction level. Its hands-on so start coding!</p>
-	<p>'Html designer': You won't see any of the code. Make your design (template.html + style.css) upload it - done. Promise.</p><br>
+	<p>'Html designer': You won't see any of the code. Make your design (template.html + style.css) upload it - done. Promise.</p><br />
 	
 </div>

@@ -250,7 +250,7 @@ class load {
 class cannotConnectToMongoServer extends Exception {
     public function __toString() {
         return '<h1>Cannot connect to the MongoDB database.</h1> ' . PHP_EOL . 'If Mongo is installed then be sure that'
-             . ' an instance of the "mongod" server, not "mongo" shell, is running. <br>' . PHP_EOL
+             . ' an instance of the "mongod" server, not "mongo" shell, is running. <br />' . PHP_EOL
              . 'Instructions and database download: <a href="http://vork.us/go/fhk4">http://vork.us/go/fhk4</a>';
     }
 }
@@ -1361,7 +1361,7 @@ var dom = function(id) {
     public function getNotifications($messages, $class = 'errormessage') {
         if (isset($messages) && $messages) {
             return '<div class="' . $class . '">'
-                 . (is_array($messages) ? implode('<br>', $messages) : $messages) . '</div>';
+                 . (is_array($messages) ? implode('<br />', $messages) : $messages) . '</div>';
         }
     }
 }
@@ -1486,7 +1486,7 @@ class formHelper {
             }
             if (isset($args['alert'])) {
                 if ($args['alert']) {
-                    $alert = (is_array($args['alert']) ? implode('<br>', $args['alert']) : $args['alert']);
+                    $alert = (is_array($args['alert']) ? implode('<br />', $args['alert']) : $args['alert']);
                 }
                 unset($args['alert']);
             }
@@ -1543,7 +1543,7 @@ class formHelper {
                        . $label . '</label>';
             }
             if (isset($args['addBreak']) && $args['addBreak']) {
-                $label = ($labelFirst ? $label . '<br>' : '<br>' . $label);
+                $label = ($labelFirst ? $label . '<br />' : '<br />' . $label);
             }
             $formElement = ($labelFirst ? $label . $formElement : $formElement . $label);
             if (!isset($args['id'])) {
@@ -1772,7 +1772,7 @@ class formHelper {
         }
         $return = $this->_getLabel($args, $return);
         if (isset($args['error'])) {
-             $return .= $this->getErrorMessageContainer($args['id'], '<br>' . $args['error']);
+             $return .= $this->getErrorMessageContainer($args['id'], '<br />' . $args['error']);
         }
         return $return;
     }
@@ -1830,7 +1830,7 @@ class formHelper {
             unset($properties['checked'], $rowClass);
         }
         $this->{$properties['type'] == 'radio' ? 'radios' : 'checkboxes'} = $radios;
-        $break = (!isset($args['optionBreak']) ? '<br>' : $args['optionBreak']);
+        $break = (!isset($args['optionBreak']) ? '<br />' : $args['optionBreak']);
         $addFieldset = (isset($args['addFieldset']) ? $args['addFieldset']
                         : ((isset($args['label']) && $args['label']) || count($args['options']) > 1));
         if ($addFieldset) {

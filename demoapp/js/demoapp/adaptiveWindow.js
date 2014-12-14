@@ -35,13 +35,13 @@ demoapp.adaptiveWindow = {
 		},
 
 		'adaptiveWindow.success': function adaptiveWindow_success(ev){
-			var html = '<p style="font-style:italic;font-weight:normal">When CN humbly asked me whether I could make this bold, i did because...</p><br>';
+			var html = '<p style="font-style:italic;font-weight:normal">When CN humbly asked me whether I could make this bold, i did because...</p><br />';
 
 			$.each( ev.value, function( i, v ){
 				html += '<p><i aria-hidden="true" class="icon-info"></i>&nbsp;' + v.joke + '</p>'
 			});
 
-			html += '<br>';
+			html += '<br />';
 			this.trigger(':window.setStatus:d', '<p style="font-style:italic;font-weight:normal">Most of all, he personally invented the <i class="blink">blink</i> tag.'+
 				' It even works on paper and 3D printers if he prints it.</p>');
 			$( this.target ).find('._adaptiveWindow').html( html );

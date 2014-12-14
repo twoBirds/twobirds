@@ -289,10 +289,10 @@ tb( tb.ui.scroll ).trigger(':scroll.update:l' [, data] )
 tb( tb.ui.scroll ).trigger('super:scroll.ready:lu' [, data] )		
 
 // same as above, but easier. 
-// Missing 'l' indicates not to trigger it locally.<br>
+// Missing 'l' indicates not to trigger it locally.<br />
 tb( tb.ui.scroll ).trigger(':scroll.ready:u' [, data ] )		
 
-// as you might have guessed - the infamous 'tb.init' system event<br>	
+// as you might have guessed - the infamous 'tb.init' system event<br />	
 tb( <anyObject> ).trigger(':tb.init:ld' )				
 ```
 
