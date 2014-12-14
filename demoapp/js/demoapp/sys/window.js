@@ -142,7 +142,7 @@ tb.nameSpace('demoapp.sys').window = {
 			$( this.target ).find('> div > div:nth-child(1) > span > i.movetop-icon').on(
 				'click',
 				function(ev){
-					var windowController = tb(/demoapp.windowController/),
+					var windowController = tb( demoapp.windowController ),
 						thisWindow = $( that._root().target ),
 						firstWindow = windowController.children(/demoapp.sys.window/)[0],
 						previousWindow = thisWindow.prev();
