@@ -10,7 +10,7 @@ tb.nameSpace( 'demoapp', true ).topMenu = {
 			// menu model
 			this.model = new tb.Model(
 				{
-					url: 'service/menu.{usernick}.{userpass}.fragment' // {...} being the placeholders for later get() invocation
+					url: 'service/menu.{usernick}.{userpass}.html' // {...} being the placeholders for later get() invocation
 				},
 				this
 			);
