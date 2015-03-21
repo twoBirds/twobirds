@@ -94,16 +94,14 @@ tb.nameSpace('demoapp.sys').window = {
 					that.trigger(':window.active:', true);
 					});
 				
-			this.title
-				.parent()
-				.on( 'mouseover', function(){
+			this.win.hover(
+				function(){
 					that.trigger(':window.active:', true);
-					});
-
-			this.status
-				.on( 'mouseover', function(){
-					that.trigger(':window.active:', true);
-					});
+				},
+				function(){
+					that.trigger(':window.active:', false);
+				}				
+			);
 
 			$( this.target ).find('> div > div:nth-child(1) > span > i.close-icon').on(
 				'click',
@@ -142,9 +140,8 @@ tb.nameSpace('demoapp.sys').window = {
 			$( this.target ).find('> div > div:nth-child(1) > span > i.movetop-icon').on(
 				'click',
 				function(ev){
-					var windowController = tb( demoapp.windowController ),
-						thisWindow = $( that._root().target ),
-						firstWindow = windowController.children(/demoapp.sys.window/)[0],
+					var thisWindow = $( that._root().target ),
+						firstWindow = tb( /demoapp.windowController/ ).children(/demoapp.sys.window/)[0],
 						previousWindow = thisWindow.prev();
 
 					$( previousWindow[0] ).data('tbo').trigger(':window.active:ld', true );
@@ -268,7 +265,7 @@ tb.nameSpace('demoapp.sys').window = {
 		},
 
 		'window.denyclose': function sys_window_denyclose(ev){
-			console.log('window deny close', ev.data);
+			//console.log('window deny close', ev.data);
 			that.canClose = false;
 		}
 

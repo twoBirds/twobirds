@@ -531,7 +531,7 @@ if (!Array.prototype.indexOf)
 
 					case 'function':
 						if ( obj.prototype === Function.prototype ){
-							console.log( 'inject function', obj );
+							// console.log( 'inject function', obj );
 							obj.apply( this, [ this[namespace] ] );
 						} else { // a constructor
 							var c = tb.nameSpace(namespace), // constructor
@@ -838,7 +838,7 @@ tb.require = function( pA, pCb, pId ){
 	});
 
 	if ( lA.length === 0 ) { // all requirements met
-		console.log('CB pA done:', myA, pId);
+		//console.log('CB pA done:', myA, pId);
 		myCb();
 		return;
 	} else { // open requirements: add to requirements group object
@@ -1706,7 +1706,7 @@ tb.loader.js = (function () {
 			script.setAttribute('type', 'text/javascript');
 			script.setAttribute('src', pUrl);
 		} else {
-			console.log( 'already loading ', pPath, ' in ', tb.require.groups.toString() );
+			// console.log( 'already loading ', pPath, ' in ', tb.require.groups.toString() );
 		}
 		
 		if ( pId !== undefined ){
