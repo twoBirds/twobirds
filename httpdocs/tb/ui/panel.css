@@ -1,0 +1,16 @@
+.tb-ui-panel {
+	border: 1px solid grey;
+}
+
+.tb-ui-panel div:first-child {
+	width: 100%;
+	height: 1em;
+	background-color: lightblue;
+}
+
+.tb-ui-panel > div + div {
+	top: 0px;
+	bottom: 0px;
+	width: 100%;
+	background-color: inherited;
+}

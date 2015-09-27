@@ -18,7 +18,7 @@ var tb = (function(){
      *
      * @param {object} pSelectorObject - instanceOf TbSelector
      * @param {string} pMethodName - name of method to call
-     * @param {variant} [pSelector] - tb selector parameter
+     * @param {*} [pArguments] - arguments
      *
      * @returns {object} instance of TbSelector
      */
@@ -53,7 +53,7 @@ var tb = (function(){
      * @private
      *
      * @param {string} pEventName - name of event
-     * @param {*} [pEventData={}] - data to be appended to this event
+     * @param {*} [pEventData] - data to be appended to this event
      * @param {string} [pBubble=l] - bubbling indicator, 'l' = local, 'u' = up, 'd' = down or any combination
      *
      * @returns {object} TbEvent instance
@@ -132,7 +132,8 @@ var tb = (function(){
     var TbSelector = function( pSelector ){
 
         var that = this,
-            elements;
+            elements,
+            isTbObject;
 
         that.length = 0;
 
@@ -163,8 +164,9 @@ var tb = (function(){
                 if ( pSelector instanceof RegExp ){ // it is a regular expression
 
                     elements = $('[data-tb]').filter( function () {
-                        var obj = $(this).data( 'tbo' ),
-                            isTbObject = typeof obj === 'object' && obj.__tb__;
+                        var obj = $(this).data( 'tbo' );
+
+                        isTbObject = typeof obj === 'object' && obj.__tb__;
 
                         return isTbObject;
                     });
@@ -181,8 +183,9 @@ var tb = (function(){
                     );
 
                 } else if ( typeof pSelector.nodeType !== 'undefined' ){
-                    var obj = $( pSelector ).data( 'tbo' ),
-                        isTbObject = typeof obj === 'object' && obj.__tb__;
+                    var obj = $(this).data( 'tbo' );
+
+                    isTbObject = typeof obj === 'object' && obj.__tb__;
 
                     if( isTbObject ){
                         Array.prototype.push.call( that, obj );
@@ -196,8 +199,9 @@ var tb = (function(){
             case 'function':
 
                 elements = $('[data-tb]').filter( function () {
-                    var obj = $(this).data( 'tbo' ),
-                        isTbObject = typeof obj === 'object' && obj.__tb__;
+                    var obj = $(this).data( 'tbo' );
+
+                    isTbObject = typeof obj === 'object' && obj.__tb__;
 
                     return isTbObject;
                 });
@@ -230,7 +234,7 @@ var tb = (function(){
              *
              * @method trigger
              *
-             * @param {string|TbEvent#} pEvent - name of event or TbEvent instance or TbEvent instance
+             * @param {string|object} pEvent - name of event or TbEvent instance or TbEvent instance
              * @param {*} [pEventData] - event data, usally an object
              * @param {string} [pBubble=l] - bubbling indicator : 'l' = local, 'u' = up, 'd' = down or any combination
              *
@@ -253,7 +257,7 @@ var tb = (function(){
                 if ( that instanceof TbSelector ) {
                     $.each(
                         $.makeArray( that ),
-                        function triggerCallHandler( key, tbObject ) {
+                        function( key, tbObject ) {
                             if ( tbObject ) tbObject.trigger( tbEvent );
                         }
                     );
@@ -266,7 +270,7 @@ var tb = (function(){
                             that.handlers[tbEvent.name],
                             function (key, handler) {
                                 setTimeout(
-                                    function tbHandlerApply() {
+                                    function() {
                                         // call handler function
                                         // in the scope of the tbObject
                                         if ( tbEvent.bubble.indexOf('l') > -1
@@ -293,7 +297,7 @@ var tb = (function(){
                     //bubble
                     setTimeout(
 
-                        function tbBubble() {
+                        function() {
 
                             // this will be called after all local event handlers have been called
                             // if one of these sets __stopped__ to true, bubbling is cancelled
@@ -470,7 +474,7 @@ var tb = (function(){
 
                         $.makeArray( that.children( false, true ) ),
 
-                        function localDescendantsEach( key, value ){
+                        function( key, value ){
                             walk( value );
                         }
 
@@ -525,7 +529,7 @@ var tb = (function(){
 
                     $.each(
                         that,
-                        function localChildrenEach( key, value ){
+                        function( key, value ){
                             if ( typeof key === 'string' && key.indexOf( '.' )  > -1 ){ // prop name contains "."
                                 Array.prototype.push.call( ret, value );
                             }
@@ -704,7 +708,7 @@ var tb = (function(){
                 if ( that instanceof TbSelector ) {
                     $.each(
                         $.makeArray( that ),     // convert these results to true array
-                        function filterEach( key, tbObject ) {
+                        function( key, tbObject ) {
                             if ( check.indexOf( tbObject ) > -1 ){
                                 Array.prototype.push.call( ret, tbObject );
                             }
@@ -748,7 +752,7 @@ var tb = (function(){
 
                 $.each(
                     check,
-                    function notEach( key, tbObject ) {
+                    function( key, tbObject ) {
 
                         index = Array.prototype.indexOf.call( ret, tbObject );
                         if (  index > -1 ){
@@ -790,7 +794,7 @@ var tb = (function(){
 
                 $.each(
                     check,
-                    function addEach( key, tbObject ) {
+                    function( key, tbObject ) {
 
                         index = Array.prototype.indexOf.call( ret, tbObject );
 
@@ -805,13 +809,13 @@ var tb = (function(){
             },
 
             /**
-             * addHandler() method
+             * on() method
              *
              * for each this[0...n] or this as tb() instance,
              * - add handler to handler array
              * - return TbSelector result set (unique)
              *
-             * @method addHandler
+             * @method
              *
              * @param {string} pEventName - name of the handler function
              * @param {function} pHandler - the function to be added to the handler array
@@ -819,7 +823,7 @@ var tb = (function(){
              *
              * @returns {object} - TbSelector instance
              */
-            addHandler: function( pEventName, pHandler, pOnce ){
+            on: function( pEventName, pHandler, pOnce ){
 
                 var that = this;
 
@@ -843,20 +847,44 @@ var tb = (function(){
             },
 
             /**
-             * deleteHandler() method
+             * one() method
              *
              * for each this[0...n] or this as tb() instance,
-             * - delete handler from handler array
+             * - add handler to handler array
              * - return TbSelector result set (unique)
              *
-             * @function deleteHandler
+             * @method
              *
              * @param {string} pEventName - name of the handler function
              * @param {function} pHandler - the function to be added to the handler array
              *
              * @returns {object} - TbSelector instance
              */
-            deleteHandler: function( pEventName, pHandler ){
+            one: function( pEventName, pHandler ){
+
+                var that = this;
+
+                that.on( pEventName, pHandler, true ); // add event that is only being triggered once
+
+                return that;
+
+            },
+
+            /**
+             * off() method
+             *
+             * for each this[0...n] or this as tb() instance,
+             * - delete handler from handler array
+             * - return TbSelector result set (unique)
+             *
+             * @method
+             *
+             * @param {string} pEventName - name of the handler function
+             * @param {function} pHandler - the function to be added to the handler array
+             *
+             * @returns {object} - TbSelector instance
+             */
+            off: function( pEventName, pHandler ){
 
                 var that = this,
                     index;
@@ -904,13 +932,13 @@ var tb = (function(){
      *
      *
      * @param {string}     arguments[0]   - namespace of class | TbSelector parameter
-     * @param {variant}  [ arguments[1] ] - config data ( if called as constructor )
-     * @param {variant}  [ arguments[2] ] - DOM target or parent tb instance
+     * @param {*}  [ arguments[1] ] - config data ( if called as constructor )
+     * @param {*}  [ arguments[2] ] - DOM target or parent tb instance
      *
      * @returns {object} - twoBirds Object or TbSelector instance /w results
      *
      */
-    return function() {
+    var tb = function() {
         var that = this;
 
         /*
@@ -919,15 +947,38 @@ var tb = (function(){
          arguments[2]: optional DOM node or parent tb object
          */
 
+        function makePrototype( pConfig ){
+
+            var f = function ( pConfig ){
+                $.extend(
+                    true,
+                    this,
+                    pConfig
+                );
+            };
+
+            f.prototype = $.extend(
+                true,
+                {
+                    constructor: tb
+                },
+                TbSelector.prototype
+            );
+
+            var r = new f( pConfig );
+
+            return r;
+        }
+
+
         if ( that instanceof tb ) {    // called as constructor, create and return tb object instance
-            var tbClass =  typeof arguments[0] === 'string' ? tb.namespace( arguments[0] ) : arguments[0],
+            var isNamespace = typeof arguments[0] === 'string',
+                tbClass =  isNamespace ? tb.namespace( arguments[0] ) : arguments[0],
                 tbInstance,
                 fileName;
 
-            if ( !tbClass ){
+            if ( isNamespace && !tbClass ){
                 fileName = arguments[0].replace( /\./g, '/' ) + '.js';
-                
-                //console.log( 'start requirement loading:   ', arguments[0] );
 
                 tb.head.load(
                     fileName,
@@ -951,10 +1002,16 @@ var tb = (function(){
 
                 //console.log( 'constructor', arguments, tbClass);
 
-                tbClass.prototype.__tb__ = 'V6.0a';
+                if ( !tbClass.prototype.__tb__ ){
+                    // extend prototype with selector prototype
+                    //console.log( 'extend', tbClass.name, tbClass.prototype );
+                    tbClass.prototype = makePrototype( tbClass.prototype );
+                    tbClass.prototype.__tb__ = 'V6.0a';
+                }
 
                 // make a new instance of given constructor
                 tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
+                //console.log( 'tbInstance', tbInstance );
 
                 // prepare .namespace property of tb object
                 if ( !tbInstance.namespace ){
@@ -1012,26 +1069,15 @@ var tb = (function(){
                     );
                 }
 
-                // add selector prototype to instance prototype
-                // !!! HINT !!! TbSelector and new tb() share the TbSelector prototype functions, but keep in mind:
-                //              new tb(...) instanceOf TbSelector => false
-                //              new tb(...) instanceOf tb         => true
-                $.each(
-                    TbSelector.prototype,
-                    function( key, value ){
-                        if ( typeof tbInstance[key] === 'undefined' ){
-                            tbInstance[key] = TbSelector.prototype[key];
-                        }
-                    }
-                );
-
                 // add requirement loading
-                if ( !!tbInstance[ 'tb.require' ] ){
+                if ( !!tbInstance[ 'tb.require' ] && tbInstance[ 'tb.require'].length ){
                     // add requirement handling
                     //console.log( 'requires', tbInstance[ 'tb.require' ] );
                     tb.head.load(
                         tbInstance[ 'tb.require' ],
                         function(){
+                            tbInstance['tb.require'] = null;
+                            delete tbInstance['tb.require'];
                             tbInstance.trigger( 'init' );
                         }
                     );
@@ -1040,13 +1086,13 @@ var tb = (function(){
                 }
 
 
-                // @todo: revisit this code
+                // add prop declared tb objects
                 $.each(
                     tbInstance,
                     function( key, value ){
                         if ( typeof key === 'string'
-                            && key.indexOf( '.' ) > -1 
-                            && key !== 'tb.require' 
+                            && key.indexOf( '.' ) > -1
+                            && key !== 'tb.require'
                             ){ // prop name contains ".", treat as tb class
                             tbInstance[key] = new tb( key, value, tbInstance );
                         }
@@ -1065,8 +1111,9 @@ var tb = (function(){
 
     };
 
-})();
+    return tb;
 
+})();
 
 
 
@@ -1168,7 +1215,7 @@ tb.namespace = function( pNamespace, pForceCreation ){
  *
  * @returns {void}
  *
- * @description // @todo: jsDoc: If you describe a symbol at the very beginning of a JSDoc comment, before using any block tags, you may omit the @description tag.
+ * @description
  *
  * sample calls:
  *
@@ -1478,6 +1525,11 @@ tb.Model.prototype = (function(){
 
 })();
 
+
+
+
+
+
 /**
  * tb.parse() function
  * for each key/value in pObject, check string for {key}
@@ -1499,6 +1551,15 @@ tb.parse = function( pText, pParse ){
 
 
 
+
+
+
+
+
+
+/**
+ * requirement handling
+ */
 (function(){
     // private
 
@@ -1526,13 +1587,6 @@ tb.parse = function( pText, pParse ){
                         type: 'text/javascript',
                         src: '{src}'
                     }
-                },
-                '_default_': {
-                    tag: 'script',
-                    attributes: {
-                        type: 'text/x-tb-{type}',
-                        src: '{src}'
-                    }
                 }
             },
             typeConfig, // a single type configuration
@@ -1548,59 +1602,64 @@ tb.parse = function( pText, pParse ){
         that.type = that.config.type = type;
         that.done = false;
         that.cb = that.config.cb || function(){};
+        that.data = tb.observable( {} );
 
         // element 'load' callback
         function onLoad( e ){
-            //console.info( 'onLoad', that.element );
+
             if ( e && e.data ){
-                //console.info( '-> set data', that.element, e.data );
-                that.data = e.data;
+                that.data( e.data );
             }
             that.done = true;
             if ( element.type === 'js' ) {
                 $( that.element ).remove();
             }
-
         }
+
+        // execute onLoad only once
         onLoad.once = true;
 
-        // add handlers for 'element loaded'
+        // handlers
         that.handlers = {
             'onLoad': onLoad
         };
 
-        // get default config for type
-        typeConfig = isTyped
-            ? typeConfigs[type]
-            : typeConfigs['_default_'];
 
-        // create DOM element
-        element = document.createElement( typeConfig.tag );
-        element.async = true;
-        element.onreadystatechange = element.onload = function() {
-            var state = element.readyState;
-            if (!that.done && (!state || /loaded|complete/.test(state))) {
-                //console.log( 'loaded', element );
-                that.trigger( 'onLoad' );
-            }
-        };
-        
-        // add attributes to DOM element
-        $.each(
-            typeConfig.attributes,
-            function( key, value ){
-                $( element ).attr( key, tb.parse( value, that.config ) );
-            }
-        );
+        if ( isTyped ) { // either *.css or *.js file
 
-        // append node to head
-        document.getElementsByTagName('head')[0].appendChild( element );
+            // get default config for type
+            typeConfig = typeConfigs[type];
 
-        // load via request if unknown type
-        if ( !isTyped ){
+            // create DOM element
+            element = document.createElement( typeConfig.tag );
+            element.async = true;
+            element.onreadystatechange = element.onload = function() {
+                var state = element.readyState;
+                if (!that.done && (!state || /loaded|complete/.test(state))) {
+                    //console.log( 'loaded', element );
+                    that.trigger( 'onLoad' );
+                }
+            };
+
+            // add attributes to DOM element
+            $.each(
+                typeConfig.attributes,
+                function( key, value ){
+                    $( element ).attr( key, tb.parse( value, that.config ) );
+                }
+            );
+
+            // append node to head
+            document.getElementsByTagName('head')[0].appendChild( element );
+
+            that.element = element;
+
+        } else { // load via request if unknown type
+
             var f = function( data ){
-                    that.trigger( 'onLoad', data );
-                };
+                that.data( data );
+                that.trigger( 'onLoad', data );
+            };
 
             $.ajax(
                 that.src,
@@ -1612,8 +1671,6 @@ tb.parse = function( pText, pParse ){
                 }
             );
         }
-
-        that.element = element;
 
     };
 
@@ -1668,7 +1725,7 @@ tb.parse = function( pText, pParse ){
                 pCallback( this );
             };
 
-            rq.addHandler(
+            rq.on(
                 'onLoad',
                 functionWrapper,
                 true
@@ -1709,7 +1766,7 @@ tb.parse = function( pText, pParse ){
             // load a group requirement ( multiple files )
             if ( typeof pSrc !== 'string' ){
 
-                groupCallback = (function( pSources, pCallback ){ 
+                groupCallback = (function( pSources, pCallback ){
                     return function( pElement ){
                         var index = pSources.indexOf( pElement.src );
 
@@ -1751,6 +1808,16 @@ tb.parse = function( pText, pParse ){
 
             rg.load( pSrc, pCallback );
 
+        },
+
+        data: function( pFileName, pData ){
+
+            var that = this,
+                type = getTypeFromSrc( pFileName),
+                rg = that.requirementGroups[type] ? that.requirementGroups[type] : false,
+                rq = rg ? ( rg.requirements[pFileName] ? rg.requirements[pFileName] : false ) : false;
+
+            return rq ? rq.data( pData ) : 'unknown: ' + pFileName;
         }
 
     };
