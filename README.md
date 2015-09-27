@@ -1,3 +1,10 @@
+PLEASE BE PATIENT
+
+# twobirds v6.0a is coming within 
+# the next couple of days
+
+deprecated:
+
 # twoBirds v5.0
 
 [twoBirds](https://github.com/FrankieTh-xx/twobirds) is a lightweight, component-based,
