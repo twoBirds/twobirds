@@ -925,11 +925,7 @@ var tb = (function(){
                 fileName;
 
             if ( !tbClass ){
-                //DEFAULT: fileName = arguments[0].replace( /\./g, '/' ) + '.js';
-                
-                //IN2 specific
-                var a = arguments[0].split('.')
-                fileName = '/namespace/'+a[0]+'/js/'+ a[1] + '.js';
+                fileName = arguments[0].replace( /\./g, '/' ) + '.js';
                 
                 //console.log( 'start requirement loading:   ', arguments[0] );
 
