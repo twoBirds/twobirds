@@ -263,6 +263,24 @@ tb( ... ).last() // the next tb instance in this.parent().children()
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
 
+### Adding or removing event handler functions
+... roughly resembles jQuery: 
+
+```js 
+function myHandler( e ){
+	// do whatever
+};
+
+// add handlers (one = only one execution, delete handler afterwards)
+tb('body').on('myevent', f);
+or
+tb('body').one('myevent', f);
+
+// remove handler
+tb('body').off('myevent', f);
+
+```
+
 ### tb(selector).trigger(event, data, bubble)
 - communication between object instances on the page
 
