@@ -309,4 +309,4 @@ twoBirds was created 2004 to be able to build a complex web application for an i
 It was first made public as V2 in 2006 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ).
 It was constantly under development. 
 
-In case of questions contact [me](mailTo://frank_thuerigen@yahoo.de).
+In case of questions contact [me](mailTo:frank_thuerigen@yahoo.de).
