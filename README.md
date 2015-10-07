@@ -1,40 +1,68 @@
-PLEASE BE PATIENT
+# twoBirds v6.0a
 
-# twobirds v6.0a is coming within 
-# the next couple of days
-
-deprecated:
-
-# twoBirds v5.0
+Welcome Birdies ;-)
 
 [twoBirds](https://github.com/FrankieTh-xx/twobirds) is a lightweight, component-based,
 event-driven JavaScript framework that maps nested objects to DOM nodes. 
 
 twoBirds strictly follows the KISS doctrine, it is the minimum possible solution for an application framework.
 
-It consists of only 3 parts:
-- a simple client repository object structure + instanciation mechanism
-- a selector to adress instances of these objects on the page
-- a trigger to communicate with the selected instance on the page
+It consists of 3 parts:
 
-twoBirds builds nested structures of instances of repo objects that all look the same codewise, but add up to complex functionality like in this structural example:
+1.) a simple client repository object structure + instanciation mechanism
+
+demoapp/myClass.js
+```
+var demoapp = {};
+
+demoapp.myClass = function(){
+}
+
+demoapp.myClass.prototype = {
+}
+```
+
+index.html
+```
+<body data-tb="demoapp.myClass">
+```
+
+or, somewhere in your js code:
+```
+new tb(
+	demoapp.myClass,
+	{ ... config data ... },
+	$('body')
+);
+```
+
+2.) a selector to adress instances of these objects on the page
 
 ```
-myWindow contains
-    a system window to display contents, which contains
-        a scollBar to scroll the window contents
+tb( 'body' )
 ```
 
-All instances inside this example are loose coupled by the selector-trigger mechanism.
+3.) a trigger mechanism to communicate with the selected instance on the page
 
-twoBirds was created 2006 by the Frank Thuerigen.
+```
+tb( 'body' ).trigger( 'myEventName', <eventData>, <bubble> );
+```
+hint: bubble = 'l' for local, 'd' for down, 'u' for up ('l' being default)
+
+twoBirds allows for building of nested structures of instances of repository classes that all look the same codewise, but add up to complex functionality.
+
+All instances of those classes are located in DOM nodes or other tB instances, and communicate with each other via a selector -- trigger mechanism:
+
+twoBirds was created 2004 and saw its first commercial use in 2006.
 
 twoBirds utilizes jQuery.
 
 * [Tech demo](http://demo.two-birds.selfhost.eu/) Desktop only. Code is included in this repo.
 * [API documentation](doc/README.md) only this so far, but it will get you going. 
 
-Comparision: twoBirds can be compared to twitters Flight and googles Polymer / Web Components. Like Flight it is Javascript centric, as opposed to Web Components. Unlike both of these it allows for complete separation of code and design. As mentioned it aims at making nesting of loose coupled objects into complex structures easier and more transparent. Unlike Flight requirement loading is inherent part of the system.
+Comparision: twoBirds can be compared to Flight, Polymer / Web Components and most of all react.js. 
+Unlike these frameworks it allows for complete separation of code and design. As mentioned it aims at making nesting of loose coupled objects into complex structures easier and more transparent. 
+Requirement loading is an inherent part of the system.
 
 ## Description
 
@@ -52,23 +80,25 @@ Each of the nested instances may or may not add additional HTML / DOM nodes to t
 
 ### Repository
 
-In twoBirds, on the client side you have a repository of plain JS objects. These are the copy sources of the instances you later create on DOM nodes. In general this follows a mixin pattern.
+In twoBirds, on the client side you have a repository of plain JS claases. 
+These are used to create instances. 
+The instances are saved in the DOM nodes or in other tB instances.
 
-### Repository Objects
+### Instances
 
 There are 3 property names in twoBirds objects that are reserved:
 
 * *target*: ... is the DOM node the tB instance is attached to. In nested objects it is inherited from the parent, but AT RUNTIME can be set to another DOM node as well if necessary. You cannot set this property in a repo object, since it would make no sense.
 
-* *name*: ... is the namespace of the repo object, and should be set accordingly, since both the regEx selector tb(/.../) as well as the .instanceOf("namespace") method checks against the "name" property.
+* *namespace*: ... is the namespace of the repo object, and should be set accordingly, since both the regEx selector tb(/.../) as well as the .instanceOf("namespace") method checks against the "name" property.
 
-* *handlers*: ... is a plain object, where { key: value } is { eventName: function( params ){ /\*...\*/ } }. If for some reasons you need more than one handler for an eventName, eventName also can be an array of callback functions.
+* *handlers*: ... is a plain object, where { key: value } is { eventName: function( params ){ /\*...\*/ } }. If for some reasons you need more than one handler for an eventName, eventName also can be an array of callback functions. Internally they are converted to array anyway.
 
 As for handlers, there currently is 1 event name that is reserved:
 
-* *tb.init*: function(){ /* all requirement loading for all nestings is done, now construct the object as necessary */ }
+* *init*: function(){ /* all requirement loading for all nestings is done, now construct the object as necessary */ }
 
-This event bubbles down the nested structure, when all required files have been loaded, hereby initializing the object.
+This event will be sent to every newly created instance, when all required files have been loaded.
 
 There is a special convention inside twoBirds instances:
 
@@ -92,104 +122,72 @@ Now lets see all of this in context:
 
 demoapp/body.js 
 ```js
-demoapp = {}; // declare namespace once
+tb.namespace('demoapp', true).body = (function(){
 
-demoapp.body = {
+	function onInit(){
+		
+		var that = this;
 
-	name: 'demoapp.body',
+		new tb(
+			'tb.ui.panel',
+			{
+				title: '-no title-',
+				css: {
+					width: '100%'
+				}
+			},
+			$( '<div />' ).appendTo( that.target )
+		);
 
-	handlers: {
-		'tb.init': function body_init(ev){
-			$(this.target).html( tb.loader.get('demoapp/body.html') );
+	}
 
-			// ... 
+	function body(){
+		
+		var that = this;
 
-			this.initChildren();
-		}
-	},
+		that.handlers = {
+			'init': onInit
+		};
 
-	'tb.require': [
-		'demoapp/props/icomoon/style.css',
-		'demoapp/body.html',
-		'demoapp/body.css'
-	]
+	}
 
-}
+	body.prototype = {
+
+		namespace: 'demoapp.body',
+
+		'tb.require': [
+			'/demoapp/body.css'
+		]
+
+	};
+
+	return body;
+
+})();
 ```
 * "tb.require" is a dotted property
 * also it is a function
 
-The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. "tb.init" will fire then.
-
-* HINT: named callback functions ( *body_init* ) for event handlers aid in debugging.
-* HINT: .initChildren() will run initialization on newly inserted DOM content.
-
-### Nesting instances
-
-There are 2 ways of nesting subinstances into another instance:
-
-#### ON LOAD / WHEN INSTANCIATING:
-
-demoapp/globalSpinner.js 
-```js 
-tb.nameSpace( 'demoapp', true ).globalSpinner = {
-
-	name: 'demoapp.globalSpinner',
-
-	'tb.ui.spinner': {},
-
-	handlers: {
-
-		'tb.init': function globalSpinner_tb_init(){
-			var that = this['tb.ui.spinner'];
-
-			// observe loading status and trigger spinner accordingly
-			tb.loader.loading.observe( function globalSpinner_setSpinner( pBool ){ 
-				if ( pBool ){
-					that.trigger(':tb.ui.spinner.on:');
-				} else {
-					that.trigger(':tb.ui.spinner.off:');
-				}
-			});
-
-		}
-
-	}
-
-}
-```
-* "tb.ui.spinner" is a dotted property
-* it doesnt exist in the namespace when the instanciation of "demoapp.globalSpinner" is done
-* instanciation halts until "tb/ui/spinner.js" is loaded (and also all nested requirements)
-* when everything is loaded, twoBirds detects that tb.ui.spinner is a plain object
-* the object is then inserted into the "tb.ui.spinner" property
-* "tb.init" is fired, with the empty object {} as a single parameter
+The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. The "init" event will fire then.
 
 * HINT: Properties that contain a dot (.) are said to be misleading because they look like a namespace. In twoBirds, what looks like a namespace IS a namespace - and will be treated as such.
 
 #### ON EVENT / AT RUNTIME:
 
-You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code (example taken from demoapp/sys/window.js ):
+You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code ( the scroller is yet converted from V5 to V6, I will add it later):
 ```
-this['tb.ui.scroll'] = {
-	content: this.content[0],
-	direction: 'y',
-	bubbleUp: true,
-	pixelsPerSecond: 2000,
-	attachDelay: 2000,
-	easing: 'swing'
-};
-
-this.inject( 'tb.ui.scroll' );
-
-this['tb.ui.scroll'].addHandler(
-	'scroll.active', 
-    	function(){
-    		this._super().trigger(':window.active:', true); // make window active when scroll becomes active
-    	}
+this.scroll = new tb(
+	tb.ui.scroll,
+	{
+		content: this.content[0],
+		direction: 'y',
+		bubbleUp: true,
+		pixelsPerSecond: 2000,
+		attachDelay: 2000,
+		easing: 'swing'
+	}
 );
 ```
-* on a sidenote you can also see here how to add a custom handler to a subinstance at runtime
 
 ## API / Examples
 
@@ -199,24 +197,20 @@ this['tb.ui.scroll'].addHandler(
 <html>
 	<head>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-		<script src="http://<yourPathTo>/twobirds.js"></script>
+		<script src="http://<yourPathTo>/tb.js"></script>
 	</head>
     <body data-tb="demoapp/body.js">
     </body>
 </html>
 ```
 By default upon startup twoBirds will lookup DOM nodes containing a "data-tb" attribute, 
-and treats them as a white-space delimited list of twoBirds instances to attach there. 
+and treats them as a tB class: and instance of the class is created and attached to the DOM node. 
 If the corresponding repo object doesnt exist, on-demand loading is performed recursively. 
 
 ### tb() Selector and inner structure example
 
-All possible selectors:
 ```js 
-// tb() SELECTOR ALWAYS RETURNS ONE OF...
-// - an empty array ( indicating there is no match )
-// - a single tB object ( one match )
-// - an array containing tB objects ( more than one match )
+// tb() selector always returns a jQuery-like result set
 
 // PARAMETER TYPES
 
@@ -251,7 +245,7 @@ tb( '*' )
 
 // THIS:
 
-this // in handler code, this always points to the current sub-instance
+this // in handler code, this always points to the current instance
 
 // CHAINING:
 
@@ -261,127 +255,39 @@ this // in handler code, this always points to the current sub-instance
 
 tb('body').children('div') // all children of body tB object that reside inside a div HTML element
 tb('body').descendants() // all descendants of body tB object
-tb( demoapp.infoWindow ).parent() // closest parent, in this case the windowController
-tb( demoapp.infoWindow ).parents() // array of all parent tB objects, nearest first
-tb( demoapp.infoWindow ).prev() // the previous tb instance in this.parent().children()
-tb( demoapp.infoWindow ).next() // the next tb instance in this.parent().children()
+tb( ... ).parent() // closest parent, in this case body tb object
+tb( ... ).parents() // array of all parent tB objects, nearest first
+tb( ... ).prev() // the previous tb instance in this.parent().children()
+tb( ... ).next() // the next tb instance in this.parent().children()
+tb( ... ).first() // the previous tb instance in this.parent().children()
+tb( ... ).last() // the next tb instance in this.parent().children()
 
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
 
-### tb(selector).trigger(event, data)
+### tb(selector).trigger(event, data, bubble)
 - communication between object instances on the page
 
-some trigger snippets from demoapp:
+some trigger snippets from other projects:
 ```js 
 // get the $('body') DOM node, 
 // retrieve its tB toplevel object, 
-// and trigger '<myevent>' on it, 
-// ( by default ) bubbling down the sub-instances attached within.
-tb('body').trigger('<myevent>' [, data])
+// and trigger '<myevent>' on it
+tb('body').trigger('<myevent>' [, data] [, bubble])
 
-// find all demoapp.body instances, 
-// select their root object, 
+// find all demoapp.body instances (only one), 
 // trigger <myevent> bubbling down locally.
-tb( demoapp.body ).trigger('root:<myevent>:ld' [, data] )	
+tb( demoapp.body ).trigger('<myevent>' ,null ,'ld' )	
 
 // find all tb.ui.scroll instances, 
-// and trigger ':scroll.update:l' on it, meaning its a local event that doesnt bubble. 
-// As for this special event, all scrollBar handles will be resized and repositioned.
-tb( tb.ui.scroll ).trigger(':scroll.update:l' [, data] )			
-
-// find all tb.ui.scroll instances, 
-// select their super object, 
-// trigger scroll.ready bubbling up locally.
-tb( tb.ui.scroll ).trigger('super:scroll.ready:lu' [, data] )		
-
-// same as above, but easier. 
-// Missing 'l' indicates not to trigger it locally.<br />
-tb( tb.ui.scroll ).trigger(':scroll.ready:u' [, data ] )		
-
-// as you might have guessed - the infamous 'tb.init' system event<br />	
-tb( <anyObject> ).trigger(':tb.init:ld' )				
-```
-
-## Reflection
-
-### .structure()
-
-When on the demoapp, and the info window is on page, enter this in console...
-```js 
-tb( demoapp.infoWindow ).structure()
-```
-
-... and console will come up with its inner structure, much as expected it looks like:
-```js 
-demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
-	['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
-		['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
-```
-
-
-
-To see the complete structure attached to this DOM node, enter this in console...
-```js 
-tb( demoapp.infoWindow )._root().structure()
-```
-
-... and the response will be:
-```js 
-_1415886556968_036833262191511307 Object { target=div, handlers={...}, name="_1415886556968_036833262191511307", mehr...}
-	['demoapp.infoWindow']: demoapp.infoWindow Object { target=div, handlers={...}, name="demoapp.infoWindow", mehr...}
-		['demoapp.sys.window']: demoapp.sys.window Object { target=div, handlers={...}, name="demoapp.sys.window", mehr...}
-			['tb.ui.scroll']: tb.ui.scroll Object { target=div, handlers={...}, name="tb.ui.scroll", mehr...}
+// and trigger 'scroll.update' on it, meaning its a local event that doesnt bubble. 
+tb( tb.ui.scroll ).trigger('scroll.update' );			
 
 ```
-
-As you see, it is a consistent nested structure of instances, looking all the same codewise.
-
-### .describe()
-
-When on the demoapp, enter this in console...
-```js 
-tb( demoapp.userLogin ).describe()
-```
-
-... and console will come up with the events it handles, and the events it triggers inside these handlers:
-```js 
-[demoapp.userLogin] describe handlers:
--> tb.init
-    <- .trigger( 'userlogin.success', that.model.data()
-    <- .trigger(':userLogin.login:')
--> userlogin.login
--> userlogin.logout
--> userlogin.success
-    <- .trigger( ':tb.model.failure:l' )
-    <- .trigger(':tb.init:')
--> tb.model.failure
-```
-This helps in following the asynchronous event flow.
-
-### .structure( true )
-
-When on the demoapp, enter this in console...
-```js 
-tb( demoapp.globalSpinner ).structure( true )
-```
-
-... and console will show both structure and handlers/triggers:
-```js 
-demoapp.globalSpinner Object { target=div, handlers={...}, name="demoapp.globalSpinner", mehr...}
-	-> tb.init
-	   <- .trigger(':tb.ui.spinner.on:d')
-	   <- .trigger(':tb.ui.spinner.off:d')
-	['tb.ui.spinner']: tb.ui.spinner Object { target=div, handlers={...}, name="tb.ui.spinner", mehr...}
-		-> tb.init
-		-> tb.ui.spinner.on
-		-> tb.ui.spinner.off
-```
-
 
 ## Installation
 
-copy twoBirds.js from demoapp and insert into your project
+copy twoBirds.js from this and insert into your project. Have fun!
 
 ## Use case 
 - component style web programming
@@ -392,7 +298,7 @@ copy twoBirds.js from demoapp and insert into your project
 - async on demand loading, recursive inside tb objects
 - effective multiple inheritance
 - web-components-like programming, defining repository objects
-- instances of top level tB objects live in a DOM node
+- instances of top level tB objects live in a DOM node or other tB instances
 - own chained selector for tl tB objects
 - own async trigger mechanism on app level
 
@@ -401,8 +307,8 @@ copy twoBirds.js from demoapp and insert into your project
 - will be updated w/ new functionality as needed
 
 # History
-twoBirds was created 2006 by the [repo owner](http://frank.thuerigen.two-birds.ch) to be able to build a complex web application for an insurance company.
-It was first made public in 2007 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ), but had no impact then.
-It stayed submerged for the next years, though it was constantly under development. 
+twoBirds was created 2004 to be able to build a complex web application for an insurance company.
+It was first made public as V2 in 2006 ( [Ajaxian](http://ajaxian.com/archives/twobirds-lib-20-released) ).
+It was constantly under development. 
 
-In case of questions contact [me](http://frank.thuerigen.two-birds.ch).
+In case of questions contact [me](mailTo://frank_thuerigen@yahoo.de).
