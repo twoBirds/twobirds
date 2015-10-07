@@ -80,7 +80,7 @@ Each of the nested instances may or may not add additional HTML / DOM nodes to t
 
 ### Repository
 
-In twoBirds, on the client side you have a repository of plain JS claases. 
+In twoBirds, on the client side you have a repository of plain JS classes. 
 These are used to create instances. 
 The instances are saved in the DOM nodes or in other tB instances.
 
@@ -165,8 +165,6 @@ tb.namespace('demoapp', true).body = (function(){
 
 })();
 ```
-* "tb.require" is a dotted property
-* also it is a function
 
 The function will execute, starting the requirement loading. Further execution is halted until all required files have loaded. The "init" event will fire then.
 
@@ -199,7 +197,7 @@ this.scroll = new tb(
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="http://<yourPathTo>/tb.js"></script>
 	</head>
-    <body data-tb="demoapp/body.js">
+    <body data-tb="demoapp.body">
     </body>
 </html>
 ```
@@ -230,11 +228,11 @@ tb( demoapp.body )
 // find all tb.ui.scroll sub-instances ( may return many )
 tb( tb.ui.scroll )
 
-// REGEXP: as object, but matching to instance 'name' property 
+// REGEXP: as object, but matching to instance 'namespace' property 
 
 // always returns the root object
 
-tb( /app.bod/ ) // returns the demoapp.body root object, its 'name' matches
+tb( /app.bod/ ) // returns the demoapp.body object, its 'namespace' matches
 
 // OTHER:
 
