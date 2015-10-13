@@ -276,12 +276,12 @@ function myHandler( e ){
 };
 
 // add handlers (one = only one execution, delete handler afterwards)
-tb('body').on('myevent', f);
+tb('body').on('myevent', myHandler);
 or
-tb('body').one('myevent', f);
+tb('body').one('myevent', myHandler);
 
 // remove handler
-tb('body').off('myevent', f);
+tb('body').off('myevent', myHandler);
 
 ```
 
@@ -310,20 +310,20 @@ tb( tb.ui.scroll ).trigger('scroll.update' );
 copy twoBirds.js from this and insert into your project. Have fun!
 
 ## Use case 
-- component style web programming
-- distributed programming
+- easily adding JS functionality to server side rendered HTML
+- migrating from an existing server side rendered website to a single page application
 - any size from embedded small functionality to enterprise apps
 
 # Features
-- async on demand loading, recursive inside tb objects
+- component style web programming
+- distributed programming
+- async on demand loading, recursive
 - effective multiple inheritance
 - web-components-like programming, defining repository objects
-- instances of top level tB objects live in a DOM node or other tB instances
-- own chained selector for tl tB objects
-- own async trigger mechanism on app level
 
 # Status:
-- preliminary stable
+- core API stable, optimization and cleanup on the way
+- what is not documented here is preliminary code
 - will be updated w/ new functionality as needed
 
 # History
