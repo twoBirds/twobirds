@@ -9,7 +9,7 @@ twoBirds strictly follows the KISS doctrine, it is the minimum possible solution
 
 It consists of 3 parts:
 
-*1.) a simple client repository object structure + instanciation mechanism*
+#### 1.) a simple client repository object structure + instanciation mechanism
 
 demoapp/myClass.js
 ```
@@ -42,13 +42,13 @@ new tb(
 );
 ```
 
-*2.) a selector to adress instances of these objects on the page*
+#### 2.) a selector to adress instances of these objects on the page
 
 ```
 tb( 'body' )
 ```
 
-*3.) a trigger mechanism to communicate with the selected instance on the page*
+#### 3.) a trigger mechanism to communicate with the selected instance on the page
 
 ```
 tb( 'body' ).trigger( 'myEventName', <eventData>, <bubble> );
