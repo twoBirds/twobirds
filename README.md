@@ -17,8 +17,10 @@ var demoapp = {};
 
 
 demoapp.myClass = function(){
-	myEventName: function( e ){
-		console.log( 'myEventName handler', e.data );
+	handlers: {
+		myEventName: function( e ){
+			console.log( 'myEventName handler', e.data );
+		}
 	}
 }
 
