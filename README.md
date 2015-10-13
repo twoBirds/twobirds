@@ -15,7 +15,11 @@ demoapp/myClass.js
 ```
 var demoapp = {};
 
+
 demoapp.myClass = function(){
+	myEventName: function( e ){
+		console.log( 'myEventName handler', e.data );
+	}
 }
 
 demoapp.myClass.prototype = {
