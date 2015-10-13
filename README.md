@@ -57,7 +57,7 @@ hint: bubble = 'l' for local, 'd' for down, 'u' for up ('l' being default)
 
 twoBirds allows for building of nested structures of instances of repository classes that all look the same codewise, but add up to complex functionality.
 
-All instances of those classes are located in DOM nodes or other tB instances, and communicate with each other via a selector -- trigger mechanism:
+All instances of these classes are stored in DOM nodes or other tB instances.
 
 twoBirds was created 2004 and saw its first commercial use in 2006.
 
