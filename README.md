@@ -176,7 +176,7 @@ The function will execute, starting the requirement loading. Further execution i
 
 #### ON EVENT / AT RUNTIME:
 
-You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code ( the scroller is yet converted from V5 to V6, I will add it later):
+You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code ( the scroller is nott yet converted from V5 to V6, I will refactor the old demoapp later):
 ```
 this.scroll = new tb(
 	tb.ui.scroll,
