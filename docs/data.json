@@ -1,0 +1,1489 @@
+{
+    "project": {
+        "name": "twoBirds API",
+        "description": "A javascript library ...",
+        "version": "6.0a"
+    },
+    "files": {
+        "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js": {
+            "name": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js": {
+            "name": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "httpdocs/libs/jquery-2.1.4.js": {
+            "name": "httpdocs/libs/jquery-2.1.4.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "httpdocs/tb/tb.js": {
+            "name": "httpdocs/tb/tb.js",
+            "modules": {},
+            "classes": {
+                "TbEvent": 1,
+                "TbSelector": 1,
+                "tb": 1,
+                "tb.Model": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "tb": 1
+            }
+        }
+    },
+    "modules": {},
+    "classes": {
+        "TbEvent": {
+            "name": "TbEvent",
+            "shortname": "TbEvent",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "httpdocs/tb/tb.js",
+            "line": 50,
+            "description": "standard twobirds event, internal use only",
+            "is_constructor": 1,
+            "access": "private",
+            "tagname": "",
+            "ignore": "",
+            "params": [
+                {
+                    "name": "pEventName",
+                    "description": "- name of event",
+                    "type": "String"
+                },
+                {
+                    "name": "pEventData",
+                    "description": "- data to be appended to this event",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "pBubble",
+                    "description": "- bubbling indicator, 'l' = local, 'u' = up, 'd' = down or any combination",
+                    "type": "String",
+                    "optional": true,
+                    "optdefault": "l"
+                }
+            ],
+            "return": {
+                "description": "TbEvent instance",
+                "type": "Object"
+            }
+        },
+        "TbSelector": {
+            "name": "TbSelector",
+            "shortname": "TbSelector",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "httpdocs/tb/tb.js",
+            "line": 107,
+            "description": "TbSelector constructor, internal use only\n\ncreates an array-like object containing the tb objects defined by pSelector parameter\n\nsample calls:\nnew TbSelector( '' )\n- create an empty result set\nnew TbSelector( 'div.myClass' )\n- returns all tb objects that were in the selected DOM elements.\n- uses jQuery to find DOM elements, so parameter equals jQuery selector string.\nnew TbSelector( /ns1.ns2.myClassName/ )\n- returns all tb elements (e.g. namespace ns1.ns2.myClassName) in current DOM,\n- matches namespace property with regex.\nnew TbSelector( '*' )\nnew TbSelector( /./ )\n- all tb elements in DOM\nnew TbSelector( document.body )\n- selection by DOM node\nnew TbSelector( ns1.ns2.<className> )\n- all tb elements in current DOM that are instances of the given class",
+            "is_constructor": 1,
+            "chainable": 1,
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- multiple selector types",
+                    "type": "String | regEx | constructor"
+                }
+            ],
+            "return": {
+                "description": "TbSelector instance, array-like object",
+                "type": "Object"
+            }
+        },
+        "tb": {
+            "name": "tb",
+            "shortname": "tb",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "tb",
+            "file": "httpdocs/tb/tb.js",
+            "line": 924,
+            "description": "tb() / new tb()\ncan be used as SELECTOR and CONSTRUCTOR\n\nsample call CONSTRUCTOR:\nvar a = new tb( 'tb_repo_object_namespace' )\n\nsample call SELECTOR:\nvar result = tb( 'div#app' )\n\nfor selector functionality see TbSelector object",
+            "is_constructor": 1,
+            "extends": "TbSelector",
+            "params": [
+                {
+                    "name": "arguments[0]",
+                    "description": "- namespace of class | TbSelector parameter",
+                    "type": "String"
+                },
+                {
+                    "name": "arguments[1]",
+                    "description": "- config data ( if called as constructor )",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "arguments[2]",
+                    "description": "- DOM target or parent tb instance",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- twoBirds Object or TbSelector instance /w results",
+                "type": "Object"
+            }
+        },
+        "tb.Model": {
+            "name": "tb.Model",
+            "shortname": "tb.Model",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "tb",
+            "file": "httpdocs/tb/tb.js",
+            "line": 1357,
+            "description": "tb.Model constructor\ncreate and return a simple CRUD model",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "pConfig",
+                    "description": "- config parameter, usually an object @todo: variant is no valid data type",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "- the model instance",
+                "type": "Object"
+            }
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1292,
+            "description": "Create key-value caches of limited size",
+            "return": {
+                "description": "Returns the Object data after storing it on itself with\n\tproperty name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)\n\tdeleting the oldest entry",
+                "type": "Function(string, Object)"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1312,
+            "description": "Mark a function for special use by Sizzle",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "The function to mark",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1321,
+            "description": "Support testing using an element",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "Passed the created div and expects a boolean result",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1342,
+            "description": "Adds the same handler for all of the specified attrs",
+            "params": [
+                {
+                    "name": "attrs",
+                    "description": "Pipe-separated list of attributes",
+                    "type": "String"
+                },
+                {
+                    "name": "handler",
+                    "description": "The method that will be applied",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1356,
+            "description": "Checks document order of two siblings",
+            "params": [
+                {
+                    "name": "a",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "b",
+                    "description": "",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "Returns less than 0 if a precedes b, greater than 0 if a follows b",
+                "type": "Number"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1385,
+            "description": "Returns a function to use in pseudos for input types",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1396,
+            "description": "Returns a function to use in pseudos for buttons",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1407,
+            "description": "Returns a function to use in pseudos for positionals",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1429,
+            "description": "Detect xml",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "An element or a document",
+                    "type": "Element|Object"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1443,
+            "description": "Sets document-related variables once based on the current document",
+            "params": [
+                {
+                    "name": "doc",
+                    "description": "An element or document object to use to set the document",
+                    "type": "Element|Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Returns the current document",
+                "type": "Object"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1853,
+            "description": "Document sorting and removing duplicates",
+            "params": [
+                {
+                    "name": "results",
+                    "description": "",
+                    "type": "ArrayLike"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js",
+            "line": 1882,
+            "description": "Utility function for retrieving the text value of an array of DOM nodes",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "",
+                    "type": "Array|Element"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 14879,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 14880,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 14881,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15083,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15084,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15085,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15429,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15430,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js",
+            "line": 15431,
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 858,
+            "description": "Create key-value caches of limited size",
+            "return": {
+                "description": "Returns the Object data after storing it on itself with\n\tproperty name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)\n\tdeleting the oldest entry",
+                "type": "Function(string, Object)"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 878,
+            "description": "Mark a function for special use by Sizzle",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "The function to mark",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 887,
+            "description": "Support testing using an element",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "Passed the created div and expects a boolean result",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 908,
+            "description": "Adds the same handler for all of the specified attrs",
+            "params": [
+                {
+                    "name": "attrs",
+                    "description": "Pipe-separated list of attributes",
+                    "type": "String"
+                },
+                {
+                    "name": "handler",
+                    "description": "The method that will be applied",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 922,
+            "description": "Checks document order of two siblings",
+            "params": [
+                {
+                    "name": "a",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "b",
+                    "description": "",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "Returns less than 0 if a precedes b, greater than 0 if a follows b",
+                "type": "Number"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 951,
+            "description": "Returns a function to use in pseudos for input types",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 962,
+            "description": "Returns a function to use in pseudos for buttons",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 973,
+            "description": "Returns a function to use in pseudos for positionals",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 995,
+            "description": "Checks a node for validity as a Sizzle context",
+            "params": [
+                {
+                    "name": "context",
+                    "description": "",
+                    "type": "Element|Object="
+                }
+            ],
+            "return": {
+                "description": "The input node if acceptable, otherwise a falsy value",
+                "type": "Element|Object|Boolean"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 1007,
+            "description": "Detects XML nodes",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "An element or a document",
+                    "type": "Element|Object"
+                }
+            ],
+            "return": {
+                "description": "True iff elem is a non-HTML XML node",
+                "type": "Boolean"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 1019,
+            "description": "Sets document-related variables once based on the current document",
+            "params": [
+                {
+                    "name": "doc",
+                    "description": "An element or document object to use to set the document",
+                    "type": "Element|Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Returns the current document",
+                "type": "Object"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 1461,
+            "description": "Document sorting and removing duplicates",
+            "params": [
+                {
+                    "name": "results",
+                    "description": "",
+                    "type": "ArrayLike"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 1494,
+            "description": "Utility function for retrieving the text value of an array of DOM nodes",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "",
+                    "type": "Array|Element"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 2467,
+            "description": "A low-level selection function that works with Sizzle's compiled\n selector functions",
+            "params": [
+                {
+                    "name": "selector",
+                    "description": "A selector or a pre-compiled\n selector function built with Sizzle.compile",
+                    "type": "String|Function"
+                },
+                {
+                    "name": "context",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "results",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                },
+                {
+                    "name": "seed",
+                    "description": "A set of elements to match against",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 3427,
+            "description": "The ready event handler and self cleanup method",
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 3520,
+            "description": "Determines whether an object can have data",
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 5478,
+            "description": "Retrieve the actual display of a element",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "nodeName of the element",
+                    "type": "String"
+                },
+                {
+                    "name": "doc",
+                    "description": "Document object",
+                    "type": "Object"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 5502,
+            "description": "Try to determine the default display value of an element",
+            "params": [
+                {
+                    "name": "nodeName",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 8830,
+            "description": "Load a url into a page",
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/libs/jquery-2.1.4.js",
+            "line": 8914,
+            "description": "Gets a window from an element",
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1,
+            "description": "twoBirds V6 core functionality",
+            "author": "frank.thuerigen <frank_thuerigen@yahoo.de>",
+            "copyright": "copyright (c) 2006- by author, unlimited license granted",
+            "license": "http://www.gnu.org/copyleft/gpl.html GNU GPL v3",
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 13,
+            "description": "walk all pSelector tb objects, call pMethodName on them\nreturn a UNIQUE TbSelector result set containing all single results",
+            "itemtype": "method",
+            "name": "walkSelector",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "pSelectorObject",
+                    "description": "- instanceOf TbSelector",
+                    "type": "Object"
+                },
+                {
+                    "name": "pMethodName",
+                    "description": "- name of method to call",
+                    "type": "String"
+                },
+                {
+                    "name": "pArguments",
+                    "description": "- arguments",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "instance of TbSelector",
+                "type": "Object"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 80,
+            "description": "stop propagation after all handlers on this object have run",
+            "itemtype": "method",
+            "name": "stopPropagation",
+            "return": {
+                "description": "TbEvent object",
+                "type": "Object"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 92,
+            "description": "stop propagation immediately after this handler has run",
+            "itemtype": "method",
+            "name": "stopImmediatePropagation",
+            "return": {
+                "description": "TbEvent object",
+                "type": "Object"
+            },
+            "class": "TbEvent"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 238,
+            "description": "trigger an event, optionally with data and bubble indicator",
+            "itemtype": "method",
+            "name": "trigger",
+            "params": [
+                {
+                    "name": "pEvent",
+                    "description": "- name of event or TbEvent instance or TbEvent instance",
+                    "type": "String|object"
+                },
+                {
+                    "name": "pEventData",
+                    "description": "- event data, usally an object",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "pBubble",
+                    "description": "- bubbling indicator : 'l' = local, 'u' = up, 'd' = down or any combination",
+                    "type": "String",
+                    "optional": true,
+                    "optdefault": "l"
+                }
+            ],
+            "return": {
+                "description": "- (this) -> TbSelector instance or tb object",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 337,
+            "description": "parents() method\nfor each this[0...n] or this as tb() instance,\n- get all parent tb objects\n- check them against the filter param pSelector\n- return them as a TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "parents",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 386,
+            "description": "parent() method\n\nfor each this[0...n] or this as tb() instance,\n- get closest parent tb object\n\n- check all of them against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "parent",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 426,
+            "description": "descendants() method\n\nfor each this[0...n] or this as tb() instance,\n- get all descendants of tb object\n- check them against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "descendants",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                },
+                {
+                    "name": "pLocalOnly",
+                    "description": "- only local descendants of given tb instance",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 495,
+            "description": "children() method\n\nfor each this[0...n] or this as tb() instance,\n- get all direct children of tb object\n- check them against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "children",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                },
+                {
+                    "name": "pLocalOnly",
+                    "description": "- only local children of given tb instance",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 551,
+            "description": "next() method\n\nfor each this[0...n] or this as tb() instance,\n- get the direct following sibling of tb object\n- check it against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "next",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 590,
+            "description": "prev() method\n\nfor each this[0...n] or this as tb() instance,\n- get the previous sibling of tb object\n- check them against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "prev",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 629,
+            "description": "first() method\n\nfor each this[0...n] or this as tb() instance,\n- get the first child of the tb object parent\n- check it against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "first",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 663,
+            "description": "last() method\n\nfor each this[0...n] or this as tb() instance,\n- get the last child of the tb object parent\n- check it against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "last",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "Variant",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 691,
+            "description": "filter() method\n\nfor each this[0...n] or this as tb() instance,\n- check them against the filter param pSelector\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "filter",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 732,
+            "description": "not() method\n\nfor each this[0...n] or this as tb() instance,\n- check them against pSelector and remove all fits\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "not",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 774,
+            "description": "add() method\n\nadd elements to current result set\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "- any kind of TbSelector parameter",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 817,
+            "description": "on() method\n\nfor each this[0...n] or this as tb() instance,\n- add handler to handler array\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "",
+            "params": [
+                {
+                    "name": "pEventName",
+                    "description": "- name of the handler function",
+                    "type": "String"
+                },
+                {
+                    "name": "pHandler",
+                    "description": "- the function to be added to the handler array",
+                    "type": "Function"
+                },
+                {
+                    "name": "pOnce",
+                    "description": "- true = remove handler after first call, false = keep handler",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 855,
+            "description": "one() method\n\nfor each this[0...n] or this as tb() instance,\n- add handler to handler array\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "",
+            "params": [
+                {
+                    "name": "pEventName",
+                    "description": "- name of the handler function",
+                    "type": "String"
+                },
+                {
+                    "name": "pHandler",
+                    "description": "- the function to be added to the handler array",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 879,
+            "description": "off() method\n\nfor each this[0...n] or this as tb() instance,\n- delete handler from handler array\n- return TbSelector result set (unique)",
+            "itemtype": "method",
+            "name": "",
+            "params": [
+                {
+                    "name": "pEventName",
+                    "description": "- name of the handler function",
+                    "type": "String"
+                },
+                {
+                    "name": "pHandler",
+                    "description": "- the function to be added to the handler array",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "- TbSelector instance",
+                "type": "Object"
+            },
+            "class": "TbSelector"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1126,
+            "description": "stops event handling",
+            "itemtype": "method",
+            "name": "stop",
+            "static": 1,
+            "params": [
+                {
+                    "name": "pStopit",
+                    "description": "- indicating whether to stop event handling",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "- true if event handling stopped, else false",
+                "type": "Boolean"
+            },
+            "class": "tb",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1148,
+            "description": "returns a unique id",
+            "itemtype": "method",
+            "name": "getId",
+            "static": 1,
+            "return": {
+                "description": "- unique id",
+                "type": "String"
+            },
+            "class": "tb",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1164,
+            "description": "tb.namespace() function\n\nsample calls:\ntb.namespace( 'in2.app.Dashboard' ) gets the constructor for dashboard\n\nand in the dashboard constructor:\n\ntb.namespace( 'in2.app', true ).Dashboard = function(){ ...",
+            "itemtype": "method",
+            "name": "namespace",
+            "static": 1,
+            "params": [
+                {
+                    "name": "pNamespace",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "pForceCreation",
+                    "description": "- true => force creation of namespace object if it didnt exist before",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "namespaceObject",
+                "type": "Object"
+            },
+            "class": "tb",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1220,
+            "description": "tb.bind() function\n\nsample calls:\n\ntb.bind( document.body )\n\n- scans the given element and all of its descendants\n  in the DOM and looks for attributes \"data-tb\" in the nodes.\n- resulting list will be scanned for those nodes that do not already\n  have an tb object inside.\n- creates a new tb object based on the class namespace given\n  in the \"data-tb\" attribute\n- stores it in the DOM element\n\ntb.bind( document.body, 'n1.n2.<className>' [ , <config data> ] )\n\n- creates a new tb object based on the 2nd parameter, giving 3rd as constructor parameter\n- stores it in the DOM element\nTHIS VARIANT WILL overwrite ANY tbo OBJECT THAT ALREADY RESIDES IN THE DOM NODE!",
+            "itemtype": "method",
+            "name": "bind",
+            "static": 1,
+            "params": [
+                {
+                    "name": "pSelector",
+                    "description": "DOM node",
+                    "type": "Object"
+                },
+                {
+                    "name": "pNamespace",
+                    "description": "contains the namespace path to the class",
+                    "type": "String",
+                    "optional": true
+                },
+                {
+                    "name": "pConfig",
+                    "description": "any data, will be used as a parameter when pNameSpace class is constructed @todo: 'variant' is no valid data type. use '{Object|Array|String} or similar",
+                    "type": "Variant",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Void"
+            },
+            "class": "tb",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1283,
+            "description": "function tb.observable()\n\n- creates a function\n- initializes a value to observe\n- returns this function\n\nsample calls:\n\no = tb.observable( {} );\no( { newData: 'newData' } ); // change observable value\no.observe( function(){ ... }, true ); // will be triggered when observable value changes, true indicates only once",
+            "itemtype": "method",
+            "name": "observable",
+            "static": 1,
+            "params": [
+                {
+                    "name": "pStartValue",
+                    "description": "- initial content of observable",
+                    "type": "*"
+                }
+            ],
+            "return": {
+                "description": "observableFunction",
+                "type": "Function"
+            },
+            "class": "tb",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1549,
+            "description": "tb.parse() function\nfor each key/value in pObject, check string for {key}\nreplace occurence with <value>",
+            "itemtype": "method",
+            "name": "parse",
+            "static": 1,
+            "params": [
+                {
+                    "name": "pText",
+                    "description": "- the text to parse",
+                    "type": "String"
+                },
+                {
+                    "name": "pParse",
+                    "description": "- hash object containing replacement key/<value>",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "- result string",
+                "type": "String"
+            },
+            "class": "tb.Model",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1578,
+            "description": "requirement handling",
+            "class": "tb.Model",
+            "namespace": "tb"
+        },
+        {
+            "file": "httpdocs/tb/tb.js",
+            "line": 1854,
+            "description": "document.ready bootstrap",
+            "class": "tb.Model",
+            "namespace": "tb"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1292"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1356"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1443"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-2.1.4.js:858"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-2.1.4.js:922"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-2.1.4.js:995"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1007"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1019"
+        },
+        {
+            "message": "unknown tag: copyright",
+            "line": " httpdocs/tb/tb.js:1"
+        },
+        {
+            "message": "unknown tag: license",
+            "line": " httpdocs/tb/tb.js:1"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:13"
+        },
+        {
+            "message": "unknown tag: ignore",
+            "line": " httpdocs/tb/tb.js:50"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1126"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1148"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1164"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1220"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1283"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " httpdocs/tb/tb.js:1549"
+        },
+        {
+            "message": "Missing item type\nCreate key-value caches of limited size",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1292"
+        },
+        {
+            "message": "Missing item type\nMark a function for special use by Sizzle",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1312"
+        },
+        {
+            "message": "Missing item type\nSupport testing using an element",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1321"
+        },
+        {
+            "message": "Missing item type\nAdds the same handler for all of the specified attrs",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1342"
+        },
+        {
+            "message": "Missing item type\nChecks document order of two siblings",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1356"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for input types",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1385"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for buttons",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1396"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for positionals",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1407"
+        },
+        {
+            "message": "Missing item type\nDetect xml",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1429"
+        },
+        {
+            "message": "Missing item type\nSets document-related variables once based on the current document",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1443"
+        },
+        {
+            "message": "Missing item type\nDocument sorting and removing duplicates",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1853"
+        },
+        {
+            "message": "Missing item type\nUtility function for retrieving the text value of an array of DOM nodes",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/external/jquery/jquery.js:1882"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:14879"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:14880"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:14881"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15083"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15084"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15085"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15429"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15430"
+        },
+        {
+            "message": "Missing item type",
+            "line": " httpdocs/libs/jquery-ui-1.11.4.custom/jquery-ui.js:15431"
+        },
+        {
+            "message": "Missing item type\nCreate key-value caches of limited size",
+            "line": " httpdocs/libs/jquery-2.1.4.js:858"
+        },
+        {
+            "message": "Missing item type\nMark a function for special use by Sizzle",
+            "line": " httpdocs/libs/jquery-2.1.4.js:878"
+        },
+        {
+            "message": "Missing item type\nSupport testing using an element",
+            "line": " httpdocs/libs/jquery-2.1.4.js:887"
+        },
+        {
+            "message": "Missing item type\nAdds the same handler for all of the specified attrs",
+            "line": " httpdocs/libs/jquery-2.1.4.js:908"
+        },
+        {
+            "message": "Missing item type\nChecks document order of two siblings",
+            "line": " httpdocs/libs/jquery-2.1.4.js:922"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for input types",
+            "line": " httpdocs/libs/jquery-2.1.4.js:951"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for buttons",
+            "line": " httpdocs/libs/jquery-2.1.4.js:962"
+        },
+        {
+            "message": "Missing item type\nReturns a function to use in pseudos for positionals",
+            "line": " httpdocs/libs/jquery-2.1.4.js:973"
+        },
+        {
+            "message": "Missing item type\nChecks a node for validity as a Sizzle context",
+            "line": " httpdocs/libs/jquery-2.1.4.js:995"
+        },
+        {
+            "message": "Missing item type\nDetects XML nodes",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1007"
+        },
+        {
+            "message": "Missing item type\nSets document-related variables once based on the current document",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1019"
+        },
+        {
+            "message": "Missing item type\nDocument sorting and removing duplicates",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1461"
+        },
+        {
+            "message": "Missing item type\nUtility function for retrieving the text value of an array of DOM nodes",
+            "line": " httpdocs/libs/jquery-2.1.4.js:1494"
+        },
+        {
+            "message": "Missing item type\nA low-level selection function that works with Sizzle's compiled\n selector functions",
+            "line": " httpdocs/libs/jquery-2.1.4.js:2467"
+        },
+        {
+            "message": "Missing item type\nThe ready event handler and self cleanup method",
+            "line": " httpdocs/libs/jquery-2.1.4.js:3427"
+        },
+        {
+            "message": "Missing item type\nDetermines whether an object can have data",
+            "line": " httpdocs/libs/jquery-2.1.4.js:3520"
+        },
+        {
+            "message": "Missing item type\nRetrieve the actual display of a element",
+            "line": " httpdocs/libs/jquery-2.1.4.js:5478"
+        },
+        {
+            "message": "Missing item type\nTry to determine the default display value of an element",
+            "line": " httpdocs/libs/jquery-2.1.4.js:5502"
+        },
+        {
+            "message": "Missing item type\nLoad a url into a page",
+            "line": " httpdocs/libs/jquery-2.1.4.js:8830"
+        },
+        {
+            "message": "Missing item type\nGets a window from an element",
+            "line": " httpdocs/libs/jquery-2.1.4.js:8914"
+        },
+        {
+            "message": "Missing item type\ntwoBirds V6 core functionality",
+            "line": " httpdocs/tb/tb.js:1"
+        },
+        {
+            "message": "Missing item type\nrequirement handling",
+            "line": " httpdocs/tb/tb.js:1578"
+        },
+        {
+            "message": "Missing item type\ndocument.ready bootstrap",
+            "line": " httpdocs/tb/tb.js:1854"
+        }
+    ]
+}
