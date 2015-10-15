@@ -6,7 +6,8 @@
  * @license         http://www.gnu.org/copyleft/gpl.html GNU GPL v3
  *
  */
-var tb = (function(){
+
+tb = (function(){
     //private
 
     /**
@@ -20,7 +21,7 @@ var tb = (function(){
      * @param {string} pMethodName - name of method to call
      * @param {*} [pArguments] - arguments
      *
-     * @returns {object} instance of TbSelector
+     * @return {object} instance of TbSelector
      */
     function walkSelector( pSelectorObject, pMethodName, pArguments ){
         var that = this,
@@ -49,16 +50,18 @@ var tb = (function(){
     /**
      * standard twobirds event, internal use only
      *
-     * @constructor tbEvent
+     * @class TbEvent
+     * @constructor
      * @private
+     * @ignore
      *
      * @param {string} pEventName - name of event
      * @param {*} [pEventData] - data to be appended to this event
      * @param {string} [pBubble=l] - bubbling indicator, 'l' = local, 'u' = up, 'd' = down or any combination
      *
-     * @returns {object} TbEvent instance
+     * @return {object} TbEvent instance
      */
-    var TbEvent = function( pEventName, pEventData, pBubble ){
+    function TbEvent( pEventName, pEventData, pBubble ){
         $.extend(
             true,
             this,
@@ -79,7 +82,7 @@ var tb = (function(){
          *
          * @method stopPropagation
          *
-         * @returns {object} TbEvent object
+         * @return {object} TbEvent object
          */
         stopPropagation: function(){
             this.__stopped__ = true;
@@ -91,7 +94,7 @@ var tb = (function(){
          *
          * @method stopImmediatePropagation
          *
-         * @returns {object} TbEvent object
+         * @return {object} TbEvent object
          */
         stopImmediatePropagation: function(){
             this.stopPropagation(); // also stop normal propagation
@@ -103,6 +106,7 @@ var tb = (function(){
 
     /**
      * TbSelector constructor, internal use only
+     *
      * creates an array-like object containing the tb objects defined by pSelector parameter
      *
      * sample calls:
@@ -122,14 +126,16 @@ var tb = (function(){
      * new TbSelector( ns1.ns2.<className> )
      * - all tb elements in current DOM that are instances of the given class
      *
-     * @constructor TbSelector
+     * @class TbSelector
+     * @constructor
+     * @chainable
      * @private
      *
      * @param {string | regEx | constructor} pSelector - multiple selector types
      *
-     * @returns {object} TbSelector instance, array-like object
+     * @return {object} TbSelector instance, array-like object
      */
-    var TbSelector = function( pSelector ){
+    function TbSelector( pSelector ){
 
         var that = this,
             elements,
@@ -238,7 +244,7 @@ var tb = (function(){
              * @param {*} [pEventData] - event data, usally an object
              * @param {string} [pBubble=l] - bubbling indicator : 'l' = local, 'u' = up, 'd' = down or any combination
              *
-             * @returns {object} - (this) -> TbSelector instance or tb object
+             * @return {object} - (this) -> TbSelector instance or tb object
              */
             trigger: function( pEvent, pEventData, pBubble ){
                 var that = this,
@@ -339,7 +345,7 @@ var tb = (function(){
              *
              * @param {*} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             parents: function( pSelector ){
                 var that = this,
@@ -390,7 +396,7 @@ var tb = (function(){
              *
              * @param {*} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             parent: function( pSelector ){
 
@@ -430,7 +436,7 @@ var tb = (function(){
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              * @param {boolean} [pLocalOnly] - only local descendants of given tb instance
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             descendants: function( pSelector, pLocalOnly ){
 
@@ -499,7 +505,7 @@ var tb = (function(){
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              * @param {boolean} [pLocalOnly] - only local children of given tb instance
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             children: function( pSelector, pLocalOnly ){
 
@@ -554,7 +560,7 @@ var tb = (function(){
              *
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             next: function( pSelector ){
 
@@ -593,7 +599,7 @@ var tb = (function(){
              *
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             prev: function( pSelector ){
 
@@ -632,7 +638,7 @@ var tb = (function(){
              *
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             first: function( pSelector ){
                 var that = this,
@@ -666,7 +672,7 @@ var tb = (function(){
              *
              * @param {variant} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             last: function( pSelector ){
                 var that = this,
@@ -693,7 +699,7 @@ var tb = (function(){
              *
              * @param {*} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             filter: function( pSelector ){
 
@@ -734,7 +740,7 @@ var tb = (function(){
              *
              * @param {*} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             not: function( pSelector ){
 
@@ -775,7 +781,7 @@ var tb = (function(){
              *
              * @param {*} [pSelector] - any kind of TbSelector parameter
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             add: function( pSelector ){
 
@@ -821,7 +827,7 @@ var tb = (function(){
              * @param {function} pHandler - the function to be added to the handler array
              * @param {boolean} [pOnce=false] - true = remove handler after first call, false = keep handler
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             on: function( pEventName, pHandler, pOnce ){
 
@@ -858,7 +864,7 @@ var tb = (function(){
              * @param {string} pEventName - name of the handler function
              * @param {function} pHandler - the function to be added to the handler array
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             one: function( pEventName, pHandler ){
 
@@ -882,7 +888,7 @@ var tb = (function(){
              * @param {string} pEventName - name of the handler function
              * @param {function} pHandler - the function to be added to the handler array
              *
-             * @returns {object} - TbSelector instance
+             * @return {object} - TbSelector instance
              */
             off: function( pEventName, pHandler ){
 
@@ -916,7 +922,7 @@ var tb = (function(){
     })();
 
     /**
-     * tb() function
+     * tb() / new tb()
      * can be used as SELECTOR and CONSTRUCTOR
      *
      * sample call CONSTRUCTOR:
@@ -925,20 +931,20 @@ var tb = (function(){
      * sample call SELECTOR:
      * var result = tb( 'div#app' )
      *
-     * for selector functionality see TbSelector object above
+     * for selector functionality see TbSelector object
      *
-     * @function tb
-     * @alias tb
-     *
+     * @class tb
+     * @constructor
+     * @extends TbSelector
      *
      * @param {string}     arguments[0]   - namespace of class | TbSelector parameter
      * @param {*}  [ arguments[1] ] - config data ( if called as constructor )
      * @param {*}  [ arguments[2] ] - DOM target or parent tb instance
      *
-     * @returns {object} - twoBirds Object or TbSelector instance /w results
+     * @return {object} - twoBirds Object or TbSelector instance /w results
      *
      */
-    var tb = function() {
+    function tb() {
         var that = this;
 
         /*
@@ -980,7 +986,7 @@ var tb = (function(){
             if ( isNamespace && !tbClass ){
                 fileName = arguments[0].replace( /\./g, '/' ) + '.js';
 
-                tb.head.load(
+                tb.loader.load(
                     fileName,
                     (function( args ){
                         return function(){
@@ -1073,7 +1079,7 @@ var tb = (function(){
                 if ( !!tbInstance[ 'tb.require' ] && tbInstance[ 'tb.require'].length ){
                     // add requirement handling
                     //console.log( 'requires', tbInstance[ 'tb.require' ] );
-                    tb.head.load(
+                    tb.loader.load(
                         tbInstance[ 'tb.require' ],
                         function(){
                             tbInstance['tb.require'] = null;
@@ -1118,13 +1124,15 @@ var tb = (function(){
 
 
 /**
- * tb.stop() function
+ * stops event handling
  *
- * @function tb.stop()
+ * @function stop
+ * @namespace tb
+ * @static
  *
- * @param {boolean} pStopit - namespace of class | TbSelector parameter
+ * @param {boolean} pStopit - indicating whether to stop event handling
  *
- * @returns {boolean} - true if event handling stopped, else false
+ * @return {boolean} - true if event handling stopped, else false
  */
 tb.stop = (function(pStopIt){
     var stopIt = pStopIt;
@@ -1138,12 +1146,13 @@ tb.stop = (function(pStopIt){
 
 
 /**
- * tb.getId() function
- * -returns a unique id
+ * returns a unique id
  *
- * @function tb.getId()
+ * @function getId
+ * @namespace tb
+ * @static
  *
- * @returns {string} - unique id
+ * @return {string} - unique id
  */
 tb.getId = function(){
     return 'id-' + (new Date()).getTime() + '-' + Math.random().toString().replace(/\./, '');
@@ -1163,12 +1172,14 @@ tb.getId = function(){
  * tb.namespace( 'in2.app', true ).Dashboard = function(){ ...
  *
  *
- * @function tb.namespace
+ * @function namespace
+ * @namespace tb
+ * @static
  *
  * @param {string} pNamespace
  * @param {boolean} [pForceCreation] - true => force creation of namespace object if it didnt exist before
  *
- * @returns {Object}        namespaceObject
+ * @return {Object}        namespaceObject
  */
 tb.namespace = function( pNamespace, pForceCreation ){
 
@@ -1207,15 +1218,7 @@ tb.namespace = function( pNamespace, pForceCreation ){
 
 
 /**
- * @function tb.bind
- *
- * @param   {object}     pSelector      DOM node
- * @param   {string}     [pNamespace]   contains the namespace path to the class
- * @param   {variant}    [pConfig]      any data, will be used as a parameter when pNameSpace class is constructed @todo: 'variant' is no valid data type. use '{Object|Array|String} or similar
- *
- * @returns {void}
- *
- * @description
+ * tb.bind() function
  *
  * sample calls:
  *
@@ -1234,6 +1237,15 @@ tb.namespace = function( pNamespace, pForceCreation ){
  * - creates a new tb object based on the 2nd parameter, giving 3rd as constructor parameter
  * - stores it in the DOM element
  * THIS VARIANT WILL overwrite ANY tbo OBJECT THAT ALREADY RESIDES IN THE DOM NODE!
+ * @function bind
+ * @namespace tb
+ * @static
+ *
+ * @param   {object}     pSelector      DOM node
+ * @param   {string}     [pNamespace]   contains the namespace path to the class
+ * @param   {variant}    [pConfig]      any data, will be used as a parameter when pNameSpace class is constructed @todo: 'variant' is no valid data type. use '{Object|Array|String} or similar
+ *
+ * @return {void}
  */
 tb.bind = function( pSelector, pNamespace, pConfig ){
 
@@ -1281,11 +1293,13 @@ tb.bind = function( pSelector, pNamespace, pConfig ){
  * o( { newData: 'newData' } ); // change observable value
  * o.observe( function(){ ... }, true ); // will be triggered when observable value changes, true indicates only once
  *
- * @function tb.observable
+ * @function observable
+ * @namespace tb
+ * @static
  *
  * @param {*} pStartValue - initial content of observable
  *
- * @returns {function}  observableFunction
+ * @return {function}  observableFunction
  */
 tb.observable = function( pStartValue ){
 
@@ -1344,11 +1358,13 @@ tb.observable = function( pStartValue ){
  * tb.Model constructor
  * create and return a simple CRUD model
  *
- * @class tb.model
+ * @class Model
+ * @constructor
+ * @namespace tb
  *
  * @param {object} pConfig - config parameter, usually an object @todo: variant is no valid data type
  *
- * @returns {object} - the model instance
+ * @return {object} - the model instance
  */
 tb.Model = function ( pConfig ) {
     var that = this;
@@ -1535,12 +1551,14 @@ tb.Model.prototype = (function(){
  * for each key/value in pObject, check string for {key}
  * replace occurence with <value>
  *
- * @function tb.parse
+ * @function parse
+ * @namespace tb
+ * @static
  *
  * @param {string} pText - the text to parse
  * @param {object} pParse - hash object containing replacement key/<value>
  *
- * @returns {string} - result string
+ * @return {string} - result string
  */
 tb.parse = function( pText, pParse ){
     $.each( pParse, function(i, v){
@@ -1822,11 +1840,8 @@ tb.parse = function( pText, pParse ){
 
     };
 
-
-
-
     // bind _Head instance
-    tb.head = new tb(
+    tb.loader = new tb(
         _Head,
         {   // configuration
 

@@ -1,0 +1,8 @@
+{
+    "name": "twoBirds API",
+    "description": "A javascript library ...",
+    "version": "6.0a",
+    "options": {
+        "outdir": "./httpdocs/docs"
+    }
+}
