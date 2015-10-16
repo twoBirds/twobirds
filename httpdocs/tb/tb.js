@@ -1629,7 +1629,7 @@ tb.parse = function( pText, pParse ){
                 that.data( e.data );
             }
             that.done = true;
-            console.log( that.config.src, that.element, that.type );
+            //console.log( that.config.src, that.element, that.type );
             if ( that.type === 'js' ) {
                 $( that.element ).remove();
             }
