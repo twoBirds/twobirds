@@ -1629,7 +1629,8 @@ tb.parse = function( pText, pParse ){
                 that.data( e.data );
             }
             that.done = true;
-            if ( element.type === 'js' ) {
+            console.log( that.config.src, that.element, that.type );
+            if ( that.type === 'js' ) {
                 $( that.element ).remove();
             }
         }
@@ -1762,14 +1763,14 @@ tb.parse = function( pText, pParse ){
 
 
 
-    var _Head = function( pConfig ){
+    var Loader = function( pConfig ){
         var that = this;
 
         that.config = pConfig;
         that.requirementGroups = {}; // will later contain requirementgroup tbo's in <head>
     };
 
-    _Head.prototype = {
+    Loader.prototype = {
 
         namespace: '_Head',
 
@@ -1841,13 +1842,7 @@ tb.parse = function( pText, pParse ){
     };
 
     // bind _Head instance
-    tb.loader = new tb(
-        _Head,
-        {   // configuration
-
-        },
-        document.head // ...to the document head
-    );
+    tb.loader = new tb( Loader );
 
 })();
 
