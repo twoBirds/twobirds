@@ -130,7 +130,7 @@ demoapp/body.js
 ```js
 tb.namespace('demoapp', true).body = (function(){
 
-	function onInit(){
+	function init(){
 		
 		var that = this;
 
@@ -152,7 +152,7 @@ tb.namespace('demoapp', true).body = (function(){
 		var that = this;
 
 		that.handlers = {
-			'init': onInit
+			'init': init
 		};
 
 	}
