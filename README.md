@@ -309,7 +309,7 @@ tb( tb.ui.scroll ).trigger('scroll.update' );
 
 ## Installation
 
-copy twoBirds.js from this and insert into your project. Have fun!
+copy tb.js from this and insert into your project. Have fun!
 
 ## Use case 
 - easily adding JS functionality to server side rendered HTML
