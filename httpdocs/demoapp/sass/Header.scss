@@ -1,0 +1,16 @@
+.in3-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 4rem;
+  background-color: hsl(244, 60%, 40%);
+  color: hsl(0, 0%, 20%);
+
+  > .in3-header-content {
+    width: 100%;
+    height: 4rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+}

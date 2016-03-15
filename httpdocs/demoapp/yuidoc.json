@@ -1,0 +1,8 @@
+{
+    "name": "newsletter API",
+    "description": "in3 newsletter module",
+    "version": ".alpha",
+    "options": {
+        "outdir": "./docs"
+    }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=1160">
+
+        <title>MultiSelect Test Page</title>
+
+        <link href="/languages/de/LC_MESSAGES/default.po" rel="gettext" >
+        <link href="/themes/default/img/favicon.ico" rel="shortcut icon" type="image/x-icon" >
+        <link href="/themes/default/css/intranet.reset.css?v=17" media="screen" rel="stylesheet" type="text/css">
+        <link href="/lib/kendoui/styles/kendo.common.min.css?v=17" media="screen" rel="stylesheet" type="text/css" >
+        <link href="/themes/default/css/intranet.screen.css?v=17" media="screen" rel="stylesheet" type="text/css" >
+        <link href="/themes/default/css/intranet.print.css?v=17" media="print" rel="stylesheet" type="text/css">
+        <link href="/namespace/lo/css/lo.screen.css?v=17" media="screen" rel="stylesheet" type="text/css" >
+        <link href="/namespace/sr/css/sr.screen.css?v=17" media="screen" rel="stylesheet" type="text/css" >
+        <link href="/namespace/db/css/db.screen.css?v=17" media="screen" rel="stylesheet" type="text/css" >
+        <link href="/themes/bzu/css/theme.css?v=17" media="screen" rel="stylesheet" type="text/css" >    <!--
+        [if IE]>
+                <link type="text/css" rel="stylesheet" media="screen" href="/themes/default_ie/css/basic_ie.css"
+        >
+            <![endif]-->
+            <!--[if lt IE 10]>
+            <link type="text/css" rel="stylesheet" media="screen" href="/themes/default_ie/css/basic_ie9.css"
+        >
+            <![endif]-->
+            <!--[if lt IE 9]>
+                <link type="text/css" rel="stylesheet" media="screen" href="/themes/default_ie/css/basic_ie8
+        .css">
+            <![endif]-->
+            <script type="text/javascript">
+            //<!--
+            var baseUrl = "/";
+            //-->
+        </script>
+        <script type="text/javascript">
+            //<!--
+            var school = "bzu";
+            //-->
+        </script>
+        <script type="text/javascript">
+            //<!--
+            var env = "development";
+            //-->
+        </script>
+        <script type="text/javascript" src="/lib/kendoui/js/jquery.min.js?v=17"></script>
+        <script type="text/javascript" src="/lib/jquery-ui-1.8.23.custom.min.js?v=17"></script>
+        <script type="text/javascript" src="/lib/modernizr.custom.js?v=17"></script>
+        <script type="text/javascript" src="/lib/kendoui/js/kendo.web.min.js?v=17"></script>
+        <script type="text/javascript" src="/lib/gettext/gettext.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/downloadJSON2CSV.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jQueryTabby.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.blockUI.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.idletimer.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.json-2.3.min.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.livequery.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.placeholder.min.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.session.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.throttledresize.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.ui.position.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/jquery.win-focus.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/pdfobject.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/transit.js?v=17"></script>
+        <script type="text/javascript" src="/lib/plugins/js/xdate.js?v=17"></script>
+        <script type="text/javascript" src="/lib/kendoui/js/cultures/kendo.culture.de.min.js"></script>
+        <script type="text/javascript">
+            //<!--
+            kendo.culture('de');    //-->
+        </script>
+        <script type="text/javascript">
+            //<!--
+            var translate = new Gettext();    //-->
+        </script>
+        <script type="text/javascript" src="/static/js/tb.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/intranet.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/intranet.kendo.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/profile.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/password.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/toolbox.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/navigation.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.checkboxgrid.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.navigator.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.checkboxdropdownlist.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.mail.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.binderextend.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/kendo.settings.js?v=17"></script>
+        <script type="text/javascript" src="/static/js/tb.kendo.js?v=17"></script>
+        <script type="text/javascript" src="/namespace/lo/js/login.js?v=17"></script>
+        <script type="text/javascript" src="/namespace/lo/js/sms.js?v=17"></script>
+        <script type="text/javascript" src="/namespace/sr/js/subrolewidget.js?v=17"></script>
+        <script type="text/javascript">
+            //<!--
+            Login.idleTime = 1200000;    //-->
+        </script>
+        <script type="text/javascript" src="/static/js/dashboard.js"></script>
+
+        <script type="text/javascript" src="/namespace/knd/js/TabStrip.js?v=17"></script>
+        <link type="text/css" rel="stylesheet" media="screen" href="/namespace/knd/css/TabStrip.css">
+    </head>
+    <body>
+        <div data-tb="knd.TabStrip"></div>
+    </body>
+</html>

@@ -148,15 +148,29 @@ tb = (function(){
             // selection by jQuery selector string
             case 'string':
 
-                elements = $(pSelector).filter(function () {
-                    return ($(this).data('tbo') !== undefined);
+                var hasTbElements = false,
+                    tbElements = [];
+
+                $(pSelector).filter(function () {
+
+                    var data = $(this).data() || {};
+
+                    $.each(
+                        data,
+                        function( key, value ){
+                            if ( !!value['__tb__'] ){
+                                hasTbElements = true;
+                                tbElements.push( value );
+                            }
+                        }
+                    );
+
                 });
 
-                $.each(
-                    elements,
-                    function ( key, value ) {
-                        var obj = $( value ).data( 'tbo' );
-                        Array.prototype.push.call( that, obj );
+                if ( hasTbElements ) $.map(
+                    tbElements,
+                    function ( value ) {
+                        Array.prototype.push.call( that, value );
                     }
                 );
 
@@ -169,33 +183,63 @@ tb = (function(){
 
                 if ( pSelector instanceof RegExp ){ // it is a regular expression
 
-                    elements = $('[data-tb]').filter( function () {
-                        var obj = $(this).data( 'tbo' );
+                    var hasTbElements = false,
+                        tbElements = [];
 
-                        isTbObject = typeof obj === 'object' && obj.__tb__;
+                    $('[data-tb]').filter(function () {
+                        var data = $(this).data() || {};
 
-                        return isTbObject;
+                        if ( $(this).attr('data-tb').match( pSelector ) ) $.each(
+                            data,
+                            function( key, value ){
+                                if ( !!value['__tb__'] ){
+                                    hasTbElements = true;
+                                    tbElements.push( value );
+                                }
+                            }
+                        );
+
                     });
 
-                    $.each(
-                        elements,
-                        function ( key, value ) {
-                            var obj = $( value ).data( 'tbo' );
-
-                            if ( typeof obj.namespace === 'string' && obj.namespace.match( pSelector ) ){
-                                Array.prototype.push.call( that, obj );
+                    if ( hasTbElements ) $.map(
+                        tbElements,
+                        function ( value ) {
+                            if ( typeof value.namespace === 'string' && value.namespace.match( pSelector ) ){
+                                //console.log( 'add namespace match', that );
+                                Array.prototype.push.call( that, value );
                             }
                         }
                     );
 
                 } else if ( typeof pSelector.nodeType !== 'undefined' ){
-                    var obj = $(this).data( 'tbo' );
 
-                    isTbObject = typeof obj === 'object' && obj.__tb__;
+                    var tbElements = [];
 
-                    if( isTbObject ){
-                        Array.prototype.push.call( that, obj );
-                    }
+                    $(pSelector).filter(function () {
+
+                        var data = $(this).data() || {},
+                            hasTbElement = false;
+
+                        $.each(
+                            data,
+                            function( key, value ){
+                                if ( !!value['__tb__'] ){
+                                    hasTbElement = true;
+                                    tbElements.push( value );
+                                }
+                            }
+                        );
+
+                    });
+
+                    if ( hasTbElements ) $.map(
+                        tbElements,
+                        function ( value ) {
+                            // console.log( 'dom node instance', that );
+                            Array.prototype.push.call( that, value );
+                        }
+                    );
+
                 }
 
                 break;
@@ -204,29 +248,41 @@ tb = (function(){
             // check whether their prototype matches constructor prototype
             case 'function':
 
-                elements = $('[data-tb]').filter( function () {
-                    var obj = $(this).data( 'tbo' );
+                var tbElements = [];
 
-                    isTbObject = typeof obj === 'object' && obj.__tb__;
+                $('[data-tb]').filter(function () {
 
-                    return isTbObject;
+                    var data = $(this).data() || {},
+                        hasTbElement = false;
+
+                    $.each(
+                        data,
+                        function( key, value ){
+                            if ( !!value['__tb__'] ){
+                                hasTbElements = true;
+                                tbElements.push( value );
+                            }
+                        }
+                    );
+
                 });
 
-
-                $.each(
-                    elements,
-                    function ( key, value ) {
-                        var obj = $( value ).data( 'tbo'),
-                            objNamespace = pSelector.prototype.namespace || '',
-                            data_tb = $( value ).attr('data-tb');
-
-                        if ( objNamespace === data_tb ){
-                            Array.prototype.push.call( that, obj );
+                // if there are tb elements, check for match
+                if ( hasTbElements ) $.map(
+                    tbElements,
+                    function ( value ) {
+                        if ( value.namespace === pSelector.prototype.namespace ){
+                            // console.log( 'add constructor instance', pSelector, that );
+                            Array.prototype.push.call( that, value );
                         }
                     }
                 );
+
                 break;
         }
+
+        //if ( pSelector !== '' ) console.log( 'result', pSelector, '-->', that );
+
     };
 
     TbSelector.prototype = (function(){
@@ -250,6 +306,8 @@ tb = (function(){
                 var that = this,
                     tbEvent,
                     newHandlers;
+
+                // tb.status.eventCount( tb.status.eventCount() + 1 ); // increase eventCount
 
                 if( tb.stop() ){ // @todo rethink this, may be misleading since it seems to stop tb event handling but doesnt
                     console.info( 'stopped TbEvent', arguments );
@@ -330,6 +388,14 @@ tb = (function(){
 
                 }
 
+                // after all, decrease event count ( before that, bubbled event triggers will increase it )
+                setTimeout(
+                    function() {
+                        // tb.status.eventCount( tb.status.eventCount() - 1 ); // decrease eventCount
+                    },
+                    0
+                );
+
                 return that;
 
             },
@@ -357,24 +423,28 @@ tb = (function(){
 
                     ret = walkSelector( that, 'parents', arguments );
 
-                } else if ( that.__tb__ && !!that.target.nodeType ) { // it must be a native toplevel tb object
+                } else if ( that.__tb__ && !!that.target && !!that.target.nodeType ) { // it must be a native toplevel tb object
 
                     $( that.target )
                         .parents( '[data-tb]' )
                         .each( function(){
-                            Array.prototype.push.call( ret, $(this).data('tbo') ); // push dom object to tb selector content
+                            var data = $(this).data() || {};
+
+                            $.each(
+                                data,
+                                function( key, value ){
+                                    if ( !!value['__tb__'] ){
+                                        Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                                    }
+                                }
+                            );
                         });
 
                 } else { // it is an embedded object, local target is another (parent) tb object
 
-                    thisInstance = that.target;
-
-                    while ( !done ){
-                        if( !!thisInstance.target.nodeType ){
-                            done = true;
-                        }
+                    thisInstance = that[ 'target' ];
+                    if ( thisInstance ){
                         Array.prototype.push.call( ret, thisInstance ); // push dom object to tb selector content
-                        thisInstance = thisInstance.target;
                     }
 
                 }
@@ -413,7 +483,16 @@ tb = (function(){
                     result = $( that.target )
                         .parents( '[data-tb]' )[0];
 
-                    Array.prototype.push.call( ret, $( result ).data('tbo') );
+                    var data = $(result).data() || {};
+
+                    $.each(
+                        data,
+                        function( key, value ){
+                            if ( !!value['__tb__'] ){
+                                Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                            }
+                        }
+                    );
 
                 } else { // it is an embedded object, local target is another (parent) tb object
 
@@ -453,7 +532,16 @@ tb = (function(){
                         .find('[data-tb]')
                         .each(
                             function () {
-                                Array.prototype.push.call( ret, $(this).data('tbo') );
+                                var data = $(this).data() || {};
+
+                                $.each(
+                                    data,
+                                    function( key, value ){
+                                        if ( !!value['__tb__'] ){
+                                            Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                                        }
+                                    }
+                                );
                             }
                         );
 
@@ -488,7 +576,7 @@ tb = (function(){
 
                 }
 
-                return !!pSelector ? ret.filter( selector ) : ret;
+                return !!pSelector ? ret.filter( pSelector ) : ret;
 
             },
 
@@ -527,7 +615,16 @@ tb = (function(){
                         )
                         .each(
                             function() {
-                                Array.prototype.push.call( ret, $( this ).data('tbo') );
+                                var data = $(this).data() || {};
+
+                                $.each(
+                                    data,
+                                    function( key, value ){
+                                        if ( !!value['__tb__'] ){
+                                            Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                                        }
+                                    }
+                                );
                             }
                         );
 
@@ -536,8 +633,8 @@ tb = (function(){
                     $.each(
                         that,
                         function( key, value ){
-                            if ( typeof key === 'string' && key.indexOf( '.' )  > -1 ){ // prop name contains "."
-                                Array.prototype.push.call( ret, value );
+                            if ( !!value['__tb__'] ){
+                                Array.prototype.push.call( ret, value ); // push dom object to tb selector content
                             }
                         }
                     );
@@ -641,8 +738,9 @@ tb = (function(){
              * @return {object} - TbSelector instance
              */
             first: function( pSelector ){
+
                 var that = this,
-                    ret = tb( ''),
+                    ret = tb( '' ),
                     result;
 
                 if ( that instanceof TbSelector ) {
@@ -772,6 +870,48 @@ tb = (function(){
             },
 
             /**
+             * is() method
+             *
+             * for each this[0...n] or this as tb() instance,
+             * - check them against pSelector and remove all that do not fit
+             * - return TbSelector result set (unique)
+             *
+             * @method is
+             *
+             * @param {*} [pSelector] - any kind of TbSelector parameter
+             *
+             * @return {object} - TbSelector instance
+             */
+            is: function( pSelector ){
+
+                var that = this,
+                    check = $.makeArray( tb( pSelector ) ), // object array to check against
+                    ret,
+                    index;
+
+                if ( that instanceof TbSelector ) {
+                    ret = that;
+                } else {
+                    ret = tb( '' );
+                    Array.prototype.push.call( ret, that );
+                }
+
+                $.each(
+                    check,
+                    function( key, tbObject ) {
+
+                        index = Array.prototype.indexOf.call( ret, tbObject );
+                        if (  index === -1 ){
+                            Array.prototype.splice.apply( ret, [ index, 1 ] );
+                        }
+
+                    }
+                );
+
+                return ret;
+            },
+
+            /**
              * add() method
              *
              * add elements to current result set
@@ -837,11 +977,16 @@ tb = (function(){
 
                 if ( that instanceof TbSelector ) {
 
-                    walkSelector( that, 'addHandler', arguments );
+                    walkSelector( that, 'on', arguments );
 
                 } else if ( that.__tb__ ) {
 
-                    if ( !this.handlers[ pEventName ] ){
+                    if ( !that.handlers ){
+                        // console.log( 'adding handlers object for', that);
+                        that.handlers = {};
+                    }
+
+                    if ( !that.handlers[ pEventName ] ){
                         that.handlers[ pEventName ] = [];
                     }
 
@@ -897,7 +1042,7 @@ tb = (function(){
 
                 if ( that instanceof TbSelector ) {
 
-                    walkSelector( that, 'deleteHandler', arguments );
+                    walkSelector( that, 'off', arguments );
 
                 } else if ( that.__tb__ ) { // either a toplevel or an internal tb object
 
@@ -990,7 +1135,6 @@ tb = (function(){
                     fileName,
                     (function( args ){
                         return function(){
-                            //console.log( 'args', args );
                             new tb(
                                 args[0],
                                 args[1] || {},
@@ -1003,7 +1147,7 @@ tb = (function(){
                 return;
             }
 
-
+            // it is a constructor call, like "new tb(...)"
             if ( typeof tbClass === 'function' ){
 
                 //console.log( 'constructor', arguments, tbClass);
@@ -1046,7 +1190,7 @@ tb = (function(){
                     var $that = $( tbInstance.target );
 
                     $that
-                        .data( 'tbo', tbInstance );
+                        .data( tbInstance.namespace, tbInstance );
 
                     // if element does not reside in the DOM <head> add class
                     if ( tbInstance.target !== document.head && !$that.parents( 'head' )[0] ){
@@ -1054,13 +1198,17 @@ tb = (function(){
                             .addClass( tbInstance.namespace.replace( /\./g, '-').toLowerCase() );
                     }
 
-                    $that
-                        .not('[data-tb]')
-                        .attr( 'data-tb', tbInstance.namespace );
+                    // add namespace to DOM "data-tb" attribute
+                    if ( !$that.attr( 'data-tb' ) ){
+                        $that.attr( 'data-tb', tbInstance.namespace );
+                    } else if ( $that.attr( 'data-tb').split( ' ').indexOf( tbInstance.namespace ) === -1 ){
+                        $that.attr( 'data-tb', $that.attr( 'data-tb' ) + ' ' + tbInstance.namespace );
+                    }
+
                 }
 
                 // create handlers array if necessary
-                if ( !tbInstance.handlers ){
+                if ( !tbInstance[ 'handlers' ] ){
                     tbInstance.handlers = {};
                 } else {
                     // if there are single named event handler functions,
@@ -1075,35 +1223,28 @@ tb = (function(){
                     );
                 }
 
-                // add requirement loading
-                if ( !!tbInstance[ 'tb.require' ] && tbInstance[ 'tb.require'].length ){
-                    // add requirement handling
-                    //console.log( 'requires', tbInstance[ 'tb.require' ] );
-                    tb.loader.load(
-                        tbInstance[ 'tb.require' ],
-                        function(){
-                            tbInstance['tb.require'] = null;
-                            delete tbInstance['tb.require'];
-                            tbInstance.trigger( 'init' );
-                        }
-                    );
-                } else {
-                    tbInstance.trigger( 'init' );
-                }
-
-
-                // add prop declared tb objects
+                // add property declared classes (prop contains ".") as tb objects
                 $.each(
                     tbInstance,
                     function( key, value ){
                         if ( typeof key === 'string'
                             && key.indexOf( '.' ) > -1
-                            && key !== 'tb.require'
                             ){ // prop name contains ".", treat as tb class
                             tbInstance[key] = new tb( key, value, tbInstance );
                         }
                     }
                 );
+
+                // trigger init on "tb.idle" event;
+                if ( tb.status.eventCount() > 0 ) {
+                    tb.idle(function(){
+                        //console.log( 'deferred trigger ::init() on', tbInstance.namespace, tbInstance );
+                        tbInstance.trigger( 'init' );
+                    });
+                } else {
+                    //console.log( 'trigger ::init() now on', tbInstance.namespace, tbInstance );
+                    tbInstance.trigger( 'init' );
+                }
 
                 return tbInstance;
 
@@ -1121,7 +1262,35 @@ tb = (function(){
 
 })();
 
+// requirement loading class
+tb.require = function( pConfig ){
 
+    var that = this,
+        tbTarget = that.target;
+
+    if ( !pConfig ) return;
+    //console.log( 'tbRequire config', pConfig, that );
+
+    that.requirements = pConfig;
+
+    // add requirement loading
+    tb.loader.load(
+        that.requirements,
+        function(){
+            // after loading, remove requirement array
+            // tbTarget['tb.require'] = null;
+            // delete tbTarget['tb.require'];
+            // init will be triggered in when idle
+        }
+    );
+
+};
+
+tb.require.prototype = {
+    ready: function(){
+        // do we need this???
+    }
+};
 
 /**
  * stops event handling
@@ -1165,11 +1334,11 @@ tb.getId = function(){
  * tb.namespace() function
  *
  * sample calls:
- * tb.namespace( 'in2.app.Dashboard' ) gets the constructor for dashboard
+ * tb.namespace( 'app.Dashboard' ) gets the constructor for dashboard
  *
  * and in the dashboard constructor:
  *
- * tb.namespace( 'in2.app', true ).Dashboard = function(){ ...
+ * tb.namespace( 'app', true ).Dashboard = function(){ ...
  *
  *
  * @function namespace
@@ -1178,10 +1347,11 @@ tb.getId = function(){
  *
  * @param {string} pNamespace
  * @param {boolean} [pForceCreation] - true => force creation of namespace object if it didnt exist before
+ * @param {object} [pObject] - object to scan
  *
  * @return {Object}        namespaceObject
  */
-tb.namespace = function( pNamespace, pForceCreation ){
+tb.namespace = function( pNamespace, pForceCreation, pObject ){
 
     if ( typeof pNamespace !== 'string' ){
         return false;
@@ -1212,7 +1382,7 @@ tb.namespace = function( pNamespace, pForceCreation ){
         }
     };
 
-    return walk( window, namespaceArray );
+    return walk( !pObject ? window : pObject, namespaceArray );
 
 };
 
@@ -1308,7 +1478,7 @@ tb.observable = function( pStartValue ){
     // make observable function to return in the end
     var observableFunction = function( pValue ){
 
-        if ( pValue !== undefined && observedValue !== pValue ){ // value has changed
+        if ( pValue !== undefined ){ // value has changed
             observedValue = pValue;
             observableFunction.notify();
         }
@@ -1330,6 +1500,7 @@ tb.observable = function( pStartValue ){
                     func( observedValue );
                     if ( func.once === true ){
                         observableFunction.list[key] = null;
+                        delete observableFunction.list[key];
                     }
                 }
             }
@@ -1354,6 +1525,33 @@ tb.observable = function( pStartValue ){
     return observableFunction;
 };
 
+// twoBirds system status
+tb.status = {
+    eventCount: tb.observable(0)
+};
+
+/*
+// debugging...
+tb.status.eventCount.observe(function(){
+    console.log( 'eventCount:', tb.status.eventCount() );
+});
+*/
+
+tb.idle = function( pCallback ){
+
+    var f = function(){
+        if ( tb.status.eventCount() === 0 ){
+            pCallback();
+        } else {
+            // if idle not yet reached, re-atttach function for ONE execution
+            tb.status.eventCount.observe( f, true );
+        }
+    };
+
+    tb.status.eventCount.observe( f, true );
+};
+
+
 /**
  * tb.Model constructor
  * create and return a simple CRUD model
@@ -1370,13 +1568,13 @@ tb.Model = function ( pConfig ) {
     var that = this;
 
     // result element
-    this.data = tb.observable( {} );
-    this.config = {};
+    that.data = tb.observable( {} );
+    that.config = {};
 
-    // default
+    // default config mixin -> result will be in that.config
     $.extend(
         true,
-        this.config,
+        that.config,
         {   // default settings, reference only
             'create': {
                 url: '',
@@ -1413,23 +1611,60 @@ tb.Model = function ( pConfig ) {
 };
 
 tb.Model.prototype = (function(){
-
     // private
 
-    // check parameters for any call
-    function parmCheck( pCompare, pAgainst ){
-        pAgainst = ( JSON.parse( JSON.stringify( pAgainst ) ) );
+    // create get parameter string
+    function makeGetParameterString( pParameterObject ){
+
+        var result='';
 
         $.each(
-            pCompare,
+            pParameterObject,
             function( key, value ){
-                if ( pAgainst && typeof pAgainst[ key ] === typeof pCompare[ key ] ){
-                    pAgainst[ key ] = pCompare[ key ];
+                result += ( !!result ? '&' : '' ) + key + '=' + value;
+            }
+        );
+
+        return result;
+    }
+
+    // check parameters for any call
+    function parmCheck( pCompare, pAgainst ){ // compare = parameters handed over in call
+
+        var regEx = /^\{.*\}$/, // rexEx to detect parameter mapping
+            isMapVar;
+
+        // make a deep copy of target object
+        pAgainst = ( JSON.parse( JSON.stringify( pAgainst ) ) );
+
+        // console.log( ' pre parmCheck', pCompare, pAgainst );
+
+        $.each(
+            pAgainst,
+            function( key, value ){
+
+                // determin whether there is a mapped variable
+                isMapVar = !!regEx.exec( value ) && !!regEx.exec( value )[0];
+
+                // console.log( 'isMapVar, compareParameters, value, key', isMapVar, pCompare, value, key );
+
+                // replace mapped value by actual value
+                if ( isMapVar ){
+                    pAgainst[ key ] = tb.parse( value, pCompare );
+                    if ( !!regEx.exec( pAgainst[ key ] ) && !!regEx.exec( pAgainst[ key ] )[0] ){
+                        console.error( 'mapped variable not found in data:', value, !!regEx.exec( value )[0] );
+                    }
                 } else {
-                    console.error( 'parameter ' + key + ' missing or wrong type in ', pCompare );
+                    if ( pCompare.hasOwnProperty( key ) ) {
+                        pAgainst[ key ] = pCompare[ key ];
+                    } else {
+                        console.error( 'variable not found in data:', key, 'in', pCompare );
+                    }
                 }
             }
         );
+
+        //console.log( 'post parmCheck parameters:', pAgainst );
 
         return pAgainst;
     }
@@ -1438,7 +1673,11 @@ tb.Model.prototype = (function(){
 
         'create': function( pParams ){
             var o = $.extend( true, {}, this.config.create ),
-                p = {}; // parameter object
+                p = {},
+                pParams = pParams || {}, // parameter object
+                ajax;
+
+            //console.log('create', pParams);
 
             if ( !o.url ){
                 console.error( 'no create url given!');
@@ -1449,22 +1688,28 @@ tb.Model.prototype = (function(){
                 p = parmCheck( pParams, o.params );
             }
 
-            $.ajax(
-                $.extend(
-                    true,
-                    o,
-                    { // if params given, use microparse to fill them in url
-                        url: p ? tb.parse( this.config.create.url, p ) : this.config.create.url
-                    }
-                )
+            var ajax = $.extend(
+                true,
+                o,
+                { // if params given, use microparse to fill them in url
+                    url: p ? tb.parse( this.config.create.url, p ) : this.config.create.url
+                },
+                {
+                    data: p ? p : {}
+                }
             );
+
+            // console.log( 'save', ajax );
+
+            $.ajax( ajax );
 
         },
 
         'read': function( pParams ){
 
             var o = $.extend( true, {}, this.config.read ),
-                p = {}; // parameter object
+                p = {},
+                pParams = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no read url given!');
@@ -1481,6 +1726,9 @@ tb.Model.prototype = (function(){
                     o,
                     { // if params given, use microparse to fill them in url
                         url: p ? tb.parse( this.config.read.url, p ) : this.config.read.url
+                    },
+                    {
+                        data: p ? p : {}
                     }
                 )
             );
@@ -1489,7 +1737,8 @@ tb.Model.prototype = (function(){
 
         'update': function( pParams ){
             var o = $.extend( true, {}, this.config.update ),
-                p = {}; // parameter object
+                p = {},
+                pParams = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no update url given!');
@@ -1506,6 +1755,9 @@ tb.Model.prototype = (function(){
                     o,
                     { // if params given, use microparse to fill them in url
                         url: p ? tb.parse( this.config.update.url, p ) : this.config.update.url
+                    },
+                    {
+                        data: p ? p : {}
                     }
                 )
             );
@@ -1514,7 +1766,8 @@ tb.Model.prototype = (function(){
 
         'delete': function( pParams ){
             var o = $.extend( true, {}, this.config['delete'] ),
-                p = {}; // parameter object
+                p = {},
+                pParams = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no delete url given!');
@@ -1531,6 +1784,9 @@ tb.Model.prototype = (function(){
                     o,
                     { // if params given, use microparse to fill them in url
                         url: p ? tb.parse( this.config['delete'].url, p ) : this.config.create.url
+                    },
+                    {
+                        data: p ? p : {}
                     }
                 )
             );
@@ -1560,18 +1816,37 @@ tb.Model.prototype = (function(){
  *
  * @return {string} - result string
  */
-tb.parse = function( pText, pParse ){
-    $.each( pParse, function(i, v){
-        pText = pText.replace( (new RegExp('\{'+i+'\}', 'g')), v );
+tb.parse = function( pText, pParse, pPrevNamespace ){
+    var operation = typeof pParse === 'array' ? 'map' : 'each',
+        prevNamespace = pPrevNamespace || '',
+        search;
+
+    $[operation]( pParse, function( pKey, pValue ){ // operation is either $.map() or $.each()
+        var value = operation === 'map' ? pKey : pValue,
+            key =  operation === 'map' ? pValue : pKey;
+
+        // if we are in recursion
+        if ( prevNamespace ){
+            prevNamespace = prevNamespace.replace(
+                /-/g,
+                key
+            );
+        }
+
+        // do it...
+        if ( $.isPlainObject( value ) ){
+            pText = tb.parse( pText, value, (prevNamespace ? prevNamespace : key) + '.-' ); // '-' being the placeholder for the new key
+        } else if (  $.isArray( value )  ){
+            pText = tb.parse( pText, value, (prevNamespace ? prevNamespace : key) + '[-]' );
+        } else {
+            search = '\{' + (prevNamespace ? prevNamespace : key) + '\}';
+            pText = pText.replace( search, value );
+        }
+
     });
+
     return pText;
 };
-
-
-
-
-
-
 
 
 
@@ -1615,6 +1890,13 @@ tb.parse = function( pText, pParse ){
 
         that.config = pConfig;
 
+        // cache busting
+        if ( !!that.config.src ){
+            that.config.src = that.config.src + ( that.config.src.indexOf( '?' ) > -1 ? '&' : '?' ) + tb.getId();
+        }
+
+        //console.log( 'load', pConfig.src );
+
         //that.target = pConfig.target;
         that.src = pConfig.src;
         that.type = that.config.type = type;
@@ -1628,10 +1910,17 @@ tb.parse = function( pText, pParse ){
             if ( e && e.data ){
                 that.data( e.data );
             }
+
             that.done = true;
-            //console.log( that.config.src, that.element, that.type );
+
+            // console.log( '::onLoad()', element.src, element.href );
             if ( that.type === 'js' ) {
-                $( that.element ).remove();
+                setTimeout(
+                    function(){
+                        //$( that.element ).remove();
+                    }
+                    ,200
+                );
             }
         }
 
@@ -1656,6 +1945,7 @@ tb.parse = function( pText, pParse ){
                 var state = element.readyState;
                 if (!that.done && (!state || /loaded|complete/.test(state))) {
                     //console.log( 'loaded', element );
+                    tb.status.eventCount( tb.status.eventCount() - 1 ); // decrease eventCount
                     that.trigger( 'onLoad' );
                 }
             };
@@ -1667,6 +1957,10 @@ tb.parse = function( pText, pParse ){
                     $( element ).attr( key, tb.parse( value, that.config ) );
                 }
             );
+
+            //console.log( element );
+
+            tb.status.eventCount( tb.status.eventCount() + 1 ); // increase eventCount
 
             // append node to head
             document.getElementsByTagName('head')[0].appendChild( element );
