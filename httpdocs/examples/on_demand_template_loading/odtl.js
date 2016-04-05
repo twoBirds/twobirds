@@ -28,7 +28,7 @@ tb.namespace( 'ns1.ns2', true ).someAppClass = (function(){
 
         templateString = tb.loader.get( templateFilename );   // initially get template string from loader
 
-        this.render();
+        that.render();
     }
 
     function render( pData ){
@@ -67,5 +67,7 @@ tb.namespace( 'ns1.ns2', true ).someAppClass = (function(){
             templateFilename
         ]
     };
+
+    return someAppClass;
 
 })();
