@@ -37,9 +37,9 @@
                 function init( e ){
                     var that = this;
 
-                    console.log( 'requirements loaded:', tb.loader.get('/demoapp/test.html'), tb.loader.get('/demoapp/test.json') );
+                    //console.log( 'requirements loaded:', tb.loader.get('/demoapp/test.html'), tb.loader.get('/demoapp/test.json') );
 
-                    for ( var x=0; x < 20; x++ ) new tb(
+                    for ( var x=0; x < 5; x++ ) new tb(
                             app.Parent,
                             {},
                             that.target.appendChild( document.createElement("div") )
@@ -49,7 +49,7 @@
                 function test( e ){
                     var that = this;
 
-                    console.info( 'Handler "test" in: ', that.target, 'sender: ',  e.data );
+                    //console.info( 'Handler "test" in: ', that.target, 'sender: ',  e.data );
                 }
 
             })();
@@ -159,7 +159,7 @@
                     if ( e.data.namespace === 'app.EmbeddedObject2' ){
                         e.stopPropagation();
                     }
-                    console.info( 'Handler "test" in:', that.target, 'sender: ', e.data );
+                    //console.info( 'Handler "test" in:', that.target, 'sender: ', e.data );
                 }
 
             })();

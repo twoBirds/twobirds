@@ -699,6 +699,48 @@ tb = (function(){
 
     tb.dom = dom;
 
+    /**
+     * walk all pSelector tb objects, call pMethodName on them
+     * return a UNIQUE TbSelector result set containing all single results
+     *
+     * @function walkSelector
+     * @private
+     *
+     * @param {object} pSelectorObject - instanceOf TbSelector
+     * @param {string} pMethodName - name of method to call
+     * @param {*} [pArguments] - arguments
+     *
+     * @return {object} instance of TbSelector
+     */
+    function walkSelector( pSelectorObject, pMethodName, pArguments ){
+        var that = this,
+            result,
+            ret = tb( '' ); // empty tb selector object
+
+        if ( pSelectorObject instanceof TbSelector ) {
+            [].forEach.call(
+                [].map.call( pSelectorObject, function( pElement, pKey ){
+                    if ( pSelectorObject.hasOwnProperty( pKey ) ){
+                        return pSelectorObject[ pKey ];
+                    }
+                }),
+                function walkSelectorEach( pTbObject, pKey ) {
+                    result = pTbObject[pMethodName].apply( pTbObject, [].slice.call( pArguments ) );
+
+                    [].forEach.call(
+                        result,
+                        function( pResultObject ){
+                            if ( [].indexOf.call( ret, pResultObject ) === -1 ){
+                                [].push.call( ret, pResultObject );
+                            }
+                        }
+                    );
+                }
+            );
+        }
+        return ret;
+    }
+
     tb.prototype = (function(){
         // private static
 
@@ -1494,48 +1536,6 @@ tb = (function(){
 
     })();
 
-    /**
-     * walk all pSelector tb objects, call pMethodName on them
-     * return a UNIQUE TbSelector result set containing all single results
-     *
-     * @function walkSelector
-     * @private
-     *
-     * @param {object} pSelectorObject - instanceOf TbSelector
-     * @param {string} pMethodName - name of method to call
-     * @param {*} [pArguments] - arguments
-     *
-     * @return {object} instance of TbSelector
-     */
-    function walkSelector( pSelectorObject, pMethodName, pArguments ){
-        var that = this,
-            result,
-            ret = tb( '' ); // empty tb selector object
-
-        if ( pSelectorObject instanceof TbSelector ) {
-            [].forEach.call(
-                [].map.call( pSelectorObject, function( pElement, pKey ){
-                    if ( pSelectorObject.hasOwnProperty( pKey ) ){
-                        return pSelectorObject[ pKey ];
-                    }
-                }),
-                function walkSelectorEach( pTbObject, pKey ) {
-                    result = pTbObject[pMethodName].apply( pTbObject, [].slice.call( pArguments ) );
-
-                    [].forEach.call(
-                        result,
-                        function( pResultObject ){
-                            if ( [].indexOf.call( ret, pResultObject ) === -1 ){
-                                [].push.call( ret, pResultObject );
-                            }
-                        }
-                    );
-                }
-            );
-        }
-        return ret;
-    }
-
     // define TbSelector prototype MUST BE DONE HERE !
     TbSelector.prototype = {};
 
@@ -2178,7 +2178,6 @@ tb.parse = function( pText, pParse ){
     var _Requirement = function( pConfig ){
 
         var that = this,
-            xxx = console.log( pConfig ),
             type = getTypeFromSrc( pConfig.src ), // filename extension
             typeConfigs = { // standard configuration types
                 'css': {
