@@ -3,7 +3,7 @@ tb.namespace('demoapp', true).body = (function(){
 	function onInit(){
 		
 		var that = this;
-
+		
 		new tb(
 			'tb.ui.panel',
 			{

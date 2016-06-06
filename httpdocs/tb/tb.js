@@ -1,51 +1,319 @@
 /**
- * twoBirds V6 core functionality
+ * twoBirds V7 core functionality
  *
  * @author          frank.thuerigen <frank_thuerigen@yahoo.de>
- * @copyright       copyright (c) 2006- by author, unlimited license granted
+ * @copyright       copyright (c) 2006- Frank Thürigen
  * @license         http://www.gnu.org/copyleft/gpl.html GNU GPL v3
  *
  */
 
 tb = (function(){
+
     //private
 
     /**
-     * walk all pSelector tb objects, call pMethodName on them
-     * return a UNIQUE TbSelector result set containing all single results
+     * tb.dom() function
+     *jquery like selector engine
      *
-     * @function walkSelector
-     * @private
+     * @function DOM
+     * @namespace tb
+     * @static
      *
-     * @param {object} pSelectorObject - instanceOf TbSelector
-     * @param {string} pMethodName - name of method to call
-     * @param {*} [pArguments] - arguments
-     *
-     * @return {object} instance of TbSelector
+     * @param {string|domNode|array} a selector string, a dom node or an array of dom nodes
+     * @return {string} - result string
      */
-    function walkSelector( pSelectorObject, pMethodName, pArguments ){
-        var that = this,
-            result,
-            ret = tb( '' ); // empty tb selector object
+    var dom = (function() { return function( pSelector, pDomNode ){
 
-        if ( pSelectorObject instanceof TbSelector ) {
-            $.each(
-                $.makeArray( pSelectorObject ),     // convert these results to true array
-                function walkSelectorEach( key, tbObject ) {
-                    result = tbObject[pMethodName].apply( tbObject, $.makeArray( pArguments ) );
-                    $.each(
-                        $.makeArray( result ),
-                        function( key, resultObject ){
-                            if ( Array.prototype.indexOf.call( ret, resultObject ) === -1 ){
-                                Array.prototype.push.call( ret, resultObject );
-                            }
+        var dom;
+
+        // dom constructor
+        dom = function( pSelector, pDomNode ){
+
+            var that = this,
+                domNode,
+                nodeList;
+
+            if ( !pSelector ) { // no selector given, or not a string
+                return;
+            } else if ( !!pSelector['nodeType'] ){ // selector is a dom node
+                [].push.call( that, pSelector );
+                return;
+            } else if ( !!pSelector[0] && pSelector[0] instanceof TbSelector ){ // a twobirds selector result set
+                [].forEach.call(
+                    pSelector,
+                    function( pElement ){   // copy only DOM nodes
+                        if ( !!pElement['target']
+                            && !!pElement['target']['nodeType']
+                        ){
+                            [].push.call( that, pElement );
                         }
-                    );
+                    }
+                );
+                return;
+            } else if ( pSelector instanceof Array ){
+                [].forEach.call(
+                    pSelector,
+                    function( pElement ){   // copy only DOM nodes
+                        if ( !!pElement && !!pElement['nodeType'] ){
+                            [].push.call( that, pElement );
+                        }
+                    }
+                );
+                return;
+            } else if ( typeof pSelector !== 'string' ){ // wrong selector type
+                return;
+            }
+
+            domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
+
+            nodeList = domNode.querySelectorAll( pSelector );
+
+            if ( !!nodeList.length ){
+                [].forEach.call(
+                    nodeList,
+                    function( domElement ){
+                        that[ that.length ] = domElement;
+                        that.length ++;
+                    }
+                );
+            }
+
+        };
+
+        // dom prototype, public functions
+        dom.prototype = {
+
+            length: 0,
+
+            // from Array prototype
+            concat: [].concat,
+            every: [].every,
+            forEach: [].forEach,
+            indexOf: [].indexOf,
+            keys: [].keys,
+            lastIndexOf: [].lastIndexOf,
+            map: [].map,
+            pop: [].pop,
+            reduce: [].reduce,
+            reduceRight: [].reduceRight,
+            reverse: [].reverse,
+            shift: [].shift,
+            slice: [].slice,
+            some: [].some,
+            splice: [].splice,
+            unshift: [].unshift,
+
+            //own functions
+            add: add,
+            addClass: addClass,
+            attr: attr,
+            filter: filter,
+            not: not,
+            parents: parents,
+            push: push,
+            toArray: toArray,
+            unique: unique
+        };
+
+        return new dom( pSelector, pDomNode );
+
+        // private functions
+        function unique(){
+            var that = this,
+                result = [];
+
+            result = that.filter(
+                function( pElement ){
+                    if ( result.indexOf( pElement ) === -1 ){
+                        return true;
+                    }
+                    return false;
                 }
             );
+
+            return dom( result );
         }
-        return ret;
-    }
+
+        function not( pSelector ) {
+            var that = this,
+                result = new dom(),
+                compare = new dom( pSelector );
+
+            that.forEach( function( pElement ){
+                if ( -1 === compare.indexOf( pElement ) ){
+                    result.add( pElement );
+                }
+            });
+
+            return result;
+        }
+
+        function add( pElements ){
+            var that = this,
+                result;
+
+            if ( pElements instanceof Array ){ // if array given add each of its elements
+                pElements.forEach(
+                    function( pElement ){
+                        that.add( pElement );
+                    }
+                );
+            } else if ( !!pElements[ 'nodeType' ] ){ // if DOM node given add it
+                that.push( pElements );
+            } else if ( typeof pElements === 'string' ){ // DOM selector given add its results
+                that.add( new dom( pElements ).toArray() );
+            }
+
+            result = that.unique();
+
+            return result;
+        }
+
+        function parents( pSelector ){
+
+            var that = this,
+                compare = new dom( pSelector ),
+                result = new dom(),
+                nextNode;
+
+            that.forEach(
+                function( pDomNode ){
+                    var domNode = pDomNode.parentNode;
+
+                    while ( !!domNode
+                    && !!domNode['tagName']
+                    && domNode['tagName'] !== 'html'
+                        ){
+                        nextNode = domNode.parentNode;
+                        if ( [].indexOf.call( result, domNode ) === -1 ){
+                            result.push( domNode );
+                        }
+                        domNode = nextNode;
+                    }
+                }
+            );
+
+            if ( !!pSelector ){
+                result = result.filter( pSelector );
+            }
+
+            return result;
+        }
+
+        function addClass( pClassName ){
+
+            var that = this,
+                rootNodes = that.toArray(),
+                classes;
+
+            rootNodes.forEach(
+                function( pNode ){
+                    var classes = pNode.getAttribute( 'class' ) || '';
+
+                    if ( classes.split(' ').indexOf( pClassName ) === -1 ){
+                        pNode.setAttribute( 'class', !!classes ? classes + ' ' + pClassName : pClassName );
+                    }
+                }
+            );
+
+            return that;
+        }
+
+        function attr( pKey, pValue ){
+
+            var that = this,
+                rootNodes;
+
+            if ( !pValue && that.length > 0 ) { // if no value is given and there are elements, return attribute value of first in list
+                return that[0].getAttribute( pKey );
+            }
+
+            // if a value to set is given, apply to all nodes in list
+            rootNodes = that.toArray();
+            rootNodes.forEach(
+                function( pNode ){
+                    pNode.setAttribute( pKey, pValue );
+                }
+            );
+
+            return that;
+        }
+
+        function toArray(){
+
+            var that = this,
+                result = [];
+
+            if ( !!that.length ){
+                [].map.call(
+                    that,
+                    function( pElement ){
+                        result.push( pElement );
+                    }
+                );
+            }
+
+            return result;
+
+        }
+
+        function filter( pSelector ){
+
+            var that = this,
+                compare = new dom( pSelector ),// functions and undefined will be ignored, so empty result then
+                result;
+
+            if ( pSelector === 'undefined' ) return that;    // unchanged
+
+            //console.log( 'filter', that, 'using pSelector', compare );
+            if ( typeof pSelector === 'string' ){ // DOM selector given
+                result = [].filter.call(
+                    that,
+                    function( pElement ){
+                        return -1 < compare.indexOf( pElement );
+                    }
+                );
+                //console.log( 'after [].filter.call() result => ', result );
+            } else if ( typeof pSelector === 'function' ){ // function given
+                //console.log( 'filter compare', that, 'with selector result ', pSelector );
+                result = [].filter.call(
+                    that,
+                    pSelector
+                );
+            }
+
+            //console.log( 'result, new dom', result, new tb.dom( result ) );
+
+            return new dom( result );
+
+        }
+
+        function push( pSelector ){
+
+            var that = this,
+                result = [];
+
+            if ( typeof pSelector === 'undefined' ) return that;    // unchanged
+
+            if ( pSelector instanceof Array ){ // if array given add each of its elements
+                pSelector.forEach(
+                    function( pElement ){
+                        that.push( pElement );
+                    }
+                );
+            } else if ( !!pSelector[ 'nodeType' ] ){ // if DOM node given add it
+                [].push.call( that, pSelector );
+            } else if ( typeof pSelector === 'string' ){ // DOM selector given add its results
+                that.push( new dom( pSelector ).toArray() );
+            }
+
+            result = that.unique();
+
+            return result;
+        }
+
+    };})();
+
 
     /**
      * standard twobirds event, internal use only
@@ -62,18 +330,12 @@ tb = (function(){
      * @return {object} TbEvent instance
      */
     function TbEvent( pEventName, pEventData, pBubble ){
-        $.extend(
-            true,
-            this,
-            {   // default config
-                bubble: pBubble || 'l',
-                data: pEventData || {},
-                name: pEventName || '',
-                __stopped__: false,
-                __immediateStopped__: false
-            }
-        );
-    };
+        var that = this;
+        that.bubble = pBubble || 'l';
+        that.data = pEventData || {};
+        that.name = pEventName || '';
+        that.__stopped__ = that.__immediateStopped__ = false;
+    }
 
     TbEvent.prototype = {
 
@@ -138,107 +400,83 @@ tb = (function(){
     function TbSelector( pSelector ){
 
         var that = this,
-            elements,
-            isTbObject;
+            tbElements = [];
 
         that.length = 0;
 
         switch (typeof pSelector) {
 
-            // selection by jQuery selector string
+            // selection by dom selector string
             case 'string':
 
-                var hasTbElements = false,
-                    tbElements = [];
+                tb.dom( pSelector )
+                    .filter('[data-tb]')
+                    .filter(
+                        function ( pDomNode ) {
 
-                $(pSelector).filter(function () {
+                            var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
 
-                    var data = $(this).data() || {};
-
-                    $.each(
-                        data,
-                        function( key, value ){
-                            if ( !!value['__tb__'] ){
-                                hasTbElements = true;
-                                tbElements.push( value );
+                            if ( !!namespaces['0'] ) {
+                                namespaces.forEach(
+                                    function (pNamespace) {
+                                        if ( !!pDomNode[pNamespace]
+                                            && pDomNode[pNamespace] instanceof tb
+                                        ) {
+                                            tbElements.push(pDomNode[pNamespace]);
+                                        }
+                                    }
+                                );
                             }
                         }
                     );
-
-                });
-
-                if ( hasTbElements ) $.map(
-                    tbElements,
-                    function ( value ) {
-                        Array.prototype.push.call( that, value );
-                    }
-                );
 
                 break;
 
-            // selection by regEx: get all tb instances from DOM
-            // check whether they contain a "namespace" property that matches regexp
-            // selection by HTML node: get tb instances contained in node
-            case 'object':
+            case 'object':  // either regEx or nodeType
 
                 if ( pSelector instanceof RegExp ){ // it is a regular expression
 
-                    var hasTbElements = false,
-                        tbElements = [];
+                    tb.dom( '[data-tb]' )
+                        .map(
+                            function ( pDomNode ) {
 
-                    $('[data-tb]').filter(function () {
-                        var data = $(this).data() || {};
+                                var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
 
-                        if ( $(this).attr('data-tb').match( pSelector ) ) $.each(
-                            data,
-                            function( key, value ){
-                                if ( !!value['__tb__'] ){
-                                    hasTbElements = true;
-                                    tbElements.push( value );
+                                if ( !!namespaces['0'] ){
+                                    namespaces.forEach(
+                                        function( pNamespace ){
+                                            if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
+                                                tbElements.push( pDomNode[ pNamespace ] );
+                                            }
+                                        }
+                                    );
                                 }
+
                             }
                         );
 
-                    });
+                } else if ( !!pSelector['nodeType'] ){ // it is a dom node
 
-                    if ( hasTbElements ) $.map(
-                        tbElements,
-                        function ( value ) {
-                            if ( typeof value.namespace === 'string' && value.namespace.match( pSelector ) ){
-                                //console.log( 'add namespace match', that );
-                                Array.prototype.push.call( that, value );
-                            }
-                        }
-                    );
+                    tb.dom( pSelector )
+                        .map(
+                            function ( pDomNode ) {
 
-                } else if ( typeof pSelector.nodeType !== 'undefined' ){
+                                var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
 
-                    var tbElements = [];
-
-                    $(pSelector).filter(function () {
-
-                        var data = $(this).data() || {},
-                            hasTbElement = false;
-
-                        $.each(
-                            data,
-                            function( key, value ){
-                                if ( !!value['__tb__'] ){
-                                    hasTbElement = true;
-                                    tbElements.push( value );
+                                if ( !!namespaces['0'] ) {
+                                    namespaces.forEach(
+                                        function (pNamespace) {
+                                            if ( pNamespace.match(pSelector)
+                                                && !!pDomNode[pNamespace]
+                                                && !!pDomNode[pNamespace] instanceof tb
+                                            ){
+                                                tbElements.push(pDomNode[pNamespace]);
+                                            }
+                                        }
+                                    );
                                 }
                             }
                         );
-
-                    });
-
-                    if ( hasTbElements ) $.map(
-                        tbElements,
-                        function ( value ) {
-                            // console.log( 'dom node instance', that );
-                            Array.prototype.push.call( that, value );
-                        }
-                    );
 
                 }
 
@@ -248,45 +486,233 @@ tb = (function(){
             // check whether their prototype matches constructor prototype
             case 'function':
 
-                var tbElements = [];
+                tb.dom( '[data-tb]' )
+                    .map(
+                        function ( pDomNode ) {
 
-                $('[data-tb]').filter(function () {
+                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
 
-                    var data = $(this).data() || {},
-                        hasTbElement = false;
-
-                    $.each(
-                        data,
-                        function( key, value ){
-                            if ( !!value['__tb__'] ){
-                                hasTbElements = true;
-                                tbElements.push( value );
+                            if ( !!namespaces['0'] ) {
+                                namespaces.forEach(
+                                    function( pNamespace ){
+                                        if ( !!pDomNode[pNamespace]
+                                            && pDomNode[pNamespace] instanceof tb
+                                            && pDomNode[pNamespace] instanceof pSelector
+                                        ){
+                                            tbElements.push( pDomNode[pNamespace] );
+                                        }
+                                    }
+                                );
                             }
+
                         }
                     );
-
-                });
-
-                // if there are tb elements, check for match
-                if ( hasTbElements ) $.map(
-                    tbElements,
-                    function ( value ) {
-                        if ( value.namespace === pSelector.prototype.namespace ){
-                            // console.log( 'add constructor instance', pSelector, that );
-                            Array.prototype.push.call( that, value );
-                        }
-                    }
-                );
 
                 break;
         }
 
-        //if ( pSelector !== '' ) console.log( 'result', pSelector, '-->', that );
+        // add all tb instances from dom into selector
+        tbElements.map(
+            function ( pTbObject ) {
+                [].push.call( that, pTbObject );
+            }
+        );
+
+        return that;
 
     };
 
-    TbSelector.prototype = (function(){
+    // HINT: TbSelector (class) prototype definition after Tb prototype definition
+
+    /**
+     * tb() / new tb()
+     * can be used as SELECTOR and CONSTRUCTOR
+     *
+     * sample call CONSTRUCTOR:
+     * var a = new tb( 'tb_repo_object_namespace' )
+     *
+     * sample call SELECTOR:
+     * var result = tb( 'div#app' )
+     *
+     * for selector functionality see TbSelector object
+     *
+     * @class tb
+     * @constructor
+     * @extends TbSelector
+     *
+     * @param {string}     arguments[0]   - namespace of class | TbSelector parameter
+     * @param {*}  [ arguments[1] ] - config data ( if called as constructor )
+     * @param {*}  [ arguments[2] ] - DOM target or parent tb instance
+     *
+     * @return {object} - twoBirds Object or TbSelector instance /w results
+     *
+     */
+    function tb() {
+        var that = this;
+
+        /*
+         arguments[0]: string, regEx or constructor function
+         arguments[1]: optional object, parameter hash object if arguments[0] is constructor function
+         arguments[2]: optional DOM node or parent tb object
+         */
+
+        function makePrototype( pPrototype ){
+
+            // make custom class constructor
+            var f = function ( pPrototype ){
+
+                var that = this;
+
+                for ( var i in pPrototype ) if ( pPrototype.hasOwnProperty(i) ){
+                    that[i] = pPrototype[i];
+                }
+
+            };
+
+            f.prototype = tb.prototype;
+
+            return new f( pPrototype );
+        }
+
+
+        if ( that instanceof tb ) {    // called as constructor, create and return tb object instance
+            var isNamespace = typeof arguments[0] === 'string',
+                tbClass =  isNamespace ? tb.namespace( arguments[0] ) : arguments[0],
+                tbInstance,
+                fileName;
+
+            if ( isNamespace && !tbClass ){
+                fileName = arguments[0].replace( /\./g, '/' ) + '.js';
+
+                tb.loader.load(
+                    fileName,
+                    (function( args ){
+                        return function(){
+                            new tb(
+                                args[0],
+                                args[1] || {},
+                                args[2] || false
+                            );
+                        }
+                    })( [].slice.call( arguments ) )
+                );
+
+                return;
+            }
+
+            // it is a constructor call, like "new tb(...)"
+            if ( typeof tbClass === 'function' ){
+
+                // prepare
+                if ( !tbClass.prototype.__tb__ ){
+                    tbClass.prototype.__tb__ = 'V7.0a';
+                    tbClass.prototype = makePrototype( tbClass.prototype, tbClass );
+                }
+
+                // make a new instance of given constructor
+                tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
+
+                // prepare .namespace property of tb object
+                if ( !tbInstance.namespace ){
+                    tbInstance.namespace = typeof arguments[0] === 'string'
+                        ? arguments[0]
+                        : arguments[0].namespace || tb.getId(); // if nothing helps, a unique id
+                }
+
+                // prepare .target property of tb object
+                tbInstance.target = arguments[2] || false; // preset
+                if ( !!arguments[2] ){
+                    tbInstance.target = arguments[2];
+                } else {
+                    tbInstance.target = null;
+                }
+
+                // if target is a DOM element
+                // - add class to DOM data
+                // - if not already there add namespace to target data-tb attribute
+                if ( tbInstance.target && tbInstance.target.nodeType ){
+
+                    // put tb instance in dom node
+                    tbInstance.target[ tbInstance.namespace ] = tbInstance;
+
+                    // if element does not reside in the DOM <head> add class
+                    var dom = tb.dom( tbInstance.target );
+
+                    // add class
+                    if ( tbInstance.target.nodeName !== 'head'
+                        && dom.parents().toArray().indexOf( document.head ) === -1 )
+                    {
+                        dom.addClass( tbInstance.namespace.replace( /\./g, '-').toLowerCase() );
+                    }
+
+                    // add namespace to DOM "data-tb" attribute
+                    if ( !!tbInstance.target && !!tbInstance.target['nodeType'] ){
+                        var dataTb = tbInstance.target.getAttribute( 'data-tb' );
+                        if ( !!dataTb && !!dataTb.length && -1 === dataTb.split(' ').indexOf( tbInstance.namespace ) ){
+                            tbInstance.target.setAttribute( 'data-tb', dataTb + ' ' + tbInstance.namespace );
+                        } else {
+                            tbInstance.target.setAttribute( 'data-tb', tbInstance.namespace )
+                        }
+                    }
+                }
+
+                // create handlers array if necessary
+                if ( !tbInstance[ 'handlers' ] ){
+                    tbInstance.handlers = {};
+                } else {
+                    // if there are single named event handler functions,
+                    // convert them to array of functions
+                    for ( var i in tbInstance.handlers ) if ( tbInstance.handlers.hasOwnProperty(i) ){
+                        if ( typeof tbInstance.handlers[i] === 'function' ){
+                            tbInstance.handlers[i] = [ tbInstance.handlers[i] ];
+                        } else if ( !( tbInstance.handlers[i] instanceof Array ) ){
+                            delete tbInstance.handlers[i];
+                        }
+                    }
+                }
+
+                // add property declared classes (prop contains ".") as tb objects
+                for ( var key in tbInstance ) if ( !tbInstance.hasOwnProperty( key ) ) {
+                    if ( typeof key === 'string'
+                        && key.indexOf( '.' ) > -1
+                    ){ // prop name contains ".", treat as tb class
+                        tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
+                    }
+                }
+
+                // trigger init directly if no requirement array
+                if ( !tbInstance['tb.require'] ) {
+                    tbInstance.trigger( 'init' );
+                } // otherwise tb.require will trigger it
+
+                return tbInstance;
+
+            }
+
+        } else { // arguments[0] is string or regex, return selector result
+
+            return new TbSelector( !!arguments[0] ? arguments[0] : '' );
+
+        }
+
+    }
+
+    tb.dom = dom;
+
+    tb.prototype = (function(){
         // private static
+
+        function _toArray( pTbSelector ){
+            if ( pTbSelector && pTbSelector instanceof tb ){
+                return [].map.call(
+                    pTbSelector,
+                    function ( pElement ){
+                        return pElement;
+                    }
+                );
+            }
+            return [];
+        }
 
         return {
             // public methods and properties
@@ -304,13 +730,10 @@ tb = (function(){
              */
             trigger: function( pEvent, pEventData, pBubble ){
                 var that = this,
-                    tbEvent,
-                    newHandlers;
+                    tbEvent;
 
-                // tb.status.eventCount( tb.status.eventCount() + 1 ); // increase eventCount
-
-                if( tb.stop() ){ // @todo rethink this, may be misleading since it seems to stop tb event handling but doesnt
-                    console.info( 'stopped TbEvent', arguments );
+                if( tb.stop() ){ // @todo rethink this
+                    // console.info( 'stopped TbEvent', arguments );
                     return;
                 }
 
@@ -318,21 +741,26 @@ tb = (function(){
                 tbEvent = pEvent instanceof TbEvent ? pEvent : new TbEvent( pEvent, pEventData, pBubble );
 
                 // execute handlers via setTimeout
-                if ( that instanceof TbSelector ) {
-                    $.each(
-                        $.makeArray( that ),
-                        function( key, tbObject ) {
-                            if ( tbObject ) tbObject.trigger( tbEvent );
+                if ( that instanceof TbSelector && that.hasOwnProperty( length ) ) {
+
+                    [].forEach.call(
+                        that,
+                        function( tbInstance ){
+                            //console.log( 'array trigger instance', tbEvent.name, 'on tbInstance', tbInstance );
+                            if ( !!tbInstance ){
+                                tbInstance.trigger( tbEvent );
+                            }
                         }
                     );
-                } else { // it must be a native tb object
 
-                    if ( that.handlers[tbEvent.name] && tbEvent.bubble.indexOf( 'l' ) > -1 ) {
-                        newHandlers = [];
+                } else if ( that instanceof tb ) { // it must be a native tb object
 
-                        $.each(
-                            that.handlers[tbEvent.name],
-                            function (key, handler) {
+                    if ( !!that.handlers[tbEvent.name] && tbEvent.bubble.indexOf( 'l' ) > -1 ) {
+
+                        var temp = [];
+
+                        that.handlers[tbEvent.name].map(
+                            function (handler) {
                                 setTimeout(
                                     function() {
                                         // call handler function
@@ -344,17 +772,22 @@ tb = (function(){
 
                                         }
                                     },
-                                    0
+                                    1
                                 );
 
-                                if ( !handler.once ) {
-                                    newHandlers.push( that.handlers[tbEvent.name][ key ] );
+                                //@todo: remove when sure
+                                if ( !handler ){
+                                    console.log( 'handler error', that.handlers[tbEvent.name] );
+                                }
+
+                                if ( !!handler && !handler.once ) {
+                                    temp.push( handler );
                                 }
 
                             }
                         );
 
-                        that.handlers[tbEvent.name] = newHandlers;
+                        that.handlers[tbEvent.name] = temp;
 
                     }
 
@@ -372,29 +805,23 @@ tb = (function(){
                             // bubble up
                             if ( tbEvent.bubble.indexOf('u') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
+                                //console.log( 'bubble event', tbEvent, 'up to', that.parent() );
                                 that.parent().trigger( tbEvent );
                             }
 
                             // bubble down
                             if ( tbEvent.bubble.indexOf('d') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
+                                //console.log( 'bubble event', tbEvent, 'down to', that.children() );
                                 that.children().trigger( tbEvent );
                             }
 
                         },
 
-                        0
+                        1
                     );
 
                 }
-
-                // after all, decrease event count ( before that, bubbled event triggers will increase it )
-                setTimeout(
-                    function() {
-                        // tb.status.eventCount( tb.status.eventCount() - 1 ); // decrease eventCount
-                    },
-                    0
-                );
 
                 return that;
 
@@ -415,37 +842,50 @@ tb = (function(){
              */
             parents: function( pSelector ){
                 var that = this,
-                    ret = tb(''),
-                    done = false,
-                    thisInstance;
+                    ret = tb();
 
                 if ( that instanceof TbSelector ) {
 
                     ret = walkSelector( that, 'parents', arguments );
 
-                } else if ( that.__tb__ && !!that.target && !!that.target.nodeType ) { // it must be a native toplevel tb object
+                } else if ( that instanceof tb
+                    && !!that.target
+                ){ // it is a tb object
 
-                    $( that.target )
-                        .parents( '[data-tb]' )
-                        .each( function(){
-                            var data = $(this).data() || {};
+                    if ( !!that.target['nodeType'] ){
+                        // it must be a native toplevel tb object residing in the DOM
+                        tb.dom( that.target )
+                            .parents( '[data-tb]' )
+                            .not( 'html' )
+                            .toArray()
+                            .forEach(
+                                function( pElement ){
+                                    pElement
+                                        .getAttribute('data-tb')
+                                        .split( ' ' )
+                                        .forEach(
+                                            function( pNamespace ){
+                                                var tbElement = pElement[ pNamespace ] || null;
 
-                            $.each(
-                                data,
-                                function( key, value ){
-                                    if ( !!value['__tb__'] ){
-                                        Array.prototype.push.call( ret, value ); // push dom object to tb selector content
-                                    }
+                                                if ( tbElement ){
+                                                    [].push.call( ret, tbElement ); // push dom object to tb selector content
+                                                }
+                                            }
+                                        )
                                 }
                             );
-                        });
 
-                } else { // it is an embedded object, local target is another (parent) tb object
+                    } else if ( that.target instanceof tb ){
+                        // it a tb object embedded in another tb object
 
-                    thisInstance = that[ 'target' ];
-                    if ( thisInstance ){
-                        Array.prototype.push.call( ret, thisInstance ); // push dom object to tb selector content
+                        [].push.call( ret, that.target ); // push parent object to tb selector content
+
+                        if ( !!that.target.parent()['0'] ){
+                            [].push.call( ret, that.target.parent()['0'] )
+                        }
+
                     }
+
 
                 }
 
@@ -471,35 +911,41 @@ tb = (function(){
             parent: function( pSelector ){
 
                 var that = this,
-                    ret = tb( '' ),
-                    result;
+                    ret = tb(),
+                    result = [];
 
                 if ( that instanceof TbSelector ) {
 
                     ret = walkSelector( that, 'parent', arguments );
 
-                } else if ( that.__tb__ && !!that.target.nodeType ) { // it must be a native tb object
+                } else if ( that instanceof tb
+                    && !!that.target
+                ){
 
-                    result = $( that.target )
-                        .parents( '[data-tb]' )[0];
+                    if ( !!that.target['nodeType'] ) { // tb object resides in DOM
 
-                    var data = $(result).data() || {};
+                        var tbParent = that.parents()['0'] || false;
 
-                    $.each(
-                        data,
-                        function( key, value ){
-                            if ( !!value['__tb__'] ){
-                                Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                        if ( !tbParent ){
+
+                            return ret; // no parent -> empty result set
+                        }
+
+                        for (var i in tbParent.target ){
+                            if ( tbParent.target[i] instanceof tb ){
+                                [].push.call( ret, tbParent.target[ i ] ); // push dom object to tb selector content
                             }
                         }
-                    );
 
-                } else { // it is an embedded object, local target is another (parent) tb object
+                    } else if ( that.target instanceof tb ){ // it is an embedded object, local target is another (parent) tb object
 
-                    Array.prototype.push.call( ret, that.target ); // push dom object to tb selector content
+                        [].push.call( ret, that.target ); // push parent object to tb selector content
+
+                    }
 
                 }
-                return pSelector ? ret.filter( pSelector ) : ret;
+
+                return !!pSelector ? ret.filter( pSelector ) : ret;
             },
 
             /**
@@ -520,59 +966,42 @@ tb = (function(){
             descendants: function( pSelector, pLocalOnly ){
 
                 var that = this,
-                    ret = tb('');
+                    ret = tb();
 
                 if ( that instanceof TbSelector ) {
 
                     ret = walkSelector( this, 'descendants', arguments );
 
-                } else if ( that.__tb__ && !!that.target.nodeType && !pLocalOnly ) { // it must be a native tb object
+                } else if ( that instanceof tb && !!that.target.nodeType && !pLocalOnly ) { // it must be a native tb object
 
-                    $(that.target)
-                        .find('[data-tb]')
-                        .each(
-                            function () {
-                                var data = $(this).data() || {};
-
-                                $.each(
-                                    data,
-                                    function( key, value ){
-                                        if ( !!value['__tb__'] ){
-                                            Array.prototype.push.call( ret, value ); // push dom object to tb selector content
-                                        }
+                    tb.dom( '[data-tb]', that.target )
+                        .forEach(
+                            function( pDomElement ) {
+                                for (var i in pDomElement ) {
+                                    if ( pDomelement.hasOwnProperty[i] && pDomElement[i] instanceof tb) {
+                                        [].push.call(ret, pDomElement[i]); // push tb object to tb selector content
                                     }
-                                );
+                                }
                             }
                         );
 
-                } else if ( !!pLocalOnly ){ // walk descendants
+                } else if ( that instanceof tb && !!pLocalOnly ){ // walk descendants
 
-                    function walk( pObject ){
+                    for (var i in that ) if (that.hasOwnProperty(i)){
 
-                        var children = pObject.children( false, true ); // false = no selector, true = only internal children
+                        if ( i !== 'target' && that[i] instanceof tb ) {
+                            [].push.call( ret, that[i]); // push tb object to tb selector content
 
-                        Array.prototype.push.call( ret, pObject ); // push object to tb selector content
+                            var desc = tb.dom().toArray.call( that[i].descendants( '', true ) );
 
-                        if ( children.length ){
-                            $.each(
-                                $.makeArray( children ),
-                                function( key, value ){
-                                    walk( value );
-                                }
-                            );
+                            for ( var j=0, l=desc.length; j<l; j++ ){
+                                [].push.call( ret, desc[j]); // push tb object to tb selector content
+                            }
+
                         }
+
                     }
 
-                    // add local descendants
-                    $.each(
-
-                        $.makeArray( that.children( false, true ) ),
-
-                        function( key, value ){
-                            walk( value );
-                        }
-
-                    );
 
                 }
 
@@ -590,7 +1019,7 @@ tb = (function(){
 
              * @method children
              *
-             * @param {variant} [pSelector] - any kind of TbSelector parameter
+             * @param           [pSelector] - any kind of TbSelector parameter
              * @param {boolean} [pLocalOnly] - only local children of given tb instance
              *
              * @return {object} - TbSelector instance
@@ -604,40 +1033,28 @@ tb = (function(){
 
                     ret = walkSelector( that, 'children', arguments );
 
-                } else if ( that.__tb__ && !!that.target.nodeType && !pLocalOnly ) { // it must be a native tb object
+                } else if ( that instanceof tb && !!that.target['nodeType'] && !pLocalOnly ) { // it must be a native tb object
 
-                    $( that.target )
-                        .find( '[data-tb]')
-                        .filter(
-                            function() {
-                                return $( this ).parents('[data-tb]')[0] === that.target;
-                            }
-                        )
-                        .each(
-                            function() {
-                                var data = $(this).data() || {};
-
-                                $.each(
-                                    data,
-                                    function( key, value ){
-                                        if ( !!value['__tb__'] ){
-                                            Array.prototype.push.call( ret, value ); // push dom object to tb selector content
+                    tb.dom( '[data-tb]', that.target )
+                        .map(
+                            function( pDomNode ) {
+                                if ( tb( pDomNode ).parent()[0].target === that.target ){
+                                    for ( var i in pDomNode ){
+                                        if ( pDomNode.hasOwnProperty(i) && pDomNode[i] instanceof tb ){
+                                            [].push.call( ret, pDomNode[i] ); // push tb object to tb selector content
                                         }
                                     }
-                                );
+                                }
                             }
                         );
 
                 } else if ( !!pLocalOnly ){
 
-                    $.each(
-                        that,
-                        function( key, value ){
-                            if ( !!value['__tb__'] ){
-                                Array.prototype.push.call( ret, value ); // push dom object to tb selector content
-                            }
+                    for ( var i in that ){
+                        if ( that.hasOwnProperty(i) && that[i] instanceof tb ){
+                            [].push.call( ret, that[i] ); // push tb object to tb selector content
                         }
-                    );
+                    }
 
                 }
 
@@ -673,10 +1090,10 @@ tb = (function(){
                 } else { // it must be a native tb object
 
                     result = that.parent().children();
-                    index = Array.prototype.indexOf.call( result, that );
+                    index = [].indexOf.call( result, that );
 
                     if ( result.length > index + 1 ) {
-                        Array.prototype.push.call( ret, result[ index + 1 ] ); // push dom object to tb selector content
+                        [].push.call( ret, result[ index + 1 ] ); // push dom object to tb selector content
                     }
 
                 }
@@ -712,10 +1129,10 @@ tb = (function(){
                 } else { // it must be a native tb object
 
                     result = this.parent().children();
-                    index = Array.prototype.indexOf.call( result, this );
+                    index = [].indexOf.call( result, this );
 
                     if ( index ) {
-                        Array.prototype.push.call( ret, result[ index - 1 ] ); // push dom object to tb selector content
+                        [].push.call( ret, result[ index - 1 ] ); // push dom object to tb selector content
                     }
 
                 }
@@ -750,7 +1167,7 @@ tb = (function(){
                 } else { // it must be a native tb object
 
                     result = this.parent().children();
-                    Array.prototype.push.call( ret, result[ 0 ] ); // push dom object to tb selector content
+                    [].push.call( ret, result[ 0 ] ); // push dom object to tb selector content
 
                 }
 
@@ -781,10 +1198,19 @@ tb = (function(){
                     ret = walkSelector( this, 'last', arguments );
                 } else {
                     result = this.parent().children();
-                    Array.prototype.push.call( ret, result[ result.length - 1 ] ); // push dom object to tb selector content
+                    [].push.call( ret, result[ result.length - 1 ] ); // push dom object to tb selector content
                 }
                 return !!pSelector ? ret.filter( pSelector ) : ret;
             },
+
+            /**
+             * toArray() method
+             *
+             * @method toArray
+             *
+             * @return {array} - TbSelector elements in an array
+             */
+            toArray: tb.dom().toArray, // simple mapping
 
             /**
              * filter() method
@@ -802,27 +1228,31 @@ tb = (function(){
             filter: function( pSelector ){
 
                 var that = this,
-                    check = $.makeArray( tb( pSelector ) ), // object array to check against
-                    ret = tb( '' );
+                    compare = tb( pSelector ).toArray(), // object array to check against
+                    ret = tb();
 
                 if ( !pSelector ) {
                     return that;
                 }
 
+                console.log( 'filter that, compare', that, compare );
+
                 if ( that instanceof TbSelector ) {
-                    $.each(
-                        $.makeArray( that ),     // convert these results to true array
-                        function( key, tbObject ) {
-                            if ( check.indexOf( tbObject ) > -1 ){
-                                Array.prototype.push.call( ret, tbObject );
+                    [].map.call(
+                        tb.dom().toArray.call( that ),     // convert these results to true array
+                        function( tbObject ) {
+                            if ( [].indexOf.call( compare, tbObject ) > -1 ){
+                                [].push.call( ret, tbObject );
                             }
                         }
                     );
-                } else {
-                    if ( check.indexOf( that ) > -1 ){
-                        Array.prototype.push.call( ret, that );
+                } else if ( that instanceof tb ){
+                    if ( compare.indexOf( that ) > -1 ){
+                        [].push.call( ret, that );
                     }
                 }
+
+                console.log( 'filter ret', ret );
 
                 return ret;
             },
@@ -843,7 +1273,7 @@ tb = (function(){
             not: function( pSelector ){
 
                 var that = this,
-                    check = $.makeArray( tb( pSelector ) ), // object array to check against
+                    compare = tb( pSelector ).toArray(), // object array to check against
                     ret,
                     index;
 
@@ -851,16 +1281,16 @@ tb = (function(){
                     ret = that;
                 } else {
                     ret = tb( '' );
-                    Array.prototype.push.call( ret, that );
+                    [].push.call( ret, that );
                 }
 
-                $.each(
+                that.each(
                     check,
                     function( key, tbObject ) {
 
-                        index = Array.prototype.indexOf.call( ret, tbObject );
+                        index = [].indexOf.call( ret, tbObject );
                         if (  index > -1 ){
-                            Array.prototype.splice.apply( ret, [ index, 1 ] );
+                            [].splice.apply( ret, [ index, 1 ] );
                         }
 
                     }
@@ -885,24 +1315,23 @@ tb = (function(){
             is: function( pSelector ){
 
                 var that = this,
-                    check = $.makeArray( tb( pSelector ) ), // object array to check against
+                    check = tb( pSelector ).toArray(), // object array to check against
                     ret,
                     index;
 
                 if ( that instanceof TbSelector ) {
                     ret = that;
                 } else {
-                    ret = tb( '' );
-                    Array.prototype.push.call( ret, that );
+                    ret = tb();
+                    [].push.call( ret, that );
                 }
 
-                $.each(
-                    check,
-                    function( key, tbObject ) {
+                check.forEach(
+                    function( tbObject ) {
 
-                        index = Array.prototype.indexOf.call( ret, tbObject );
+                        index = [].indexOf.call( ret, tbObject );
                         if (  index === -1 ){
-                            Array.prototype.splice.apply( ret, [ index, 1 ] );
+                            [].splice.apply( ret, [ index, 1 ] );
                         }
 
                     }
@@ -926,7 +1355,7 @@ tb = (function(){
             add: function( pSelector ){
 
                 var that = this,
-                    check = $.makeArray( tb( pSelector ) ), // object array to check against
+                    check = tb( pSelector ).toArray(), // object array to check against
                     ret,
                     index;
 
@@ -935,17 +1364,16 @@ tb = (function(){
                     ret = that;
                 } else {
                     ret = tb( '' );
-                    Array.prototype.push.call( ret, that );
+                    [].push.call( ret, that );
                 }
 
-                $.each(
-                    check,
-                    function( key, tbObject ) {
+                check.forEach(
+                    function( tbObject ) {
 
-                        index = Array.prototype.indexOf.call( ret, tbObject );
+                        index = [].indexOf.call( ret, tbObject );
 
-                        if (  index === -1 ){
-                            Array.prototype.push.call( ret, tbObject );
+                        if (  index === -1 ){ // unique result set...
+                            [].push.call( ret, tbObject );
                         }
 
                     }
@@ -979,7 +1407,7 @@ tb = (function(){
 
                     walkSelector( that, 'on', arguments );
 
-                } else if ( that.__tb__ ) {
+                } else if ( that instanceof tb) {
 
                     if ( !that.handlers ){
                         // console.log( 'adding handlers object for', that);
@@ -1044,7 +1472,7 @@ tb = (function(){
 
                     walkSelector( that, 'off', arguments );
 
-                } else if ( that.__tb__ ) { // either a toplevel or an internal tb object
+                } else if ( that instanceof tb ) { // either a toplevel or an internal tb object
 
                     if ( !that.handlers[ pEventName ] ){
                         return;
@@ -1067,196 +1495,56 @@ tb = (function(){
     })();
 
     /**
-     * tb() / new tb()
-     * can be used as SELECTOR and CONSTRUCTOR
+     * walk all pSelector tb objects, call pMethodName on them
+     * return a UNIQUE TbSelector result set containing all single results
      *
-     * sample call CONSTRUCTOR:
-     * var a = new tb( 'tb_repo_object_namespace' )
+     * @function walkSelector
+     * @private
      *
-     * sample call SELECTOR:
-     * var result = tb( 'div#app' )
+     * @param {object} pSelectorObject - instanceOf TbSelector
+     * @param {string} pMethodName - name of method to call
+     * @param {*} [pArguments] - arguments
      *
-     * for selector functionality see TbSelector object
-     *
-     * @class tb
-     * @constructor
-     * @extends TbSelector
-     *
-     * @param {string}     arguments[0]   - namespace of class | TbSelector parameter
-     * @param {*}  [ arguments[1] ] - config data ( if called as constructor )
-     * @param {*}  [ arguments[2] ] - DOM target or parent tb instance
-     *
-     * @return {object} - twoBirds Object or TbSelector instance /w results
-     *
+     * @return {object} instance of TbSelector
      */
-    function tb() {
-        var that = this;
+    function walkSelector( pSelectorObject, pMethodName, pArguments ){
+        var that = this,
+            result,
+            ret = tb( '' ); // empty tb selector object
 
-        /*
-         arguments[0]: string, regEx or constructor function
-         arguments[1]: optional object, parameter hash object if arguments[0] is constructor function
-         arguments[2]: optional DOM node or parent tb object
-         */
-
-        function makePrototype( pConfig ){
-
-            var f = function ( pConfig ){
-                $.extend(
-                    true,
-                    this,
-                    pConfig
-                );
-            };
-
-            f.prototype = $.extend(
-                true,
-                {
-                    constructor: tb
-                },
-                TbSelector.prototype
-            );
-
-            var r = new f( pConfig );
-
-            return r;
-        }
-
-
-        if ( that instanceof tb ) {    // called as constructor, create and return tb object instance
-            var isNamespace = typeof arguments[0] === 'string',
-                tbClass =  isNamespace ? tb.namespace( arguments[0] ) : arguments[0],
-                tbInstance,
-                fileName;
-
-            if ( isNamespace && !tbClass ){
-                fileName = arguments[0].replace( /\./g, '/' ) + '.js';
-
-                tb.loader.load(
-                    fileName,
-                    (function( args ){
-                        return function(){
-                            new tb(
-                                args[0],
-                                args[1] || {},
-                                args[2] || false
-                            );
-                        }
-                    })( Array.prototype.slice.call( arguments ) )
-                );
-
-                return;
-            }
-
-            // it is a constructor call, like "new tb(...)"
-            if ( typeof tbClass === 'function' ){
-
-                //console.log( 'constructor', arguments, tbClass);
-
-                if ( !tbClass.prototype.__tb__ ){
-                    // extend prototype with selector prototype
-                    //console.log( 'extend', tbClass.name, tbClass.prototype );
-                    tbClass.prototype = makePrototype( tbClass.prototype );
-                    tbClass.prototype.__tb__ = 'V6.0a';
-                }
-
-                // make a new instance of given constructor
-                tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
-                //console.log( 'tbInstance', tbInstance );
-
-                // prepare .namespace property of tb object
-                if ( !tbInstance.namespace ){
-                    tbInstance.namespace = typeof arguments[0] === 'string'
-                        ? arguments[0]
-                        : arguments[0].namespace || tb.getId(); // if nothing helps, a unique id
-                }
-
-                // prepare .target property of tb object
-                tbInstance.target = arguments[2] || false; // preset
-                if ( !!arguments[2] ){
-                    if ( arguments[2].jquery && arguments[2][0] ){ // it is a jQuery result set
-                        tbInstance.target = arguments[2][0];
-                    } else {
-                        tbInstance.target = arguments[2];
+        if ( pSelectorObject instanceof TbSelector ) {
+            [].forEach.call(
+                [].map.call( pSelectorObject, function( pElement, pKey ){
+                    if ( pSelectorObject.hasOwnProperty( pKey ) ){
+                        return pSelectorObject[ pKey ];
                     }
-                } else {
-                    tbInstance.target = null;
-                }
+                }),
+                function walkSelectorEach( pTbObject, pKey ) {
+                    result = pTbObject[pMethodName].apply( pTbObject, [].slice.call( pArguments ) );
 
-                // if it is a DOM element:
-                // - add class to DOM data
-                // - $(target).addClass( <namespacedClassname> )
-                // - if not already there add namespace to target data-tb attribute
-                if ( tbInstance.target && tbInstance.target.nodeType ){
-                    var $that = $( tbInstance.target );
-
-                    $that
-                        .data( tbInstance.namespace, tbInstance );
-
-                    // if element does not reside in the DOM <head> add class
-                    if ( tbInstance.target !== document.head && !$that.parents( 'head' )[0] ){
-                        $that
-                            .addClass( tbInstance.namespace.replace( /\./g, '-').toLowerCase() );
-                    }
-
-                    // add namespace to DOM "data-tb" attribute
-                    if ( !$that.attr( 'data-tb' ) ){
-                        $that.attr( 'data-tb', tbInstance.namespace );
-                    } else if ( $that.attr( 'data-tb').split( ' ').indexOf( tbInstance.namespace ) === -1 ){
-                        $that.attr( 'data-tb', $that.attr( 'data-tb' ) + ' ' + tbInstance.namespace );
-                    }
-
-                }
-
-                // create handlers array if necessary
-                if ( !tbInstance[ 'handlers' ] ){
-                    tbInstance.handlers = {};
-                } else {
-                    // if there are single named event handler functions,
-                    // convert them to array of functions
-                    $.each(
-                        tbInstance.handlers,
-                        function( key, value ){
-                            if ( typeof value === 'function' ){
-                                tbInstance.handlers[key] = [ value ];
+                    [].forEach.call(
+                        result,
+                        function( pResultObject ){
+                            if ( [].indexOf.call( ret, pResultObject ) === -1 ){
+                                [].push.call( ret, pResultObject );
                             }
                         }
                     );
                 }
-
-                // add property declared classes (prop contains ".") as tb objects
-                $.each(
-                    tbInstance,
-                    function( key, value ){
-                        if ( typeof key === 'string'
-                            && key.indexOf( '.' ) > -1
-                            ){ // prop name contains ".", treat as tb class
-                            tbInstance[key] = new tb( key, value, tbInstance );
-                        }
-                    }
-                );
-
-                // trigger init on "tb.idle" event;
-                if ( tb.status.eventCount() > 0 ) {
-                    tb.idle(function(){
-                        //console.log( 'deferred trigger ::init() on', tbInstance.namespace, tbInstance );
-                        tbInstance.trigger( 'init' );
-                    });
-                } else {
-                    //console.log( 'trigger ::init() now on', tbInstance.namespace, tbInstance );
-                    tbInstance.trigger( 'init' );
-                }
-
-                return tbInstance;
-
-            }
-
-        } else {                         // arguments[0] is string or regex, return selector result
-
-            return new TbSelector( arguments[0] );
-
+            );
         }
+        return ret;
+    }
 
-    };
+    // define TbSelector prototype MUST BE DONE HERE !
+    TbSelector.prototype = {};
+
+    // add TbSelector methods and properties
+    for ( var i in tb.prototype ) if ( tb.prototype.hasOwnProperty(i)){
+        TbSelector.prototype[i] = tb.prototype[i];
+    }
+
+    Tb = tb; // to have an uppercase constructor name @todo: rethink this
 
     return tb;
 
@@ -1269,7 +1557,6 @@ tb.require = function( pConfig ){
         tbTarget = that.target;
 
     if ( !pConfig ) return;
-    //console.log( 'tbRequire config', pConfig, that );
 
     that.requirements = pConfig;
 
@@ -1277,10 +1564,7 @@ tb.require = function( pConfig ){
     tb.loader.load(
         that.requirements,
         function(){
-            // after loading, remove requirement array
-            // tbTarget['tb.require'] = null;
-            // delete tbTarget['tb.require'];
-            // init will be triggered in when idle
+            that.target.trigger('init');
         }
     );
 
@@ -1312,8 +1596,6 @@ tb.stop = (function(pStopIt){
 
 
 
-
-
 /**
  * returns a unique id
  *
@@ -1326,7 +1608,6 @@ tb.stop = (function(pStopIt){
 tb.getId = function(){
     return 'id-' + (new Date()).getTime() + '-' + Math.random().toString().replace(/\./, '');
 };
-
 
 
 
@@ -1387,6 +1668,7 @@ tb.namespace = function( pNamespace, pForceCreation, pObject ){
 };
 
 
+
 /**
  * tb.bind() function
  *
@@ -1412,43 +1694,58 @@ tb.namespace = function( pNamespace, pForceCreation, pObject ){
  * @static
  *
  * @param   {object}     pSelector      DOM node
- * @param   {string}     [pNamespace]   contains the namespace path to the class
- * @param   {variant}    [pConfig]      any data, will be used as a parameter when pNameSpace class is constructed @todo: 'variant' is no valid data type. use '{Object|Array|String} or similar
  *
  * @return {void}
  */
-tb.bind = function( pSelector, pNamespace, pConfig ){
+tb.bind = function( pSelector ){
 
-    var selection;
+    var rootElement,
+        selected = [],
+        elements = document.querySelectorAll(pSelector);
 
-    if ( pNamespace ){ // namespace is given
-        selection = $( pSelector );
-        selection.attr( 'data-tb', pNamespace );
-    } else { // namespace not given, scan dom for data-tb attribute
-        selection = $( pSelector )
-            .find('[data-tb]')
-            .andSelf()
-            .filter('[data-tb]')
-            .filter( function () {
-                var obj = $(this).data( 'tbo' ),
-                    noTbObject = ( typeof obj !== 'object' || ! obj instanceof tb );
-                return noTbObject;
-            });
+    // get root node
+    if ( typeof pSelector === 'string' ) {
+        rootElement = document.querySelectorAll(pSelector)['0'] || false;
+    } else if ( pSelector instanceof HTMLElement ){
+        rootElement = pSelector;
+    } else {
+        return;
     }
 
-    // iterate over elements
-    $.each(
-        selection,
-        function( key, value ){
+    // add self if data-tb attribute present
+    if ( rootElement && rootElement.getAttribute('data-tb') ){
+        selected.push( rootElement );
+    }
 
-            var namespace = pNamespace || $(this).attr('data-tb'); // namespace of constructor
+    // add other elements
+    if ( !!elements['length'] ){
+        [].map.call(
+            elements,
+            function( element ){
+                selected.push( element );
+            }
+        );
+    }
 
-            new tb( namespace, pConfig, value );        // create tb object
+    // instanciate tb instances for given elements
+    selected.forEach(
+        function( selectedElement ){
+            var namespaces = selectedElement.getAttribute('data-tb').split(' ');
 
+            namespaces.forEach(
+                function( namespace ){
+                    if ( !selectedElement[namespace] ){
+                        //console.log( namespace );
+                        selectedElement[namespace] = new tb( namespace, null, selectedElement );        // create tb object
+                    }
+                }
+            );
         }
     );
 
 };
+
+
 
 /**
  * function tb.observable()
@@ -1492,25 +1789,16 @@ tb.observable = function( pStartValue ){
     observableFunction.notify = function(){
 
         // execute all callbacks
-        $.each(
-            observableFunction.list,
-            function( key, func ){
-                // currently only trigger functions allowed
-                if ( $.isFunction( func ) ){
+        observableFunction.list.forEach(
+            function( func, key ){
+                if ( typeof func === 'function' ){
                     func( observedValue );
-                    if ( func.once === true ){
-                        observableFunction.list[key] = null;
-                        delete observableFunction.list[key];
+                    if ( func.once ){
+                        observableFunction.list.splice(key,1);
                     }
+                } else {
+                    observableFunction.list.splice(key,1);
                 }
-            }
-        );
-
-        // cleanup callback array
-        observableFunction.list = $.map(
-            observableFunction.list,
-            function(value){
-                return(value);
             }
         );
 
@@ -1572,8 +1860,7 @@ tb.Model = function ( pConfig ) {
     that.config = {};
 
     // default config mixin -> result will be in that.config
-    $.extend(
-        true,
+    tb.extend(
         that.config,
         {   // default settings, reference only
             'create': {
@@ -1618,12 +1905,13 @@ tb.Model.prototype = (function(){
 
         var result='';
 
-        $.each(
-            pParameterObject,
-            function( key, value ){
-                result += ( !!result ? '&' : '' ) + key + '=' + value;
-            }
-        );
+        Object
+            .keys( pParameterObject )
+            .forEach(
+                function( key ) {
+                    result += ( !!result ? '&' : '' ) + key + '=' + pParameterObject[key];
+                }
+            );
 
         return result;
     }
@@ -1632,37 +1920,38 @@ tb.Model.prototype = (function(){
     function parmCheck( pCompare, pAgainst ){ // compare = parameters handed over in call
 
         var regEx = /^\{.*\}$/, // rexEx to detect parameter mapping
-            isMapVar;
+            isMapVar,
+            against;
 
         // make a deep copy of target object
-        pAgainst = ( JSON.parse( JSON.stringify( pAgainst ) ) );
+        against = ( JSON.parse( JSON.stringify( pAgainst ) ) );
 
         // console.log( ' pre parmCheck', pCompare, pAgainst );
 
-        $.each(
-            pAgainst,
-            function( key, value ){
+        Object
+            .keys( against )
+            .forEach(
+                function( key ){
+                    var value = against[ key ];
 
-                // determin whether there is a mapped variable
-                isMapVar = !!regEx.exec( value ) && !!regEx.exec( value )[0];
+                    // determine whether there is a mapped variable
+                    isMapVar = !!regEx.exec( value ) && !!regEx.exec( value )[0];
 
-                // console.log( 'isMapVar, compareParameters, value, key', isMapVar, pCompare, value, key );
-
-                // replace mapped value by actual value
-                if ( isMapVar ){
-                    pAgainst[ key ] = tb.parse( value, pCompare );
-                    if ( !!regEx.exec( pAgainst[ key ] ) && !!regEx.exec( pAgainst[ key ] )[0] ){
-                        console.error( 'mapped variable not found in data:', value, !!regEx.exec( value )[0] );
-                    }
-                } else {
-                    if ( pCompare.hasOwnProperty( key ) ) {
-                        pAgainst[ key ] = pCompare[ key ];
+                    // replace mapped value by actual value
+                    if ( isMapVar ){
+                        against[ key ] = tb.parse( value, pCompare );
+                        if ( !!regEx.exec( against[ key ] ) && !!regEx.exec( against[ key ] )[0] ){
+                            console.error( 'mapped variable not found in data:', value, !!regEx.exec( value )[0] );
+                        }
                     } else {
-                        console.error( 'variable not found in data:', key, 'in', pCompare );
+                        if ( pCompare.hasOwnProperty( key ) ) {
+                            against[ key ] = pCompare[ key ];
+                        } else {
+                            console.error( 'variable not found in data:', key, 'in', pCompare );
+                        }
                     }
                 }
-            }
-        );
+            );
 
         //console.log( 'post parmCheck parameters:', pAgainst );
 
@@ -1672,12 +1961,9 @@ tb.Model.prototype = (function(){
     return {
 
         'create': function( pParams ){
-            var o = $.extend( true, {}, this.config.create ),
+            var o = tb.extend( {}, this.config.create ),
                 p = {},
-                pParams = pParams || {}, // parameter object
-                ajax;
-
-            //console.log('create', pParams);
+                params = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no create url given!');
@@ -1685,31 +1971,28 @@ tb.Model.prototype = (function(){
             }
 
             if ( o.params ){ // this indicates get or post parameters are expected
-                p = parmCheck( pParams, o.params );
+                p = parmCheck( params, o.params );
             }
 
-            var ajax = $.extend(
-                true,
-                o,
-                { // if params given, use microparse to fill them in url
-                    url: p ? tb.parse( this.config.create.url, p ) : this.config.create.url
-                },
-                {
-                    data: p ? p : {}
-                }
+            tb.request(
+                tb.extend(
+                    o,
+                    { // if params given, use microparse to fill them in url
+                        url: p ? tb.parse( this.config.create.url, p ) : this.config.create.url
+                    },
+                    {
+                        data: p ? p : {}
+                    }
+                )
             );
-
-            // console.log( 'save', ajax );
-
-            $.ajax( ajax );
 
         },
 
         'read': function( pParams ){
 
-            var o = $.extend( true, {}, this.config.read ),
+            var o = tb.extend( {}, this.config.read ),
                 p = {},
-                pParams = pParams || {}; // parameter object
+                params = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no read url given!');
@@ -1720,9 +2003,8 @@ tb.Model.prototype = (function(){
                 p = parmCheck( pParams, o.params );
             }
 
-            $.ajax(
-                $.extend(
-                    true,
+            tb.request(
+                tb.extend(
                     o,
                     { // if params given, use microparse to fill them in url
                         url: p ? tb.parse( this.config.read.url, p ) : this.config.read.url
@@ -1736,9 +2018,9 @@ tb.Model.prototype = (function(){
         },
 
         'update': function( pParams ){
-            var o = $.extend( true, {}, this.config.update ),
+            var o = tb.extend( true, {}, this.config.update ),
                 p = {},
-                pParams = pParams || {}; // parameter object
+                params = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no update url given!');
@@ -1746,12 +2028,11 @@ tb.Model.prototype = (function(){
             }
 
             if ( o.params ){ // this indicates get or post parameters are expected
-                p = parmCheck( pParams, o.params );
+                p = parmCheck( params, o.params );
             }
 
-            $.ajax(
-                $.extend(
-                    true,
+            tb.request(
+                tb.extend(
                     o,
                     { // if params given, use microparse to fill them in url
                         url: p ? tb.parse( this.config.update.url, p ) : this.config.update.url
@@ -1765,9 +2046,9 @@ tb.Model.prototype = (function(){
         },
 
         'delete': function( pParams ){
-            var o = $.extend( true, {}, this.config['delete'] ),
+            var o = tb.extend( true, {}, this.config['delete'] ),
                 p = {},
-                pParams = pParams || {}; // parameter object
+                params = pParams || {}; // parameter object
 
             if ( !o.url ){
                 console.error( 'no delete url given!');
@@ -1775,15 +2056,14 @@ tb.Model.prototype = (function(){
             }
 
             if ( o.params ){ // this indicates get or post parameters are expected
-                p = parmCheck( pParams, o.params );
+                p = parmCheck( params, o.params );
             }
 
-            $.ajax(
-                $.extend(
-                    true,
+            tb.request(
+                tb.extend(
                     o,
                     { // if params given, use microparse to fill them in url
-                        url: p ? tb.parse( this.config['delete'].url, p ) : this.config.create.url
+                        url: p ? tb.parse( this.config.delete.url, p ) : this.config.delete.url
                     },
                     {
                         data: p ? p : {}
@@ -1799,6 +2079,38 @@ tb.Model.prototype = (function(){
 
 
 
+/**
+ * tb.extend() function
+ * extend an object by another objects properties, always a deep copy
+ *
+ * @function extend
+ * @namespace tb
+ * @static
+ *
+ * @param {object} pObj - object to extend
+ * @param {object} pSrc - other object
+ *
+ * @return {object} - other object
+ */
+tb.extend = function( pObj ){ // any number of arguments may be given
+    var src = ( JSON.parse( JSON.stringify( pSrc ) ) );
+
+    while ( arguments[1] ){
+        Object
+            .keys(src)
+            .forEach(
+                function(key) {
+                    if ( (src[key]).constructor === Object ){
+                        pObj[key] = tb.extend( pObj[key] || {}, src[key] );
+                    } else {
+                        pObj[key] = src[key];
+                    }
+                }
+            );
+        [].splice.call( arguments, 1, 1 ); // remove object that is done
+    }
+    return pObj;
+};
 
 
 
@@ -1813,41 +2125,43 @@ tb.Model.prototype = (function(){
  *
  * @param {string} pText - the text to parse
  * @param {object} pParse - hash object containing replacement key/<value>
- *
+ *  //@todo: missing parm description
  * @return {string} - result string
  */
-tb.parse = function( pText, pParse, pPrevNamespace ){
-    var operation = typeof pParse === 'array' ? 'map' : 'each',
-        prevNamespace = pPrevNamespace || '',
-        search;
+tb.parse = function( pText, pParse ){
+    var vars = pText.match( /\{.*\}/ ), // array of variables
+        v = '', // prop name
+        p = pParse, // object to parse
+        fail = false,   // true if property doesnt exist
+        value,  // value of the property
+        a = []; // namespace array
 
-    $[operation]( pParse, function( pKey, pValue ){ // operation is either $.map() or $.each()
-        var value = operation === 'map' ? pKey : pValue,
-            key =  operation === 'map' ? pValue : pKey;
+    if ( !!vars ){
 
-        // if we are in recursion
-        if ( prevNamespace ){
-            prevNamespace = prevNamespace.replace(
-                /-/g,
-                key
-            );
-        }
+        p = pParse;
 
-        // do it...
-        if ( $.isPlainObject( value ) ){
-            pText = tb.parse( pText, value, (prevNamespace ? prevNamespace : key) + '.-' ); // '-' being the placeholder for the new key
-        } else if (  $.isArray( value )  ){
-            pText = tb.parse( pText, value, (prevNamespace ? prevNamespace : key) + '[-]' );
-        } else {
-            search = '\{' + (prevNamespace ? prevNamespace : key) + '\}';
-            pText = pText.replace( search, value );
-        }
+        vars.forEach(
+            function(v){
+                fail = false;
+                a = v.replace('{', '').replace('}', '').split('.');
 
-    });
+                while ( a.length > 0 && !fail ){
+                    if ( !!p[ a[0] ] ){
+                        p = p[ a[0] ];
+                        a.shift();
+                    } else {
+                        fail = true;
+                    }
+
+                }
+                pText = pText.replace( v, !fail ? p : v );
+            }
+        );
+
+    }
 
     return pText;
 };
-
 
 
 /**
@@ -1864,6 +2178,7 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
     var _Requirement = function( pConfig ){
 
         var that = this,
+            xxx = console.log( pConfig ),
             type = getTypeFromSrc( pConfig.src ), // filename extension
             typeConfigs = { // standard configuration types
                 'css': {
@@ -1886,6 +2201,15 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
             element,
             isTyped = !!typeConfigs[type];
 
+        if ( !!tb.loader.requirementGroups[type][pConfig.src.split('?')[0]]
+            &&  !!tb.loader.requirementGroups[type][pConfig.src.split('?')[0]].done ){ // already loaded
+
+            console.log( ' rqLoader already requirementLoaded', src.split('?')[0], 'u' );
+            that.trigger( 'requirementLoaded', src.split('?')[0], 'u' );
+
+            return;
+        }
+
         pConfig.type = type; // add type
 
         that.config = pConfig;
@@ -1894,8 +2218,6 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
         if ( !!that.config.src ){
             that.config.src = that.config.src + ( that.config.src.indexOf( '?' ) > -1 ? '&' : '?' ) + tb.getId();
         }
-
-        //console.log( 'load', pConfig.src );
 
         //that.target = pConfig.target;
         that.src = pConfig.src;
@@ -1907,7 +2229,9 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
         // element 'load' callback
         function onLoad( e ){
 
-            if ( e && e.data ){
+            //console.log( 'onload', e);
+
+            if ( !!e && e.data ){
                 that.data( e.data );
             }
 
@@ -1917,11 +2241,14 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
             if ( that.type === 'js' ) {
                 setTimeout(
                     function(){
-                        //$( that.element ).remove();
+                        // that.element.parent.removeChild( that.element );     // remove js script tag from head
                     }
                     ,200
                 );
             }
+
+            that.trigger( 'requirementLoaded', that.src, 'u' );
+
         }
 
         // execute onLoad only once
@@ -1944,21 +2271,16 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
             element.onreadystatechange = element.onload = function() {
                 var state = element.readyState;
                 if (!that.done && (!state || /loaded|complete/.test(state))) {
-                    //console.log( 'loaded', element );
+                    // console.log( 'loaded', element );
                     tb.status.eventCount( tb.status.eventCount() - 1 ); // decrease eventCount
-                    that.trigger( 'onLoad' );
+                    that.trigger( 'onLoad', element );
                 }
             };
 
             // add attributes to DOM element
-            $.each(
-                typeConfig.attributes,
-                function( key, value ){
-                    $( element ).attr( key, tb.parse( value, that.config ) );
-                }
-            );
-
-            //console.log( element );
+            for ( var i in typeConfig.attributes ) if ( typeConfig.attributes.hasOwnProperty(i) ){
+                element.setAttribute( i, tb.parse( typeConfig.attributes[i], that.config ) );
+            }
 
             tb.status.eventCount( tb.status.eventCount() + 1 ); // increase eventCount
 
@@ -1967,22 +2289,31 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
 
             that.element = element;
 
-        } else { // load via request if unknown type
+        } else { // load via request if unknown type, trigger callback with text or JSON
 
             var f = function( data ){
-                that.data( data );
+
+                if ( that.type === 'json' && !!data['text'] ){
+                    try {
+                        data = JSON.parse( data.text );
+                    } catch( e ){
+                        console.log( 'error parsing, JSON expected in:', data );
+                    }
+                } else {
+                    data = data.text;
+                }
+
                 that.trigger( 'onLoad', data );
             };
 
-            $.ajax(
-                that.src,
-                {
-                    contentType: 'text/plain',
-                    dataType: 'text',
-                    success: f,
-                    error: f
-                }
-            );
+            var options = {
+                url: that.src,
+                success: f,
+                error: f
+            };
+
+            tb.request( options );
+
         }
 
     };
@@ -2010,11 +2341,10 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
 
         namespace: '_RequirementGroup',
 
-        load: function( pSrc, pCallback ){
+        load: function( pSrc ){
 
             var that = this,
-                rq = !!that.requirements[ pSrc ],
-                functionWrapper;
+                rq = !!that.requirements[ pSrc ];
 
             if ( !rq ){ // not loading or loaded: add a new requirement
 
@@ -2022,11 +2352,12 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
                     _Requirement,
                     {
                         src: pSrc,
-                        cb: pCallback,
                         target: that.target
                     },
                     that.requirements
                 );
+
+                that.requirements[ pSrc ].target = tb.loader; // needed for event bubbling
 
             } else { // already loading or loaded
 
@@ -2034,18 +2365,8 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
 
             }
 
-            functionWrapper = function(){
-                pCallback( this );
-            };
-
-            rq.on(
-                'onLoad',
-                functionWrapper,
-                true
-            );
-
-            if ( rq.done ){ // already loaded
-
+            if ( !!rq.done ){ // already loaded
+                console.log( 'already loaded', pSrc );
                 rq.trigger( 'onLoad' );
 
             }
@@ -2061,7 +2382,12 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
         var that = this;
 
         that.config = pConfig;
-        that.requirementGroups = {}; // will later contain requirementgroup tbo's in <head>
+        that.requirementGroups = {}; // will later contain requirement groups ( grouped by file extension )
+        that.rqSets = []; // requirement sets, may contain various file types
+
+        that.handlers = {
+            requirementLoaded: requirementLoaded
+        }
     };
 
     Loader.prototype = {
@@ -2074,63 +2400,60 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
                 pCallback = pCallback || function( e ){ console.log( 'onLoad dummy handler on', e ); },
                 type,
                 rg,
-                groupCallback;
+                groupCallback,
+                pSrc = typeof pSrc === 'string' ? [ pSrc ] : pSrc, // convert to array if string
+                pSrc = ([]).concat( pSrc ); // make an array copy
 
-            // load a group requirement ( multiple files )
-            if ( typeof pSrc !== 'string' ){
 
-                groupCallback = (function( pSources, pCallback ){
-                    return function( pElement ){
-                        var index = pSources.indexOf( pElement.src );
+            // will trigger loading if necessary ( async callback even if already loaded )
+            pSrc
+                .forEach(
+                    function( filename ){
+                        type = getTypeFromSrc( filename );
+                        rg = !!that.requirementGroups[type];
 
-                        pSources.splice( index, 1 );
+                        if ( !rg ){ // add a new requirement group
 
-                        if ( !pSources.length ){
-                            pCallback();
+                            that.requirementGroups[ type ] = new tb(
+                                _RequirementGroup,
+                                {
+                                    type: type
+                                },
+                                that.requirementGroups
+                            )
+
+                            that.requirementGroups[ type ].target = tb.loader; // needed for event bubbling
                         }
-                    };
-                })( pSrc, pCallback );
 
-                $.each(
-                    pSrc,
-                    function( key, value ){
-                        that.load( value, groupCallback )
+                        rg = that.requirementGroups[ type ];
+
+                        rg.load( filename );
                     }
+
                 );
 
-                return;
-            }
+            pSrc.callback = pCallback;
 
-            // load a single requirement
-            type = getTypeFromSrc( pSrc );
-            rg = !!that.requirementGroups[type];
+            pSrc.done = function( pFilename ){ // will be called when each file 'requirementLoaded' was triggered
+                var index = pSrc.indexOf( pFilename );
 
-            if ( !rg ){ // add a new requirement group
+                if ( index > -1 ){
+                    pSrc.splice( index, 1 );
+                }
+            };
 
-                that.requirementGroups[ type ] = new tb(
-                    _RequirementGroup,
-                    {
-                        type: type
-                    },
-                    that.requirementGroups
-                )
-
-            }
-
-            rg = that.requirementGroups[ type ];
-
-            rg.load( pSrc, pCallback );
+            that.rqSets.push( pSrc );
 
         },
 
-        data: function( pFileName, pData ){
+        get: function( pFileName ){
 
             var that = this,
                 type = getTypeFromSrc( pFileName),
                 rg = that.requirementGroups[type] ? that.requirementGroups[type] : false,
                 rq = rg ? ( rg.requirements[pFileName] ? rg.requirements[pFileName] : false ) : false;
 
-            return rq ? rq.data( pData ) : 'unknown: ' + pFileName;
+            return rq ? rq.data() : 'data missing for: ' + pFileName;
         }
 
     };
@@ -2138,14 +2461,351 @@ tb.parse = function( pText, pParse, pPrevNamespace ){
     // bind _Head instance
     tb.loader = new tb( Loader );
 
+    function requirementLoaded( e ){
+
+        var that = this,
+            filename  = e.data.split('?')[0];
+
+        //console.log( '<requirement loaded> handler in loader', filename, e, that );
+        that
+            .rqSets
+            .forEach(
+                function( pRqSet ){
+                    pRqSet.done( filename );
+                    if ( !pRqSet.length ){ // every file loaded
+                        //console.log( '<requirement loaded> CALLBACK in loader', filename, e, that );
+                        pRqSet.callback();
+                        that.rqSets.splice( that.rqSets.indexOf( pRqSet ), 1 );
+                    }
+                }
+            );
+
+        e.stopPropagation();
+    }
+
 })();
+
+/**
+ * @memberOf tb
+ * @namespace tb.request
+ * @field
+ * @description the twoBirds request object
+ */
+tb.request = (function () {
+    /** @private */
+    var loadlist = [],
+        readyState = 'complete',
+        cachable = false,
+        log = false,
+        count = 0,
+        interval = 30,
+        msoft = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP'];
+
+    function getConnection(pId) {
+        var obj = {},
+            xhr,
+            getConnection;
+
+        if (typeof ActiveXObject !== 'undefined'){
+            for (var i = 0; i < msoft.length; ++i) {
+                try {
+                    xhr = new ActiveXObject(msoft[i]);
+                    obj = {
+                        connection: xhr,
+                        identifier: pId
+                    };
+
+                    getConnection = (function (pType) {
+                        return function (pId) {
+                            var http = new ActiveXObject(pType);
+                            obj = {
+                                connection: xhr,
+                                identifier: pId
+                            };
+                            return obj;
+                        };
+                    })(msoft[i]);
+                } catch (e) {
+                }
+            }
+        }
+
+        try {
+            xhr = new XMLHttpRequest();
+            obj = {
+                connection: xhr,
+                identifier: pId
+            };
+            /** @ignore */
+            getConnection = function (pId) {
+                var xhr = new XMLHttpRequest();
+                obj = {
+                    connection: xhr,
+                    identifier: pId
+                };
+                return obj;
+            };
+        }
+        catch (e) {
+        }
+        finally {
+            return obj;
+        }
+    }
+
+    /** @private */
+    function handleReadyState(pReq, pCallback, pStateChange, pFailure, pOptions) {
+        var connection = this;
+        var poll = window.setInterval((function (pReadyState) {
+            return function () {
+                if (pReq.connection.readyState !== pReadyState) {
+                    pReadyState = pReq.connection.readyState;
+                    //pStateChange();
+                }
+                if (pReadyState === 4) {
+                    if (pReq.aborttimer) {
+                        window.clearTimeout(pReq.aborttimer);
+                    }
+                    window.clearInterval(poll);
+                    handleTransactionResponse(pReq, pCallback, pFailure, pOptions);
+                }
+            };
+        })(0), interval);
+
+        return poll;
+    }
+
+    /** @private */
+    function handleTransactionResponse(pReq, pCallback, pFailure, pOptions) {
+
+        try {
+            var httpStatus = pReq.connection.status;
+        }
+        catch (e) {
+            var httpStatus = 13030;
+        }
+        if (httpStatus >= 200 && httpStatus < 300) {
+            var responseObject = createResponseObject(pReq, pOptions);
+            try {
+                pCallback.call(pCallback, responseObject);
+            }
+            catch (e) {
+                if (tb.debug) debugger;
+            }
+        }
+        else {
+            var responseObject = createResponseObject(pReq, tb.extend( {}, pOptions ) );
+            console.log( 'failure pCallback call', pReq.src );
+            pFailure.call( pFailure, pReq );
+        }
+        release(pReq);
+    }
+
+    /** @private */
+    function createResponseObject(pObj, pOptions) {
+        var obj = {
+            tId: pObj.identifier,
+            status: pObj.connection.status,
+            statusText: pObj.connection.statusText,
+            allResponseHeaders: pObj.connection.getAllResponseHeaders(),
+            text: pObj.connection.responseText,
+            xml: pObj.connection.responseXML,
+            options: pOptions
+        };
+        return obj;
+    }
+
+    /** @private */
+    function release(pReq) {
+        dec( pReq );
+        if (pReq.connection){
+            pReq.connection = null;
+        }
+        delete pReq.connection;
+        pReq = null;
+        delete pReq;
+    }
+
+    function inc( pReq ) {
+        loadlist.push( pReq );
+        count++;
+        readyState = 'loading';
+    }
+
+    function dec( pReq ) {
+        if ( loadlist.indexOf( pReq ) ){
+            count--;
+            loadlist.splice( loadlist.indexOf( pReq ) );
+            if ( count === 0 ){
+                readyState = 'complete';
+            }
+        }
+    }
+
+
+    /**
+     * @name tb.request
+     * @function
+     * @param pOptions { object } a hash object containing these options:<br><br><br>
+     * @returns a twoBirds request object
+     *
+     * @param pOptions.url: (string, omitted) the URL to call
+     * @param pOptions.parms: (object, optional) a hash object containing the parameters to post
+     * @param pOptions.method: (string, optional, defaults to 'POST') the XHR method
+     * @param pOptions.headers: (object, optional) a hash object containing additional XHR headers
+     * @param pOptions.success: (function, optional) the function to call with the request result
+     * @param pOptions.error: (function, optional) the function to call if request status not in 200...299
+     * @param pOptions.statechange: (function, deprecated, optional) the function to call when readyState changes
+     * @param pOptions.timeout: (object, optional ) structure sample: { cb: myFunction, ms:10000 }<br>
+     * cb: callback to run when timeout occurs<br>
+     * ms: number of milliseconds the request will run before being terminated
+     * @param pOptions.cachable: (boolean, deprecated, optional) defaults to true, indicates whether or not to include a unique id in URL
+     * @param pOptions.async: (boolean, optional, defaults to true) whether or not to make an asynchronous request
+     */
+    return function (pOptions) {
+        var uid = 'tb' + tb.getId(),
+            xmlreq = false,
+            method = (pOptions.method ? pOptions.method.toUpperCase() : false) || 'GET',
+            url = pOptions.url,
+            parms = '',
+            successHandler = pOptions.success || tb.nop,
+            errorHandler = pOptions.error || tb.nop,
+            stateHandler = pOptions.statechange || tb.nop,
+            isCachable = pOptions.cachable || false,
+            timeout = pOptions.timeout || false,
+            isAsync = (typeof pOptions.async !== 'undefined' && pOptions.async === false) ? false : true;
+
+        if (typeof pOptions.parms != 'undefined') {
+            var ct = ( pOptions.headers && pOptions.headers['Content-Type']
+                ? pOptions.headers['Content-Type']
+                : 'application/x-www-form-urlencoded' );
+
+            switch ( ct ){
+                case 'application/json':
+                    parms = JSON.stringify( pOptions.parms );
+                    break;
+                default:
+                    for (var i in pOptions.parms) { // concat parameter string
+                        parms += ((parms.length > 0 ? '&' : '') + i + '=' + pOptions.parms[i]);
+                    }
+                    break;
+            }
+        }
+
+        inc();
+
+        if (isCachable === false) { // proxy disable - cache busting
+            url += (url.indexOf('?') < 0 ? '?' : '&') + 'tbUid=' + uid;
+        }
+
+        xmlreq = getConnection(uid);
+        if (xmlreq) {
+            if ( method === 'GET' && parms !== '') {
+                url = url + (url.indexOf('?') < 0 ? '?' : '&') + parms;
+            }
+            xmlreq.src=url;
+
+            xmlreq.connection.open(method, url, isAsync);
+
+            if (isAsync === true) {
+                xmlreq.poll = handleReadyState(xmlreq, successHandler, stateHandler, errorHandler, pOptions);
+            }
+
+            // set request headers
+            if (pOptions.headers) {
+                for (var i in pOptions.headers) {
+                    if (i !== 'Content-Type') {
+                        xmlreq.connection.setRequestHeader(i, pOptions.headers[i]);
+                    }
+                }
+            }
+
+            // abort functionality
+            if (timeout) {
+                xmlreq.timeoutTimer = window.setTimeout(
+
+                    function (pT, pR) {
+                        var f = typeof pT.cb === 'function' ? pT.cb : false;
+                        return function () {
+                            //if ( !myR && myR.connection.status == 4 ) return;
+                            if (typeof f == 'function') {
+                                f( /*createResponseObject(myR)*/ );
+                            }
+                            pR.connection.abort();
+                            window.clearInterval(pR.poll);
+                        };
+                    }(timeout, xmlreq), timeout.ms);
+            }
+
+            xmlreq.abort = ( function(xmlreq) {
+                return function () {
+                    window.clearInterval(xmlreq.poll);
+                    if (xmlreq.connection) xmlreq.connection.abort();
+                    release(xmlreq);
+                };
+            })( xmlreq );
+
+            // send
+            if (method === 'POST' || method === 'PUT') {
+                if (parms !== '') {
+                    xmlreq.connection.setRequestHeader('Content-Type', ct);
+                    xmlreq.connection.send(parms);
+                }
+                else {
+                    xmlreq.connection.send(null);
+                }
+            }
+            else {
+                xmlreq.connection.send(null);
+            }
+            // if sync request direct handler call
+            if (isAsync === false) {
+                tb.request.dec();
+                if (xmlreq.connection.status >= 200 && xmlreq.connection.status < 300) {
+                    successHandler( xmlreq );
+                }
+                else {
+                    errorHandler( xmlreq );
+                }
+            }
+            else {
+                return xmlreq;
+            }
+            return;
+        }
+        else {
+            return false;
+        }
+    };
+
+})();
+
 
 /**
  * document.ready bootstrap
  */
-$(function(){   // jQuery document.ready
+(function(){
+    
+    function domReady () {
+        tb.bind( 'body' ); // find all tb dom nodes and add tb objects if not yet done
+    }
 
-    // scan document for tb-data attributes
-    tb.bind( document.body ); // find all tb dom nodes and add tb objects if not yet done
+    // Mozilla, Opera, Webkit
+    if ( document.addEventListener ) {
+        document.addEventListener( "DOMContentLoaded", function(){
+            document.removeEventListener( "DOMContentLoaded", arguments.callee, false);
+            domReady();
+        }, false );
 
-});
+    // If IE event model is used
+    } else if ( document.attachEvent ) {
+        // ensure firing before onload
+        document.attachEvent("onreadystatechange", function(){
+            if ( document.readyState === "complete" ) {
+                document.detachEvent( "onreadystatechange", arguments.callee );
+                domReady();
+            }
+        });
+    }
+
+})();

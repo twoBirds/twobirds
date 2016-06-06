@@ -1,8 +1,44 @@
 tb.namespace('tb.ui', true).panel = (function(){
 
-	function onInit(){
+	function panel( pConfig ){
 
 		var that = this;
+
+		that.config = pConfig || {};
+
+		that.handlers = {
+			'init': init
+		};
+
+	}
+
+	panel.prototype = {
+
+		namespace: 'tb.ui.panel',
+
+		setTitle: setTitle,
+
+		setContent: setContent,
+
+		toggle: toggle,
+
+		show: show,
+
+		hide: hide,
+
+		'tb.require': [
+			'/tb/ui/panel.css'
+		]
+
+	};
+
+	return panel;
+
+	function init(){
+
+		var that = this;
+
+		console.log( 'panel init() handler ');
 
 		that.$titleBar = $('<div />').appendTo( that.target );
 		that.$content = $('<div />').appendTo( that.target );
@@ -13,65 +49,42 @@ tb.namespace('tb.ui', true).panel = (function(){
 				that.toggle();
 			}
 		);
-		
+
 		$( that.target ).css( that.config.css || {} );
 
 		that.setTitle( that.config.title || '-' );
 		that.setContent( that.config.content || '-no content-' );
 	}
 
-	function panel( pConfig ){
-
+	function setTitle( pTitle ){
 		var that = this;
-
-		that.config = pConfig || {};
-
-		that.handlers = {
-			'init': onInit			
-		};
-
+		that.$titleBar.html( '<span>' + pTitle + '</span>');
+		that.trigger( 'setTitle', pTitle );
 	}
 
-	panel.prototype = {
+	function setContent( pContent ){
+		var that = this;
+		that.$content.html( '<span>' + pContent + '</span>');
+		that.trigger( 'setContent', pContent );
+	}
 
-		namespace: 'tb.ui.panel',
+	function toggle(){
+		var that = this;
+		that.$content.toggle();
+		that.trigger('toggle');
+	}
 
-		setTitle: function( pTitle ){
-			var that = this;
-			that.$titleBar.html( '<span>' + pTitle + '</span>');
-			that.trigger( 'setTitle', pTitle );
-		},
-		
-		setContent: function( pContent ){
-			var that = this;
-			that.$content.html( '<span>' + pContent + '</span>');
-			that.trigger( 'setContent', pContent );
-		},
-		
-		toggle: function(){
-			var that = this;
-			that.$content.toggle();
-			that.trigger('toggle');
-		},
-		
-		show: function(){
-			var that = this;
-			that.$content.show();
-			that.trigger('show');
-		},
-		
-		hide: function(){
-			var that = this;
-			that.$content.hide();
-			that.trigger('hide');
-		},
-		
-		'tb.require': [
-			'/tb/ui/panel.css'
-		]
+	function show(){
+		var that = this;
+		that.$content.show();
+		that.trigger('show');
+	}
 
-	};
+	function hide(){
+		var that = this;
+		that.$content.hide();
+		that.trigger('hide');
+	}
 
-	return panel;
 
 })();
