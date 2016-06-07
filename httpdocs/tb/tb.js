@@ -803,19 +803,15 @@ tb = (function(){
 
                         that.handlers[tbEvent.name].map(
                             function (handler) {
-                                setTimeout(
-                                    function() {
-                                        // call handler function
-                                        // in the scope of the tbObject
-                                        if ( tbEvent.bubble.indexOf('l') > -1
-                                            && !tbEvent.__immediateStopped__ ){
 
-                                            handler.apply(that, [tbEvent]);
+                                if ( tbEvent.bubble.indexOf('l') > -1
+                                    && !tbEvent.__immediateStopped__
+                                    && !!handler
+                                ){
 
-                                        }
-                                    },
-                                    1
-                                );
+                                    handler.apply(that, [tbEvent]);
+
+                                }
 
                                 //@todo: remove when sure
                                 if ( !handler ){
@@ -848,14 +844,28 @@ tb = (function(){
                             if ( tbEvent.bubble.indexOf('u') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
                                 //console.log( 'bubble event', tbEvent, 'up to', that.parent() );
-                                that.parent().trigger( tbEvent );
+                                [].map.call(
+                                    that.parents().toArray(),
+                                    function( tbObject ){
+                                        if ( tbObject.handlers[ tbEvent.name ] ){
+                                            tbObject.trigger( tbEvent );
+                                        }
+                                    }
+                                );
                             }
 
                             // bubble down
                             if ( tbEvent.bubble.indexOf('d') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
                                 //console.log( 'bubble event', tbEvent, 'down to', that.children() );
-                                that.children().trigger( tbEvent );
+                                [].map.call(
+                                    that.children().toArray(),
+                                    function( tbObject ){
+                                        if ( tbObject.handlers[ tbEvent.name ] ){
+                                            tbObject.trigger( tbEvent );
+                                        }
+                                    }
+                                );
                             }
 
                         },
