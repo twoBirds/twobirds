@@ -782,14 +782,22 @@ tb = (function(){
                 // construct event if necessary
                 tbEvent = pEvent instanceof TbEvent ? pEvent : new TbEvent( pEvent, pEventData, pBubble );
 
-                // execute handlers via setTimeout
+                // if event __stopped__ , handling is cancelled
+                if ( tbEvent.__stopped__  ) {
+                    return that;
+                }
+
+                // execute local handlers
                 if ( that instanceof TbSelector && that.hasOwnProperty( length ) ) {
 
                     [].forEach.call(
                         that,
                         function( tbInstance ){
                             //console.log( 'array trigger instance', tbEvent.name, 'on tbInstance', tbInstance );
-                            if ( !!tbInstance ){
+                            if ( !!tbInstance
+                                && tbInstance instanceof tb
+                                && !!tbEvent.__immediateStopped__
+                            ){
                                 tbInstance.trigger( tbEvent );
                             }
                         }
@@ -797,6 +805,7 @@ tb = (function(){
 
                 } else if ( that instanceof tb ) { // it must be a native tb object
 
+                    // local handlers
                     if ( !!that.handlers[tbEvent.name] && tbEvent.bubble.indexOf( 'l' ) > -1 ) {
 
                         var temp = [];
@@ -808,14 +817,7 @@ tb = (function(){
                                     && !tbEvent.__immediateStopped__
                                     && !!handler
                                 ){
-
                                     handler.apply(that, [tbEvent]);
-
-                                }
-
-                                //@todo: remove when sure
-                                if ( !handler ){
-                                    console.log( 'handler error', that.handlers[tbEvent.name] );
                                 }
 
                                 if ( !!handler && !handler.once ) {
@@ -829,29 +831,30 @@ tb = (function(){
 
                     }
 
-                    //bubble
+                    // if event __stopped__ , handling is cancelled
+                    if ( !!tbEvent.__stopped__  ) {
+                        return that;
+                    }
+
                     setTimeout(
-
-                        function() {
-
-                            // this will be called after all local event handlers have been called
-                            // if one of these sets __stopped__ to true, bubbling is cancelled
-                            if ( tbEvent.__stopped__ || tbEvent.__immediateStopped__  ) {
-                                return;
-                            }
+                        function(){
 
                             // bubble up
                             if ( tbEvent.bubble.indexOf('u') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
                                 //console.log( 'bubble event', tbEvent, 'up to', that.parent() );
-                                [].map.call(
-                                    that.parents().toArray(),
-                                    function( tbObject ){
-                                        if ( tbObject.handlers[ tbEvent.name ] ){
-                                            tbObject.trigger( tbEvent );
-                                        }
+                                var done = false,
+                                    tbObject = that;
+
+                                while ( !done && !!tbObject ){
+                                    var tbObject = tbObject.parent()[0] || false;
+
+                                    if ( !!tbObject['handlers']
+                                        &&tbObject.handlers[ tbEvent.name ]
+                                    ){
+                                        tbObject.trigger( tbEvent );
                                     }
-                                );
+                                }
                             }
 
                             // bubble down
@@ -862,16 +865,21 @@ tb = (function(){
                                     that.children().toArray(),
                                     function( tbObject ){
                                         if ( tbObject.handlers[ tbEvent.name ] ){
-                                            tbObject.trigger( tbEvent );
+                                            tbObject.trigger(
+                                                new TbEvent(
+                                                    tbEvent.name,
+                                                    tbEvent.data,
+                                                    tbEvent.bubble
+                                                )
+                                            );
                                         }
                                     }
                                 );
                             }
 
                         },
-
-                        1
-                    );
+                        0
+                    )
 
                 }
 

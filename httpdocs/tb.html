@@ -37,19 +37,19 @@
                 function init( e ){
                     var that = this;
 
-                    //console.log( 'requirements loaded:', tb.loader.get('/demoapp/test.html'), tb.loader.get('/demoapp/test.json') );
-
-                    for ( var x=0; x < 5; x++ ) new tb(
+                    for ( var x=0; x < 5; x++ ) {
+                        new tb(
                             app.Parent,
                             {},
                             that.target.appendChild( document.createElement("div") )
-                    );
+                        );
+                    }
                 }
 
                 function test( e ){
                     var that = this;
 
-                    //console.info( 'Handler "test" in: ', that.target, 'sender: ',  e.data );
+                    console.info( 'Handler "test" in: ', that.target, 'sender: ',  e );
                 }
 
             })();
@@ -79,11 +79,11 @@
                 function init( e ){
                     var that = this;
 
-                    for ( var i=0; i<5; i++ ){
+                    for ( var i=0; i<10; i++ ){
                         new tb(
-                                app.Child,
-                                {},
-                                that.target.appendChild( document.createElement("div") )
+                            app.Child,
+                            {},
+                            that.target.appendChild( document.createElement("div") )
                         );
                     }
                 }
@@ -159,7 +159,7 @@
                     if ( e.data.namespace === 'app.EmbeddedObject2' ){
                         e.stopPropagation();
                     }
-                    //console.info( 'Handler "test" in:', that.target, 'sender: ', e.data );
+                    console.info( 'Handler "test" in:', that.target, 'sender: ', e );
                 }
 
             })();
@@ -194,9 +194,9 @@
 
                     for ( var i=0; i<2; i++ ){
                         new tb(
-                                app.GreatGrandChild,
-                                {},
-                                that.target.appendChild( document.createElement("div") )
+                            app.GreatGrandChild,
+                            {},
+                            that.target.appendChild( document.createElement("div") )
                         );
                     }
                 }
@@ -228,7 +228,7 @@
                 function init( e ){
                     var that = this;
 
-                    that.trigger( 'test', that, 'u' );
+                    //that.trigger( 'test', that, 'u' );
                 }
 
             })();
