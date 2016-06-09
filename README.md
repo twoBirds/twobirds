@@ -1,4 +1,4 @@
-# twoBirds v6.0a
+# twoBirds v7.0a
 
 Welcome Birdies ;-)
 
@@ -7,13 +7,13 @@ event-driven JavaScript framework that maps nested objects to DOM nodes.
 
 twoBirds strictly follows the KISS doctrine, it is the minimum possible solution for an application framework.
 
-It consists of 3 parts:
+It consists of 3 parts ( these examples using jQuery ):
 
 #### 1.) a simple client repository object structure + instanciation mechanism
 
 demoapp/myClass.js
 ```
-var demoapp = {};
+var demoapp = demoapp || {};
 
 
 demoapp.myClass = function(){
@@ -45,7 +45,7 @@ new tb(
 #### 2.) a selector to adress instances of these objects on the page
 
 ```
-tb( 'body' )
+tb( document.body )    // will return any tb instances that are contained in document.body
 ```
 
 #### 3.) a trigger mechanism to communicate with the selected instance on the page
@@ -61,12 +61,9 @@ All instances of these classes are stored in DOM nodes or other tB instances.
 
 twoBirds was created 2004 and saw its first commercial use in 2006.
 
-twoBirds utilizes jQuery.
+twoBirds has a selector ot its own, but can work with any selector lib that returns array-like objects.
 
-* [Tech demo](http://demo.two-birds.selfhost.eu/) Desktop only. Code is included in this repo.
-* [API documentation](doc/README.md) only this so far, but it will get you going. 
-
-Comparision: twoBirds can be compared to Flight, Polymer / Web Components and most of all react.js. 
+Comparision: twoBirds can be compared to Flight, Polymer / Web Components and most of all react.js.
 Unlike these frameworks it allows for complete separation of code and design. As mentioned it aims at making nesting of loose coupled objects into complex structures easier and more transparent. 
 Requirement loading is an inherent part of the system.
 
