@@ -10,214 +10,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
     // VARIABLES
     var FieldValidator; // to be returned later
 
-    var messages = {
-        'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
-        'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
-        'This value is too small!': 'Dieser Wert ist zu klein.',
-        'This value is too big!': 'Dieser Wert ist zu gross.',
-        'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
-        'resetMessage': ''
-    };
-
-    var classes = {
-        info: 'tb-ui-validator-info',
-        warning: 'tb-ui-validator-warning',
-        error: 'tb-ui-validator-error'
-    };
-
-    // VALIDATOR FUNCTION FACTORIES
-
-    /**
-     message factory, sets message
-
-     @function message
-     @returns function
-     */
-    function message( pMessage ){
-        var f;
-
-        f = function( value ) {
-            return false; // always display message
-        };
-
-        if ( !!pMessage && typeof pMessage === 'string' ){
-            f.message = pMessage;
-        }
-
-        return f;
-
-    }
-
-    /**
-     reset factory, deletes messages
-
-     @function reset
-     @returns function
-     */
-    function reset(){
-        var f;
-
-        f = function( value ) {
-            return true;
-        };
-
-        return f;
-
-    }
-
-    /**
-     required factory, checks input for existence
-
-     @function required
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function required( pMessage ){
-        var f;
-
-        f = function( value ) {
-            return !!value;
-        };
-
-        if ( !!pMessage && typeof pMessage === 'string' ){
-            f.message = pMessage;
-        }
-
-        return f;
-
-    }
-
-    /**
-     regex factory, checks input for regex match
-
-     @function regex
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function regex( pRegEx ){
-        var f;
-
-        f = function( value ){
-            return !!value.match( pRegEx );
-        };
-
-        return f;
-
-    }
-
-    /**
-     email factory, checks input for valid email adress
-
-     @function regex
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function email( pDelimiter ){
-        var delimiter = typeof pDelimiter === 'string' && pDelimiter.length === 1
-                ? pDelimiter
-                : false,
-            eMailRegEx = regex( /^[A-Z0-9._%+-]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i ), // regex function
-            f;
-
-        f = function( value ){
-
-            var adresses = delimiter ? value.split( delimiter ) : [ value ],
-                valid = true;
-
-            $.map(
-                adresses,
-                function( email ){
-                    if ( !eMailRegEx( email ) ){
-                        valid = false;
-                    }
-                }
-            );
-
-            return valid;
-        };
-
-        return f;
-
-    }
-
-    /**
-     min factory, checks parseInt( input ) < manimal value given
-
-     @function min
-     @param pMinValue {string} - the minimium value
-     @returns function
-     */
-    function min( pMinValue ){
-        var f;
-
-        f = function( value ){
-            return !!parseFloat(pMinValue) <= parseFloat(value);
-        };
-
-        return f;
-
-    }
-
-    /**
-     max factory, checks parseInt( input ) > maximal value given
-
-     @function max
-     @param pMaxValue {string} - the maximium value
-     @returns function
-     */
-    function max( pMaxValue ){
-        var f;
-
-        f = function( value ){
-            return !!parseFloat(pMaxValue) >= parseFloat(value);
-        };
-
-        return f;
-
-    }
-
-    // OTHER FUNCTIONS
-
-    /**
-     validate handler
-
-     @event validate
-     @param e
-     */
-    function validate( pConfig ){
-
-        var that = this;
-
-        // console.log( 'fieldValidator::validate' );
-
-        that
-            .parents('form')[0]
-            .formValidator
-            .trigger( 'onStartFieldValidation' );
-
-        // execute beforeSubmit() validation
-        that
-            .config
-            .$inputElement
-            .one(
-                'beforeSubmit',
-                function(){
-                    setTimeout(
-                        function(){
-                            that
-                               .parents('form')[0]
-                               .formValidator
-                               .trigger( 'onEndFieldValidation' );
-
-                        },
-                        100
-                    );
-                }
-            )
-            .trigger( 'beforeSubmit' );
-
-    }
-
     /**
      FieldValidator constructor
 
@@ -486,6 +278,214 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
     return FieldValidator;
 
+    var messages = {
+        'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
+        'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
+        'This value is too small!': 'Dieser Wert ist zu klein.',
+        'This value is too big!': 'Dieser Wert ist zu gross.',
+        'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
+        'resetMessage': ''
+    };
+
+    var classes = {
+        info: 'tb-ui-validator-info',
+        warning: 'tb-ui-validator-warning',
+        error: 'tb-ui-validator-error'
+    };
+
+    // VALIDATOR FUNCTION FACTORIES
+
+    /**
+     message factory, sets message
+
+     @function message
+     @returns function
+     */
+    function message( pMessage ){
+        var f;
+
+        f = function( value ) {
+            return false; // always display message
+        };
+
+        if ( !!pMessage && typeof pMessage === 'string' ){
+            f.message = pMessage;
+        }
+
+        return f;
+
+    }
+
+    /**
+     reset factory, deletes messages
+
+     @function reset
+     @returns function
+     */
+    function reset(){
+        var f;
+
+        f = function( value ) {
+            return true;
+        };
+
+        return f;
+
+    }
+
+    /**
+     required factory, checks input for existence
+
+     @function required
+     @param pMessage {string} - the message to display on error
+     @returns function
+     */
+    function required( pMessage ){
+        var f;
+
+        f = function( value ) {
+            return !!value;
+        };
+
+        if ( !!pMessage && typeof pMessage === 'string' ){
+            f.message = pMessage;
+        }
+
+        return f;
+
+    }
+
+    /**
+     regex factory, checks input for regex match
+
+     @function regex
+     @param pMessage {string} - the message to display on error
+     @returns function
+     */
+    function regex( pRegEx ){
+        var f;
+
+        f = function( value ){
+            return !!value.match( pRegEx );
+        };
+
+        return f;
+
+    }
+
+    /**
+     email factory, checks input for valid email adress
+
+     @function regex
+     @param pMessage {string} - the message to display on error
+     @returns function
+     */
+    function email( pDelimiter ){
+        var delimiter = typeof pDelimiter === 'string' && pDelimiter.length === 1
+                ? pDelimiter
+                : false,
+            eMailRegEx = regex( /^[A-Z0-9._%+-]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i ), // regex function
+            f;
+
+        f = function( value ){
+
+            var adresses = delimiter ? value.split( delimiter ) : [ value ],
+                valid = true;
+
+            $.map(
+                adresses,
+                function( email ){
+                    if ( !eMailRegEx( email ) ){
+                        valid = false;
+                    }
+                }
+            );
+
+            return valid;
+        };
+
+        return f;
+
+    }
+
+    /**
+     min factory, checks parseInt( input ) < manimal value given
+
+     @function min
+     @param pMinValue {string} - the minimium value
+     @returns function
+     */
+    function min( pMinValue ){
+        var f;
+
+        f = function( value ){
+            return !!parseFloat(pMinValue) <= parseFloat(value);
+        };
+
+        return f;
+
+    }
+
+    /**
+     max factory, checks parseInt( input ) > maximal value given
+
+     @function max
+     @param pMaxValue {string} - the maximium value
+     @returns function
+     */
+    function max( pMaxValue ){
+        var f;
+
+        f = function( value ){
+            return !!parseFloat(pMaxValue) >= parseFloat(value);
+        };
+
+        return f;
+
+    }
+
+    // OTHER FUNCTIONS
+
+    /**
+     validate handler
+
+     @event validate
+     @param e
+     */
+    function validate( pConfig ){
+
+        var that = this;
+
+        // console.log( 'fieldValidator::validate' );
+
+        that
+            .parents('form')[0]
+            .formValidator
+            .trigger( 'onStartFieldValidation' );
+
+        // execute beforeSubmit() validation
+        that
+            .config
+            .$inputElement
+            .one(
+                'beforeSubmit',
+                function(){
+                    setTimeout(
+                        function(){
+                            that
+                               .parents('form')[0]
+                               .formValidator
+                               .trigger( 'onEndFieldValidation' );
+
+                        },
+                        100
+                    );
+                }
+            )
+            .trigger( 'beforeSubmit' );
+
+    }
+
 })();
 
 /**
@@ -494,6 +494,62 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
     var FormValidator;
+
+    /**
+     FormValidator constructor
+
+     @class tb.ui.FormValidator
+     @constructor
+
+     @param pConfig
+     */
+    FormValidator = function( pConfig ){
+
+        var that = this,
+            config = pConfig;
+
+        that.config = config;
+
+        // this indicates the number of field validations currently in progress,
+        // when it reaches 0 callbacks are executed depending on status
+        that.fieldValidationCount = 0;
+
+        // this will contain all errors and warnings after validation
+        that.status = {
+            warning: [],
+            error: []
+        };
+
+        // handlers for instance
+        that.handlers = {
+            setStatus: setStatus,
+            validate: validate,
+            onStartFieldValidation: onStartFieldValidation,
+            onEndFieldValidation: onEndFieldValidation
+        }
+
+    };
+
+    FormValidator.prototype = {
+
+        /**
+         used to identify instance(s) via tb( /&lt;string&gt;/ )
+
+         @property namespace
+         @type string
+         @static
+         */
+        namespace: 'tb.ui.FormValidator',
+
+        /**
+         validate form
+
+         @method validate
+         */
+        validate: validate
+    };
+
+    return FormValidator;
 
     // VARIABLES
     var messages = {
@@ -597,62 +653,6 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
     }
 
-    /**
-     FormValidator constructor
-
-     @class tb.ui.FormValidator
-     @constructor
-
-     @param pConfig
-     */
-    FormValidator = function( pConfig ){
-
-        var that = this,
-            config = pConfig;
-
-        that.config = config;
-
-        // this indicates the number of field validations currently in progress,
-        // when it reaches 0 callbacks are executed depending on status
-        that.fieldValidationCount = 0;
-
-        // this will contain all errors and warnings after validation
-        that.status = {
-            warning: [],
-            error: []
-        };
-
-        // handlers for instance
-        that.handlers = {
-            setStatus: setStatus,
-            validate: validate,
-            onStartFieldValidation: onStartFieldValidation,
-            onEndFieldValidation: onEndFieldValidation
-        }
-
-    };
-
-    FormValidator.prototype = {
-
-        /**
-         used to identify instance(s) via tb( /&lt;string&gt;/ )
-
-         @property namespace
-         @type string
-         @static
-         */
-        namespace: 'tb.ui.FormValidator',
-
-        /**
-         validate form
-
-         @method validate
-         */
-        validate: validate
-    };
-
-    return FormValidator;
-
 })();
 
 /**
@@ -662,6 +662,88 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
     // VARIABLES
     var messages = {};
+
+    /**
+     Field constructor
+
+     @class Field
+     @constructor
+
+     @param pConfig
+     */
+    var Field = function( pConfig ){
+
+        // var
+        var that = this,
+            config;
+
+        config = that.config = pConfig;
+
+        /**
+         event handlers of this instance at creation time
+
+         @example
+
+            //the object &lt;property name&gt; equals the event name you trigger, like
+            handlers = { &lt;event name&gt;: &lt;function name&gt; }
+
+         @example
+
+            &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+
+         @property handlers
+         @type object
+         */
+        that.handlers = {
+            init: init,
+            render: render,
+            focus: focus,
+            scrollTo: scrollTo,
+            validate: validate
+        }
+
+    };
+
+    Field.prototype = {
+
+        /**
+         used to identify instance(s) via tb( /&lt;string&gt;/ )
+
+         @property namespace
+         @type string
+         @static
+         */
+        namespace: 'tb.ui.Field',
+
+        /**
+         static helper variable for last field generated
+
+         @property prevField
+         @type {object} - tb.ui.Field
+         @static
+         */
+        prevField: {},
+
+        /**
+         handles requirement loading, an array containing file name strings
+
+         @property tb.require
+         @type array
+         @static
+         */
+        'tb.require': [
+            '/namespace/tb/css/Form.css' /** @todo: export to path */
+        ],
+
+        /**
+         renders field html
+         @method render
+         */
+        render: render
+
+    };
+
+    return Field;
 
     // PRIVATE FUNCTIONS
     /**
@@ -873,146 +955,12 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
         );
     }
 
-
-    /**
-     Field constructor
-
-     @class Field
-     @constructor
-
-     @param pConfig
-     */
-    var Field = function( pConfig ){
-
-        // var
-        var that = this,
-            config;
-
-        config = that.config = pConfig;
-
-        /**
-         event handlers of this instance at creation time
-
-         @example
-
-            //the object &lt;property name&gt; equals the event name you trigger, like
-            handlers = { &lt;event name&gt;: &lt;function name&gt; }
-
-         @example
-
-            &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
-
-         @property handlers
-         @type object
-         */
-        that.handlers = {
-            init: init,
-            render: render,
-            focus: focus,
-            scrollTo: scrollTo,
-            validate: validate
-        }
-
-    };
-
-    Field.prototype = {
-
-        /**
-         used to identify instance(s) via tb( /&lt;string&gt;/ )
-
-         @property namespace
-         @type string
-         @static
-         */
-        namespace: 'tb.ui.Field',
-
-        /**
-         static helper variable for last field generated
-
-         @property prevField
-         @type {object} - tb.ui.Field
-         @static
-         */
-        prevField: {},
-
-        /**
-         handles requirement loading, an array containing file name strings
-
-         @property tb.require
-         @type array
-         @static
-         */
-        'tb.require': [
-            '/namespace/tb/css/Form.css' /** @todo: export to path */
-        ],
-
-        /**
-         renders field html
-         @method render
-         */
-        render: render
-
-    };
-
-    return Field;
-
 })();
 
 /**
  * @namespace tb.ui.FieldSet
  */
 tb.namespace( 'tb.ui', true ).FieldSet = (function(){
-
-    // VARIABLES
-    var messages = {
-    };
-
-    // PRIVATE FUNCTIONS
-    /**
-     * init handler
-     *
-     * @event init
-     * @param e
-     */
-    function init( e ){
-        this.render();
-    }
-
-    /**
-     * render function, both used in handlers and as a method
-     *
-     * @event render
-     */
-    function render(){
-
-        var that = this;
-
-        // clear content (in case of re-render )
-        $( that.target )
-            .children()
-            .remove();
-
-        $.each(
-            that.config.fields,
-            function( key, value ){
-
-                var field;
-
-                if ( !value['name'] ){
-                    value.name = key;
-                }
-
-                field = new tb(
-                    tb.ui.Field,
-                    value,
-                    $( '<div />' ).appendTo( that.target )
-                );
-
-            }
-
-        );
-
-    }
 
     /**
      * FieldSet constructor
@@ -1022,7 +970,6 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
      *
      * @param pConfig
      */
-
     var FieldSet = function( pConfig ){
 
         // var
@@ -1081,21 +1028,13 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
 
     return FieldSet;
 
-})();
-
-/**
- * @namespace tb.ui.Form
- */
-tb.namespace( 'tb.ui', true ).Form = (function(){
-
     // VARIABLES
-
     var messages = {
     };
 
     // PRIVATE FUNCTIONS
     /**
-       * init handler
+     * init handler
      *
      * @event init
      * @param e
@@ -1111,49 +1050,41 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
      */
     function render(){
 
-        var that = this,
-            config = that.config;
+        var that = this;
 
         // clear content (in case of re-render )
-        $( that.target)
-            .attr( !!config.form ? config.form : {} ) // set form attributes
+        $( that.target )
             .children()
             .remove();
 
-        // reset last field created before this one
-        tb.ui.Field.prototype.prevField = false;
+        $.each(
+            that.config.fields,
+            function( key, value ){
 
-        // create fields
-        if ( config.fieldSets ){
+                var field;
 
-            // merge field definitions into fieldsets
-            $.each(
-                config.fieldSets,  // for each fieldset
-                function( fieldSetIndex, fieldSet ){
-
-                    // replace fields array in config with field definitions
-                    $.map(
-                        fieldSet.fields,
-                        function( value, key ){
-                            fieldSet.fields[key] = that.config.fields[value];
-                        }
-                    );
-
-                    // make fieldset
-                    new tb(
-                        tb.ui.FieldSet,
-                        fieldSet,
-                        $('<fieldset />').appendTo( that.target )
-                    );
+                if ( !value['name'] ){
+                    value.name = key;
                 }
-            );
 
-        }
+                field = new tb(
+                    tb.ui.Field,
+                    value,
+                    $( '<div />' ).appendTo( that.target )
+                );
 
-        // reset last field created before this one
-        tb.ui.Field.prototype.prevField = false;
+            }
+
+        );
 
     }
+
+})();
+
+/**
+ * @namespace tb.ui.Form
+ */
+tb.namespace( 'tb.ui', true ).Form = (function(){
 
     /**
      * Form constructor
@@ -1163,7 +1094,6 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
      *
      * @param pConfig
      */
-
     var Form = function( pConfig ){
 
         // var
@@ -1229,5 +1159,70 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
 
     return Form;
 
-})();
+    // VARIABLES
+    var messages = {
+    };
 
+    // PRIVATE FUNCTIONS
+    /**
+       * init handler
+     *
+     * @event init
+     * @param e
+     */
+    function init( e ){
+        this.render();
+    }
+
+    /**
+     * render function, both used in handlers and as a method
+     *
+     * @event render
+     */
+    function render(){
+
+        var that = this,
+            config = that.config;
+
+        // clear content (in case of re-render )
+        $( that.target)
+            .attr( !!config.form ? config.form : {} ) // set form attributes
+            .children()
+            .remove();
+
+        // reset last field created before this one
+        tb.ui.Field.prototype.prevField = false;
+
+        // create fields
+        if ( config.fieldSets ){
+
+            // merge field definitions into fieldsets
+            $.each(
+                config.fieldSets,  // for each fieldset
+                function( fieldSetIndex, fieldSet ){
+
+                    // replace fields array in config with field definitions
+                    $.map(
+                        fieldSet.fields,
+                        function( value, key ){
+                            fieldSet.fields[key] = that.config.fields[value];
+                        }
+                    );
+
+                    // make fieldset
+                    new tb(
+                        tb.ui.FieldSet,
+                        fieldSet,
+                        $('<fieldset />').appendTo( that.target )
+                    );
+                }
+            );
+
+        }
+
+        // reset last field created before this one
+        tb.ui.Field.prototype.prevField = false;
+
+    }
+
+})();

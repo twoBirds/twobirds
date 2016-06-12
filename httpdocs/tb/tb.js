@@ -520,7 +520,7 @@ tb = (function(){
 
         return that;
 
-    };
+    }
 
     // HINT: TbSelector (class) prototype definition after Tb prototype definition
 
@@ -593,7 +593,7 @@ tb = (function(){
                                 args[1] || {},
                                 args[2] || false
                             );
-                        }
+                        };
                     })( [].slice.call( arguments ) )
                 );
 
@@ -2711,9 +2711,11 @@ tb.request = (function () {
 
         inc();
 
+        /*
         if (isCachable === false) { // proxy disable - cache busting
             url += (url.indexOf('?') < 0 ? '?' : '&') + 'tbUid=' + uid;
         }
+        */
 
         xmlreq = getConnection(uid);
         if (xmlreq) {
@@ -2802,7 +2804,7 @@ tb.request = (function () {
  * document.ready bootstrap
  */
 (function(){
-    
+
     function domReady () {
         tb.bind( 'body' ); // find all tb dom nodes and add tb objects if not yet done
     }
