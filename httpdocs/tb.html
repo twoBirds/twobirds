@@ -92,7 +92,7 @@
 
 
             // simple objects...
-            app.EmbeddedObject1 = function( pConfig ){
+            app.EmbeddedObject1 = function EmbeddedObject1( pConfig ){
             };
 
             app.EmbeddedObject1.prototype = {
@@ -100,7 +100,7 @@
                 'app.EmbeddedObject2': {}
             };
 
-            app.EmbeddedObject2 = function( pConfig ){
+            app.EmbeddedObject2 = function EmbeddedObject2( pConfig ){
                 var that = this;
 
                 that.handlers = {

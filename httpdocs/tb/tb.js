@@ -1562,7 +1562,7 @@ tb = (function(){
         TbSelector.prototype[i] = tb.prototype[i];
     }
 
-    Tb = tb; // to have an uppercase constructor name @todo: rethink this
+    //Tb = tb; // to have an uppercase constructor name @todo: rethink this
 
     return tb;
 
