@@ -1,8 +1,0 @@
-/* line 4, ../sass/MultiSelect.scss */
-.knd-multiselect > div > ul > li.k-button {
-  border-radius: 10px;
-  background-image: linear-gradient(to bottom, #ffaaaa, #c8c8c8);
-  background-position: 0 0;
-  background-repeat: repeat-x;
-  background-size: 100% auto;
-}

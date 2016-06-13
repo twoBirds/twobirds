@@ -22,297 +22,321 @@ tb = (function(){
      * @param {string|domNode|array} a selector string, a dom node or an array of dom nodes
      * @return {string} - result string
      */
-    var dom = (function() { return function( pSelector, pDomNode ){
+    var dom;
+    dom = (function () {
+        return function (pSelector, pDomNode) {
 
-        var dom;
+            var dom;
 
-        // dom constructor
-        dom = function( pSelector, pDomNode ){
+            // dom constructor
+            dom = function (pSelector, pDomNode) {
 
-            var that = this,
-                domNode,
-                nodeList;
+                var that = this,
+                    domNode,
+                    nodeList;
 
-            if ( !pSelector ) { // no selector given, or not a string
-                return;
-            } else if ( !!pSelector['nodeType'] ){ // selector is a dom node
-                [].push.call( that, pSelector );
-                return;
-            } else if ( !!pSelector[0] && pSelector[0] instanceof TbSelector ){ // a twobirds selector result set
-                [].forEach.call(
-                    pSelector,
-                    function( pElement ){   // copy only DOM nodes
-                        if ( !!pElement['target']
-                            && !!pElement['target']['nodeType']
-                        ){
-                            [].push.call( that, pElement );
+                if (!pSelector) { // no selector given, or not a string
+                    return;
+                } else if (!!pSelector['nodeType']) { // selector is a dom node
+                    [].push.call(that, pSelector);
+                    return;
+                } else if (!!pSelector[0] && pSelector[0] instanceof TbSelector) { // a twobirds selector result set
+                    [].forEach.call(
+                        pSelector,
+                        function (pElement) {   // copy only DOM nodes
+                            if (!!pElement['target']
+                                && !!pElement['target']['nodeType']
+                            ) {
+                                [].push.call(that, pElement);
+                            }
                         }
+                    );
+                    return;
+                } else if (pSelector instanceof Array) {
+                    [].forEach.call(
+                        pSelector,
+                        function (pElement) {   // copy only DOM nodes
+                            if (!!pElement && !!pElement['nodeType']) {
+                                [].push.call(that, pElement);
+                            }
+                        }
+                    );
+                    return;
+                } else if (typeof pSelector !== 'string') { // wrong selector type
+                    return;
+                }
+
+                domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
+
+                nodeList = domNode.querySelectorAll(pSelector);
+
+                if (!!nodeList.length) {
+                    [].forEach.call(
+                        nodeList,
+                        function (domElement) {
+                            that[that.length] = domElement;
+                            that.length++;
+                        }
+                    );
+                }
+
+            };
+
+            // dom prototype, public functions
+            dom.prototype = {
+
+                length: 0,
+
+                // from Array prototype
+                concat: [].concat,
+                every: [].every,
+                forEach: [].forEach,
+                indexOf: [].indexOf,
+                keys: [].keys,
+                lastIndexOf: [].lastIndexOf,
+                map: [].map,
+                pop: [].pop,
+                reduce: [].reduce,
+                reduceRight: [].reduceRight,
+                reverse: [].reverse,
+                shift: [].shift,
+                slice: [].slice,
+                some: [].some,
+                splice: [].splice,
+                unshift: [].unshift,
+
+                //own functions
+                add: add,
+                addClass: addClass,
+                removeClass: removeClass,
+                attr: attr,
+                filter: filter,
+                not: not,
+                parents: parents,
+                push: push,
+                toArray: toArray,
+                unique: unique
+            };
+
+            return new dom(pSelector, pDomNode);
+
+            // private functions
+            function unique() {
+                var that = this,
+                    result = [];
+
+                result = that.filter(
+                    function (pElement) {
+                        return result.indexOf(pElement) === -1;
                     }
                 );
-                return;
-            } else if ( pSelector instanceof Array ){
-                [].forEach.call(
-                    pSelector,
-                    function( pElement ){   // copy only DOM nodes
-                        if ( !!pElement && !!pElement['nodeType'] ){
-                            [].push.call( that, pElement );
-                        }
-                    }
-                );
-                return;
-            } else if ( typeof pSelector !== 'string' ){ // wrong selector type
-                return;
+
+                return dom(result);
             }
 
-            domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
+            function not(pSelector) {
+                var that = this,
+                    result = new dom(),
+                    compare = new dom(pSelector);
 
-            nodeList = domNode.querySelectorAll( pSelector );
+                that.forEach(function (pElement) {
+                    if (-1 === compare.indexOf(pElement)) {
+                        result.add(pElement);
+                    }
+                });
 
-            if ( !!nodeList.length ){
-                [].forEach.call(
-                    nodeList,
-                    function( domElement ){
-                        that[ that.length ] = domElement;
-                        that.length ++;
+                return result;
+            }
+
+            function add(pElements) {
+                var that = this,
+                    result;
+
+                if (pElements instanceof Array) { // if array given add each of its elements
+                    pElements.forEach(
+                        function (pElement) {
+                            that.add(pElement);
+                        }
+                    );
+                } else if (!!pElements['nodeType']) { // if DOM node given add it
+                    that.push(pElements);
+                } else if (typeof pElements === 'string') { // DOM selector given add its results
+                    that.add(new dom(pElements).toArray());
+                }
+
+                result = that.unique();
+
+                return result;
+            }
+
+            function parents(pSelector) {
+
+                var that = this,
+                    result = new dom(),
+                    nextNode;
+
+                that.forEach(
+                    function (pDomNode) {
+                        var domNode = pDomNode.parentNode;
+
+                        while (!!domNode
+                        && !!domNode['tagName']
+                        && domNode['tagName'] !== 'html'
+                            ) {
+                            nextNode = domNode.parentNode;
+                            if ([].indexOf.call(result, domNode) === -1) {
+                                result.push(domNode);
+                            }
+                            domNode = nextNode;
+                        }
                     }
                 );
+
+                if (!!pSelector) {
+                    result = result.filter(pSelector);
+                }
+
+                return result;
+            }
+
+            function addClass(pClassName) {
+
+                var that = this,
+                    rootNodes = that.toArray();
+
+                rootNodes.forEach(
+                    function (pNode) {
+                        var classes = pNode.getAttribute('class') || '',
+                            classes = classes.split(' ') || [],
+                            index = classes.indexOf(pClassName);
+
+                        if (index === -1) {
+                            pNode.setAttribute('class', !!classes ? classes + ' ' + pClassName : pClassName);
+                        }
+                    }
+                );
+
+                return that;
+            }
+
+            function removeClass(pClassName) {
+
+                var that = this,
+                    rootNodes = that.toArray();
+
+                rootNodes.forEach(
+                    function (pNode) {
+                        var classes = pNode.getAttribute('class') || '',
+                            classes = classes.split(' ') || [],
+                            index = classes.indexOf(pClassName);
+
+                        if (index !== -1) {
+                            classes.splice(index, 1);
+                        }
+
+                        pNode.setAttribute('class', classes.join(' '));
+
+                    }
+                );
+
+                return that;
+            }
+
+            function attr(pKey, pValue) {
+
+                var that = this,
+                    rootNodes;
+
+                if (!pValue && that.length > 0) { // if no value is given and there are elements, return attribute value of first in list
+                    return that[0].getAttribute(pKey);
+                }
+
+                // if a value to set is given, apply to all nodes in list
+                rootNodes = that.toArray();
+                rootNodes.forEach(
+                    function (pNode) {
+                        pNode.setAttribute(pKey, pValue);
+                    }
+                );
+
+                return that;
+            }
+
+            function toArray() {
+
+                var that = this,
+                    result = [];
+
+                if (!!that.length) {
+                    [].map.call(
+                        that,
+                        function (pElement) {
+                            result.push(pElement);
+                        }
+                    );
+                }
+
+                return result;
+
+            }
+
+            function filter(pSelector) {
+
+                var that = this,
+                    compare = new dom(pSelector),// functions and undefined will be ignored, so empty result then
+                    result;
+
+                if (pSelector === 'undefined') return that;    // unchanged
+
+                //console.log( 'filter', that, 'using pSelector', compare );
+                if (typeof pSelector === 'string') { // DOM selector given
+                    result = [].filter.call(
+                        that,
+                        function (pElement) {
+                            return -1 < compare.indexOf(pElement);
+                        }
+                    );
+                    //console.log( 'after [].filter.call() result => ', result );
+                } else if (typeof pSelector === 'function') { // function given
+                    //console.log( 'filter compare', that, 'with selector result ', pSelector );
+                    result = [].filter.call(
+                        that,
+                        pSelector
+                    );
+                }
+
+                //console.log( 'result, new dom', result, new tb.dom( result ) );
+
+                return new dom(result);
+
+            }
+
+            function push(pSelector) {
+
+                var that = this,
+                    result = [];
+
+                if (typeof pSelector === 'undefined') return that;    // unchanged
+
+                if (pSelector instanceof Array) { // if array given add each of its elements
+                    pSelector.forEach(
+                        function (pElement) {
+                            that.push(pElement);
+                        }
+                    );
+                } else if (!!pSelector['nodeType']) { // if DOM node given add it
+                    [].push.call(that, pSelector);
+                } else if (typeof pSelector === 'string') { // DOM selector given add its results
+                    that.push(new dom(pSelector).toArray());
+                }
+
+                result = that.unique();
+
+                return result;
             }
 
         };
-
-        // dom prototype, public functions
-        dom.prototype = {
-
-            length: 0,
-
-            // from Array prototype
-            concat: [].concat,
-            every: [].every,
-            forEach: [].forEach,
-            indexOf: [].indexOf,
-            keys: [].keys,
-            lastIndexOf: [].lastIndexOf,
-            map: [].map,
-            pop: [].pop,
-            reduce: [].reduce,
-            reduceRight: [].reduceRight,
-            reverse: [].reverse,
-            shift: [].shift,
-            slice: [].slice,
-            some: [].some,
-            splice: [].splice,
-            unshift: [].unshift,
-
-            //own functions
-            add: add,
-            addClass: addClass,
-            attr: attr,
-            filter: filter,
-            not: not,
-            parents: parents,
-            push: push,
-            toArray: toArray,
-            unique: unique
-        };
-
-        return new dom( pSelector, pDomNode );
-
-        // private functions
-        function unique(){
-            var that = this,
-                result = [];
-
-            result = that.filter(
-                function( pElement ){
-                    if ( result.indexOf( pElement ) === -1 ){
-                        return true;
-                    }
-                    return false;
-                }
-            );
-
-            return dom( result );
-        }
-
-        function not( pSelector ) {
-            var that = this,
-                result = new dom(),
-                compare = new dom( pSelector );
-
-            that.forEach( function( pElement ){
-                if ( -1 === compare.indexOf( pElement ) ){
-                    result.add( pElement );
-                }
-            });
-
-            return result;
-        }
-
-        function add( pElements ){
-            var that = this,
-                result;
-
-            if ( pElements instanceof Array ){ // if array given add each of its elements
-                pElements.forEach(
-                    function( pElement ){
-                        that.add( pElement );
-                    }
-                );
-            } else if ( !!pElements[ 'nodeType' ] ){ // if DOM node given add it
-                that.push( pElements );
-            } else if ( typeof pElements === 'string' ){ // DOM selector given add its results
-                that.add( new dom( pElements ).toArray() );
-            }
-
-            result = that.unique();
-
-            return result;
-        }
-
-        function parents( pSelector ){
-
-            var that = this,
-                compare = new dom( pSelector ),
-                result = new dom(),
-                nextNode;
-
-            that.forEach(
-                function( pDomNode ){
-                    var domNode = pDomNode.parentNode;
-
-                    while ( !!domNode
-                    && !!domNode['tagName']
-                    && domNode['tagName'] !== 'html'
-                        ){
-                        nextNode = domNode.parentNode;
-                        if ( [].indexOf.call( result, domNode ) === -1 ){
-                            result.push( domNode );
-                        }
-                        domNode = nextNode;
-                    }
-                }
-            );
-
-            if ( !!pSelector ){
-                result = result.filter( pSelector );
-            }
-
-            return result;
-        }
-
-        function addClass( pClassName ){
-
-            var that = this,
-                rootNodes = that.toArray(),
-                classes;
-
-            rootNodes.forEach(
-                function( pNode ){
-                    var classes = pNode.getAttribute( 'class' ) || '';
-
-                    if ( classes.split(' ').indexOf( pClassName ) === -1 ){
-                        pNode.setAttribute( 'class', !!classes ? classes + ' ' + pClassName : pClassName );
-                    }
-                }
-            );
-
-            return that;
-        }
-
-        function attr( pKey, pValue ){
-
-            var that = this,
-                rootNodes;
-
-            if ( !pValue && that.length > 0 ) { // if no value is given and there are elements, return attribute value of first in list
-                return that[0].getAttribute( pKey );
-            }
-
-            // if a value to set is given, apply to all nodes in list
-            rootNodes = that.toArray();
-            rootNodes.forEach(
-                function( pNode ){
-                    pNode.setAttribute( pKey, pValue );
-                }
-            );
-
-            return that;
-        }
-
-        function toArray(){
-
-            var that = this,
-                result = [];
-
-            if ( !!that.length ){
-                [].map.call(
-                    that,
-                    function( pElement ){
-                        result.push( pElement );
-                    }
-                );
-            }
-
-            return result;
-
-        }
-
-        function filter( pSelector ){
-
-            var that = this,
-                compare = new dom( pSelector ),// functions and undefined will be ignored, so empty result then
-                result;
-
-            if ( pSelector === 'undefined' ) return that;    // unchanged
-
-            //console.log( 'filter', that, 'using pSelector', compare );
-            if ( typeof pSelector === 'string' ){ // DOM selector given
-                result = [].filter.call(
-                    that,
-                    function( pElement ){
-                        return -1 < compare.indexOf( pElement );
-                    }
-                );
-                //console.log( 'after [].filter.call() result => ', result );
-            } else if ( typeof pSelector === 'function' ){ // function given
-                //console.log( 'filter compare', that, 'with selector result ', pSelector );
-                result = [].filter.call(
-                    that,
-                    pSelector
-                );
-            }
-
-            //console.log( 'result, new dom', result, new tb.dom( result ) );
-
-            return new dom( result );
-
-        }
-
-        function push( pSelector ){
-
-            var that = this,
-                result = [];
-
-            if ( typeof pSelector === 'undefined' ) return that;    // unchanged
-
-            if ( pSelector instanceof Array ){ // if array given add each of its elements
-                pSelector.forEach(
-                    function( pElement ){
-                        that.push( pElement );
-                    }
-                );
-            } else if ( !!pSelector[ 'nodeType' ] ){ // if DOM node given add it
-                [].push.call( that, pSelector );
-            } else if ( typeof pSelector === 'string' ){ // DOM selector given add its results
-                that.push( new dom( pSelector ).toArray() );
-            }
-
-            result = that.unique();
-
-            return result;
-        }
-
-    };})();
+    })();
 
 
     /**
@@ -818,10 +842,10 @@ tb = (function(){
                                     && !!handler
                                 ){
                                     handler.apply(that, [tbEvent]);
-                                }
 
-                                if ( !!handler && !handler.once ) {
-                                    temp.push( handler );
+                                    if ( !handler.once ) {
+                                        temp.push( handler );
+                                    }
                                 }
 
                             }
@@ -878,7 +902,7 @@ tb = (function(){
                             }
 
                         },
-                        0
+                        10
                     )
 
                 }
