@@ -23,7 +23,7 @@
 /**
  * @namespace in3
  */
-tb.namespace( 'in3', true ).Body = (function(){
+tb.namespace( 'demoapp', true ).Footer = (function(){
 
     // VARIABLES
 
@@ -32,7 +32,7 @@ tb.namespace( 'in3', true ).Body = (function(){
 
     // PRIVATE FUNCTIONS
     /**
-     * @for in3.Body
+     * @for demoapp.Footer
      */
 
     /**
@@ -54,35 +54,37 @@ tb.namespace( 'in3', true ).Body = (function(){
 
         var that = this;
 
-        // top blue bar
-        new tb(
-            'in3.Header',
-            that.config.class,
-            $( '<div />').appendTo(that.target)
-        );
-
-        // inner content area
-        $( '<div class="in2-body-content"/>').appendTo(that.target);
-
-        // lower footer area
-        new tb(
-            'in3.Footer',
-            that.config.scope,
-            $( '<div />').appendTo(that.target)
-        );
+        // create footer content DIV
+        that.$content = $( '<div class="demoapp-footer-content">test footer</div>').appendTo(that.target);
 
     }
 
     /**
-     * body constructor
+     * setContent function, used as a method
      *
-     * @class Body
+     * @param [$pContentElements] {jQuery} jQuery content object(s)
+     */
+    function setContent( $pContentElements ){
+
+        var that = this;
+
+        // set footer content
+        $( '.demoapp-footer-content' )
+            .empty()
+            .append( $pContentElements );
+
+    }
+
+    /**
+     * Footer constructor
+     *
+     * @class Footer
      * @constructor
      *
      * @param pConfig
      */
 
-    var Body = function( pConfig ){
+    var Footer = function( pConfig ){
 
         // var
         var that = this; // for minification purposes
@@ -107,7 +109,7 @@ tb.namespace( 'in3', true ).Body = (function(){
 
     };
 
-    Body.prototype = {
+    Footer.prototype = {
 
         /**
          * used to identify instance(s) via tb( /&lt;string&gt;/ )
@@ -116,7 +118,7 @@ tb.namespace( 'in3', true ).Body = (function(){
          * @type string
          * @static
          */
-        namespace: 'in3.Body',
+        namespace: 'demoapp.Footer',
 
         /**
          * handles requirement loading, an array containing file name strings
@@ -126,17 +128,22 @@ tb.namespace( 'in3', true ).Body = (function(){
          * @static
          */
         'tb.require': [
-            '/namespace/in3/css/Body.css'
+            '/demoapp/Footer.css'
         ],
 
         /**
          * @method render
          */
-        render: render
+        render: render,
+
+        /**
+         * @method setContent
+         */
+        setContent: setContent
 
     };
 
-    return Body;
+    return Footer;
 
 })();
 

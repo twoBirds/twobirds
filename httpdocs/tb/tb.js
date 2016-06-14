@@ -207,11 +207,11 @@ tb = (function(){
                 rootNodes.forEach(
                     function (pNode) {
                         var classes = pNode.getAttribute('class') || '',
-                            classes = classes.split(' ') || [],
+                            classes = !!classes.length ? classes.split(' ') : [],
                             index = classes.indexOf(pClassName);
 
                         if (index === -1) {
-                            pNode.setAttribute('class', !!classes ? classes + ' ' + pClassName : pClassName);
+                            pNode.setAttribute('class', !!classes.length ? classes + ' ' + pClassName : pClassName);
                         }
                     }
                 );
@@ -227,14 +227,16 @@ tb = (function(){
                 rootNodes.forEach(
                     function (pNode) {
                         var classes = pNode.getAttribute('class') || '',
-                            classes = classes.split(' ') || [],
+                            classes = !!classes.length ? classes.split(' ') : [],
                             index = classes.indexOf(pClassName);
 
                         if (index !== -1) {
                             classes.splice(index, 1);
-                        }
 
-                        pNode.setAttribute('class', classes.join(' '));
+                            if ( classes.length ){
+                                pNode.setAttribute('class', classes.join(' '));
+                            }
+                        }
 
                     }
                 );
@@ -636,6 +638,7 @@ tb = (function(){
                 // make a new instance of given constructor
                 tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
 
+                console.log( tbInstance );
                 // prepare .namespace property of tb object
                 if ( !tbInstance.namespace ){
                     tbInstance.namespace = typeof arguments[0] === 'string'
@@ -646,6 +649,13 @@ tb = (function(){
                 // prepare .target property of tb object
                 tbInstance.target = arguments[2] || false; // preset
                 if ( !!arguments[2] ){
+                    if ( !arguments[2]['nodeType']
+                        && !!arguments[2][0]
+                        && !!arguments[2][0]['nodeType']
+                    ){
+                        arguments[2] = arguments[2][0]; // get first element of an array-like selector return object
+                    }
+
                     tbInstance.target = arguments[2];
                 } else {
                     tbInstance.target = null;

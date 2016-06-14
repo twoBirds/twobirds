@@ -1,17 +1,20 @@
-.in3-footer {
+.demoapp-footer {
   position: fixed;
-  width: 100%;
   bottom: 0;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  background-color: rgb(255, 255, 255);
+  left: 0;
+  width: 100%;
+  height: 4rem;
+  margin: 0px;
+  padding: 0.5rem 0;
+  background-color: hsl(244, 60%, 40%);
+  color: antiquewhite;
   text-align: center;
 
-  > .in3-footer-content {
+  > .demoapp-footer-content {
     overflow: hidden;
     max-width: 1040px;
     margin: 0 auto;
     text-align: left;
-    color: hsl(0, 0%, 40%);
 
     > :first-child {
       margin-left: 2.5rem;
@@ -49,4 +52,5 @@
     }
 
   }
+
 }
