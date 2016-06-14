@@ -1,0 +1,22 @@
+.demoapp-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4rem;
+  margin: 0px;
+  padding: 0.5rem 0;
+  background-color: #3129a3;
+  color: antiquewhite;
+  text-align: center; }
+  .demoapp-header > .demoapp-header-content {
+    overflow: hidden;
+    max-width: 1040px;
+    margin: 0 auto;
+    text-align: left; }
+    .demoapp-header > .demoapp-header-content > :first-child {
+      margin-left: 2.5rem; }
+    .demoapp-header > .demoapp-header-content > :last-child {
+      margin-right: 2.5rem; }
+
+/*# sourceMappingURL=Header.css.map */
