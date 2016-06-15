@@ -122,26 +122,26 @@ tb.namespace( 'demoapp', true ).Body = (function(){
 
         // footer area
         new tb(
-            'demoapp.Footer',
+            'demoapp.Footer', // lazy loading!!!
             {},
             that.target.appendChild( document.createElement("div") )
-        ).one( // execute only once
+        ).one( // deferred, execute only once
             'init', // when all requirements have loaded
             function setInitialFooter(){
                 var that = this;
 
-                that.setContent('- twoBirds -');
+                that.setContent('- this will be overwritten, see in code below -');
             }
-        ).on( // an example of how to map a prototype method to an event
+        ).on( // deferred, an example of how to map a prototype method to an event
             'setContent', // event name
             function setContentHandler( e ){ // associated function
                 var that = this;
 
                 that.setContent( e.data );
             }
-        ).trigger( // an example of deferred event triggering
+        ).trigger( // deferred event triggering
             'setContent', // event name
-            'blub'
+            '- twoBirds -'
         );
 
     }

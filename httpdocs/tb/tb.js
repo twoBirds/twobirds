@@ -873,7 +873,6 @@ tb = (function(){
                                 that.trigger( tbEvent );
                             }
                         );
-                        console.log( that, tbEvent ); debugger;
                         return that;
                     }
 
