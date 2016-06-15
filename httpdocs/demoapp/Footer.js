@@ -1,79 +1,7 @@
 /**
- * Intranet 3
- * Copyright (c) 2012- gyselroth™  (http://www.gyselroth.net)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License,
- * or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * @category    intranet
- * @package     intranet
- * @author      Frank Thürigen <thuerigen@gyselroth.com>
- * @copyright   Copyright (c) 2012- gyselroth™  (http://www.gyselroth.net)
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPLv3
- * @version     $Id:$
- */
-
-/**
- * @namespace in3
+ * @namespace demoapp
  */
 tb.namespace( 'demoapp', true ).Footer = (function(){
-
-    // VARIABLES
-
-    var messages = {
-    };
-
-    // PRIVATE FUNCTIONS
-    /**
-     * @for demoapp.Footer
-     */
-
-    /**
-     * init handler
-     *
-     * @event init
-     * @param e
-     */
-    function init( e ){
-        this.render();
-    }
-
-    /**
-     * render function, both used in handlers and as a method
-     *
-     * @event render
-     */
-    function render(){
-
-        var that = this;
-
-        // create footer content DIV
-        that.$content = $( '<div class="demoapp-footer-content">test footer</div>').appendTo(that.target);
-
-    }
-
-    /**
-     * setContent function, used as a method
-     *
-     * @param [$pContentElements] {jQuery} jQuery content object(s)
-     */
-    function setContent( $pContentElements ){
-
-        var that = this;
-
-        // set footer content
-        $( '.demoapp-footer-content' )
-            .empty()
-            .append( $pContentElements );
-
-    }
 
     /**
      * Footer constructor
@@ -84,7 +12,7 @@ tb.namespace( 'demoapp', true ).Footer = (function(){
      * @param pConfig
      */
 
-    var Footer = function( pConfig ){
+    function Footer( pConfig ){
 
         // var
         var that = this; // for minification purposes
@@ -106,8 +34,7 @@ tb.namespace( 'demoapp', true ).Footer = (function(){
             render: render
         }
 
-
-    };
+    }
 
     Footer.prototype = {
 
@@ -144,6 +71,59 @@ tb.namespace( 'demoapp', true ).Footer = (function(){
     };
 
     return Footer;
+
+    // VARIABLES
+
+    // PRIVATE FUNCTIONS
+    /**
+     * @for demoapp.Footer
+     */
+
+    /**
+     * init handler
+     *
+     * @event init
+     * @param e
+     */
+    function init( e ){
+        this.render();
+    }
+
+    /**
+     * render function, both used in handlers and as a method
+     *
+     * @event render
+     */
+    function render(){
+
+        var that = this;
+
+        // create footer content DIV
+        that.content = that
+            .target
+            .appendChild( document.createElement("div") );
+
+        that.setContent( 'test footer' );
+
+        tb.dom( that.content )
+            .addClass( 'demoapp-footer-content' );
+
+    }
+
+    /**
+     * setContent function, used as a method
+     *
+     * @param [$pContentHTML] {string} - the content inner HTML
+     */
+    function setContent( pContentHTML ){
+
+        var that = this;
+
+        console.log( 'footer setContent() method' )
+        // set footer content
+        that.content.innerHTML = !!pContentHTML ? pContentHTML : '';
+
+    }
 
 })();
 

@@ -7,9 +7,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
      @namespace tb.ui.FieldValidator
      */
 
-    // VARIABLES
-    var FieldValidator; // to be returned later
-
     /**
      FieldValidator constructor
 
@@ -18,7 +15,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
      @param pConfig
      */
-    FieldValidator = function( pConfig ){
+    function FieldValidator( pConfig ){
 
         var that = this,
             config = pConfig;
@@ -293,7 +290,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
         error: 'tb-ui-validator-error'
     };
 
-    // VALIDATOR FUNCTION FACTORIES
+    // private functions
 
     /**
      message factory, sets message
@@ -444,8 +441,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
     }
 
-    // OTHER FUNCTIONS
-
     /**
      validate handler
 
@@ -493,8 +488,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
  */
 tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
-    var FormValidator;
-
     /**
      FormValidator constructor
 
@@ -503,7 +496,7 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
      @param pConfig
      */
-    FormValidator = function( pConfig ){
+    function FormValidator( pConfig ){
 
         var that = this,
             config = pConfig;
@@ -552,8 +545,6 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
     return FormValidator;
 
     // VARIABLES
-    var messages = {
-    };
 
     // PRIVATE FUNCTIONS
     /**
@@ -660,9 +651,6 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
  */
 tb.namespace( 'tb.ui', true ).Field = (function() {
 
-    // VARIABLES
-    var messages = {};
-
     /**
      Field constructor
 
@@ -671,7 +659,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
      @param pConfig
      */
-    var Field = function( pConfig ){
+    function Field( pConfig ){
 
         // var
         var that = this,
@@ -744,6 +732,8 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
     };
 
     return Field;
+
+    // VARIABLES
 
     // PRIVATE FUNCTIONS
     /**
@@ -970,7 +960,7 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
      *
      * @param pConfig
      */
-    var FieldSet = function( pConfig ){
+    function FieldSet( pConfig ){
 
         // var
         var that = this;
@@ -1029,8 +1019,6 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
     return FieldSet;
 
     // VARIABLES
-    var messages = {
-    };
 
     // PRIVATE FUNCTIONS
     /**
@@ -1094,7 +1082,7 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
      *
      * @param pConfig
      */
-    var Form = function( pConfig ){
+    function Form( pConfig ){
 
         // var
         var that = this; // for minification purposes
@@ -1160,8 +1148,6 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
     return Form;
 
     // VARIABLES
-    var messages = {
-    };
 
     // PRIVATE FUNCTIONS
     /**

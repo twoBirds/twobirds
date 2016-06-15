@@ -499,7 +499,8 @@ tb = (function(){
                                                 tbElements.push(pDomNode[pNamespace]);
                                             }
                                         }
-                                    );
+                                    );console.log( tbInstance );
+                
                                 }
                             }
                         );
@@ -600,30 +601,52 @@ tb = (function(){
             return new f( pPrototype );
         }
 
+        // merge handlers from temp instance into target object
+        function mergeHandlers( pSourceTb , pTargetTb ){
+            for ( var i in pSourceTb.handlers ) if ( pSourceTb.handlers.hasOwnProperty(i) ){
+                if ( !pTargetTb.handlers[i] ){
+                    pTargetTb.handlers[i] = [];
+                }
+                for ( var j = 0, l = pSourceTb.handlers[i].length; j < l; j++ ){
+                    pTargetTb.handlers[i].push( pSourceTb.handlers[i][j] ); // copy handler
+                }
+            }
+        }
+
+        // empty class def for temporary handler storage
+        function Nop(){};
+        Nop.prototype = {};
 
         if ( that instanceof tb ) {    // called as constructor, create and return tb object instance
             var isNamespace = typeof arguments[0] === 'string',
                 tbClass =  isNamespace ? tb.namespace( arguments[0] ) : arguments[0],
                 tbInstance,
-                fileName;
+                fileName,
+                tempInstance; // empty tb object, used as handler store
 
             if ( isNamespace && !tbClass ){
                 fileName = arguments[0].replace( /\./g, '/' ) + '.js';
+                tempInstance = new tb( Nop ); // construct temp tb instance from empty constructor -> temp handler store
 
                 tb.loader.load(
                     fileName,
                     (function( args ){
                         return function(){
-                            new tb(
+                            var thisTb = new tb(
                                 args[0],
                                 args[1] || {},
                                 args[2] || false
                             );
+
+                            if ( !!tempInstance ){
+                                mergeHandlers( tempInstance, thisTb );
+                            }
+
                         };
                     })( [].slice.call( arguments ) )
                 );
 
-                return;
+                return tempInstance; // return temp instance so handlers can be attached
             }
 
             // it is a constructor call, like "new tb(...)"
@@ -638,7 +661,6 @@ tb = (function(){
                 // make a new instance of given constructor
                 tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
 
-                console.log( tbInstance );
                 // prepare .namespace property of tb object
                 if ( !tbInstance.namespace ){
                     tbInstance.namespace = typeof arguments[0] === 'string'
@@ -822,15 +844,14 @@ tb = (function(){
                 }
 
                 // execute local handlers
-                if ( that instanceof TbSelector && that.hasOwnProperty( length ) ) {
+                if ( that instanceof TbSelector && !!that['length'] ) {
 
                     [].forEach.call(
                         that,
                         function( tbInstance ){
-                            //console.log( 'array trigger instance', tbEvent.name, 'on tbInstance', tbInstance );
                             if ( !!tbInstance
                                 && tbInstance instanceof tb
-                                && !!tbEvent.__immediateStopped__
+                                && !tbEvent.__immediateStopped__
                             ){
                                 tbInstance.trigger( tbEvent );
                             }
@@ -1867,28 +1888,29 @@ tb.observable = function( pStartValue ){
 
 // twoBirds system status
 tb.status = {
-    eventCount: tb.observable(0)
+    loadCount: tb.observable(0)
 };
 
 /*
 // debugging...
-tb.status.eventCount.observe(function(){
-    console.log( 'eventCount:', tb.status.eventCount() );
+tb.status.loadCount.observe(function(){
+    console.log( 'loadCount:', tb.status.loadCount() );
 });
 */
 
 tb.idle = function( pCallback ){
 
     var f = function(){
-        if ( tb.status.eventCount() === 0 ){
+        if ( tb.status.loadCount() === 0 ){
             pCallback();
         } else {
             // if idle not yet reached, re-atttach function for ONE execution
-            tb.status.eventCount.observe( f, true );
+            tb.status.loadCount.observe( f, true );
         }
     };
 
-    tb.status.eventCount.observe( f, true );
+    tb.status.loadCount.observe( f, true );
+
 };
 
 
@@ -2323,7 +2345,7 @@ tb.parse = function( pText, pParse ){
                 var state = element.readyState;
                 if (!that.done && (!state || /loaded|complete/.test(state))) {
                     // console.log( 'loaded', element );
-                    tb.status.eventCount( tb.status.eventCount() - 1 ); // decrease eventCount
+                    tb.status.loadCount( tb.status.loadCount() - 1 ); // decrease loadCount
                     that.trigger( 'onLoad', element );
                 }
             };
@@ -2333,7 +2355,7 @@ tb.parse = function( pText, pParse ){
                 element.setAttribute( i, tb.parse( typeConfig.attributes[i], that.config ) );
             }
 
-            tb.status.eventCount( tb.status.eventCount() + 1 ); // increase eventCount
+            tb.status.loadCount( tb.status.loadCount() + 1 ); // increase loadCount
 
             // append node to head
             document.getElementsByTagName('head')[0].appendChild( element );

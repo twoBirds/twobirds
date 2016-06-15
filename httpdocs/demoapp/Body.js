@@ -12,7 +12,7 @@ tb.namespace( 'demoapp', true ).Body = (function(){
      * @param pConfig
      */
 
-    var Body = function( pConfig ){
+    function Body( pConfig ){
 
         // var
         var that = this; // for minification purposes
@@ -69,8 +69,6 @@ tb.namespace( 'demoapp', true ).Body = (function(){
     return Body;
 
     // VARIABLES
-    var messages = {
-    };
 
     // PRIVATE FUNCTIONS
     /**
@@ -84,7 +82,6 @@ tb.namespace( 'demoapp', true ).Body = (function(){
      * @param e
      */
     function init( e ){
-        console.log( 'body init()' );
         this.render();
     }
 
@@ -95,23 +92,54 @@ tb.namespace( 'demoapp', true ).Body = (function(){
      */
     function render(){
 
-        var that = this;
+        var that = this,
+            header;
 
-        // top blue bar
+        // header area
         new tb(
             'demoapp.Header',
             {},
-            $('<div />').appendTo(that.target)
+            that.target.appendChild( document.createElement("div") )
+        ).one( // execute only once
+            'init', // when all requirements have loaded
+            function setInitialHeader(){
+                var that = this;
+
+                that.setContent('Example Form');
+            }
         );
 
         // inner content area
-        $( '<div class="demoapp-body-content"/>').appendTo(that.target);
+        that.content = that
+            .target
+            .appendChild( document.createElement("div") );
 
-        // lower footer area
+        that.content
+            .innerHTML = 'test content';
+
+        tb.dom( that.content )
+            .addClass( 'demoapp-body-content' );
+
+        // footer area
         new tb(
             'demoapp.Footer',
             {},
-            $('<div />').appendTo(that.target)
+            that.target.appendChild( document.createElement("div") )
+        ).one( // execute only once
+            'init', // when all requirements have loaded
+            function setInitialFooter(){
+                var that = this;
+
+                that.setContent('- twoBirds -');
+            }
+        ).on( // an example of how to map a prototype method to an event
+            'setContent', // event name
+            function setContentHandler( e ){ // associated function
+                var that = this;
+
+                console.log( 'setContent handler', e );
+                that.setContent( e.data );
+            }
         );
 
     }

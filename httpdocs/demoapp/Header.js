@@ -3,41 +3,6 @@
  */
 tb.namespace( 'demoapp', true ).Header = (function(){
 
-    // VARIABLES
-
-    var messages = {
-    };
-
-    // PRIVATE FUNCTIONS
-    /**
-     * @for demoapp.Header
-     */
-
-    /**
-     * init handler
-     *
-     * @event init
-     * @param e
-     */
-    function init( e ){
-        this.render();
-    }
-
-    /**
-     * render function, both used in handlers and as a method
-     *
-     * @event render
-     */
-    function render(){
-
-        var that = this;
-
-        // create header content DIV
-        that.$content = $( '<div class="demoapp-header-content">test header</div>').appendTo(that.target);
-
-
-    }
-
     /**
      * Header constructor
      *
@@ -97,11 +62,69 @@ tb.namespace( 'demoapp', true ).Header = (function(){
         /**
          * @method render
          */
-        render: render
+        render: render,
+
+        /**
+         * @method setContent
+         */
+        setContent: setContent
 
     };
 
     return Header;
+
+    // VARIABLES
+
+    // PRIVATE FUNCTIONS
+    /**
+     * @for demoapp.Header
+     */
+
+    /**
+     * init handler
+     *
+     * @event init
+     * @param e
+     */
+    function init( e ){
+        this.render();
+    }
+
+    /**
+     * render function, both used in handlers and as a method
+     *
+     * @event render
+     */
+    function render(){
+
+        var that = this;
+
+        // create header content DIV
+        that.content = that
+            .target
+            .appendChild( document.createElement("div") );
+
+        that.content
+            .innerHTML = 'test header';
+
+        tb.dom( that.content )
+            .addClass( 'demoapp-header-content' );
+        
+    }
+
+    /**
+     * setContent function, used as a method
+     *
+     * @param [$pContentHTML] {string} - the content inner HTML
+     */
+    function setContent( pContentHTML ){
+
+        var that = this;
+
+        // set footer content
+        that.content.innerHTML = !!pContentHTML ? pContentHTML : '';
+
+    }
 
 })();
 
