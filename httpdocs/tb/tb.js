@@ -549,6 +549,10 @@ tb = (function(){
 
     }
 
+    // empty class def for temporary handler storage, needed for on(), one(), off() and trigger()
+    function Nop(){};
+    Nop.prototype = {};
+
     // HINT: TbSelector (class) prototype definition after Tb prototype definition
 
     /**
@@ -612,10 +616,6 @@ tb = (function(){
                 }
             }
         }
-
-        // empty class def for temporary handler storage
-        function Nop(){};
-        Nop.prototype = {};
 
         if ( that instanceof tb ) {    // called as constructor, create and return tb object instance
             var isNamespace = typeof arguments[0] === 'string',
@@ -859,6 +859,23 @@ tb = (function(){
                     );
 
                 } else if ( that instanceof tb ) { // it must be a native tb object
+
+                    if ( that instanceof Nop
+                        && tbEvent.name !== 'init'
+                    ){
+                        // its an object that was not loaded yet
+                        that.one(
+                            'init',
+                            function lazyHandler(){
+                                var that = this;
+
+                                console.log( 'lazy handler', tbEvent.name, tbEvent );
+                                that.trigger( tbEvent );
+                            }
+                        );
+                        console.log( that, tbEvent ); debugger;
+                        return that;
+                    }
 
                     // local handlers
                     if ( !!that.handlers[tbEvent.name] && tbEvent.bubble.indexOf( 'l' ) > -1 ) {

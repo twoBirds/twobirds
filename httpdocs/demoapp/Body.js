@@ -139,6 +139,9 @@ tb.namespace( 'demoapp', true ).Body = (function(){
 
                 that.setContent( e.data );
             }
+        ).trigger( // an example of deferred event triggering
+            'setContent', // event name
+            'blub'
         );
 
     }
