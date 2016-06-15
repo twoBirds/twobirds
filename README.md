@@ -2,49 +2,8 @@
 
 Welcome Birdies ;-)
 
-## I dont want to read a lot - give me a kick-start
 
-###On console do...
-
-git clone this repository
-
-goto /httpdocs
-
-php -S 0.0.0.0:3000 &
-
-
-###Open browser, adress:
-
-
-####(Example one)
-
-
-localhost:3000/tb.html
-
-####Open dev tools, e.g. firebug
-
-- inspect DOM to see how twoBirds instances reside in DOM structure, on HTML tab right-click on a div and select 'inspect in DOM' 
-
-- right-click on an "app.child" div, select 'inspect in DOM' to see how twoBirds instances can also reside inside each other
-
-- view 'tb.html' file to see the app code
-
-
-####(Example two)
-
-
-localhost:3000/index.html
-
-
-####Open dev tools, e.g. firebug
-
-- inspect DOM to see the structure
-
-- go to the 'network' tab and reload to see the sequence of requirement loading
-
-- view 'index.html' file to see the app code
-
-- view js files in /httpdocs/demoapp/ to see the app code for those objects that are lazy loaded
+[I dont want to read a lot - give me a kick-start](https://github.com/FrankieTh-xx/twobirds/blob/master/README.md#i-dont-want-to-read-a-lot---give-me-a-kick-start)
 
 
 ## Intro
@@ -336,6 +295,51 @@ tb( demoapp.Body ).trigger('<myevent>' ,null ,'ld' )
 tb( demoapp.SomeElement ).trigger('scroll.update' );			
 
 ```
+
+## I dont want to read a lot - give me a kick-start
+
+###On console do...
+
+git clone this repository
+
+goto /httpdocs
+
+php -S 0.0.0.0:3000 &
+
+
+###Open browser, adress:
+
+
+####(Example one)
+
+
+localhost:3000/tb.html
+
+####Open dev tools, e.g. firebug
+
+- inspect DOM to see how twoBirds instances reside in DOM structure, on HTML tab right-click on a div and select 'inspect in DOM' 
+
+- right-click on an "app.child" div, select 'inspect in DOM' to see how twoBirds instances can also reside inside each other
+
+- view 'tb.html' file to see the app code
+
+
+####(Example two)
+
+
+localhost:3000/index.html
+
+
+####Open dev tools, e.g. firebug
+
+- inspect DOM to see the structure
+
+- go to the 'network' tab and reload to see the sequence of requirement loading
+
+- view 'index.html' file to see the app code
+
+- view js files in /httpdocs/demoapp/ to see the app code for those objects that are lazy loaded
+
 
 ## Installation
 
