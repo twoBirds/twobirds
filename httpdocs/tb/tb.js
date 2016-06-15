@@ -869,7 +869,6 @@ tb = (function(){
                             function lazyHandler(){
                                 var that = this;
 
-                                console.log( 'lazy handler', tbEvent.name, tbEvent );
                                 that.trigger( tbEvent );
                             }
                         );
