@@ -131,7 +131,7 @@ Now lets see all of this in context:
 
 demoapp/Body.js 
 ```js
-tb.namespace('demoapp', true).body = (function(){
+tb.namespace('demoapp', true).Body = (function(){
 
 	// Constructor
 	function Body(){
@@ -146,7 +146,7 @@ tb.namespace('demoapp', true).body = (function(){
 
 	Body.prototype = {
 
-		namespace: 'demoapp.body',
+		namespace: 'demoapp.Body',
 
 		'tb.require': [
 			'/demoapp/body.css'
@@ -190,7 +190,7 @@ this.tbElement = new tb(
 	<head>
 		<script src="http://<yourPathTo>/tb.js"></script>
 	</head>
-    <body data-tb="demoapp.body">
+    <body data-tb="demoapp.Body">
     </body>
 </html>
 ```
