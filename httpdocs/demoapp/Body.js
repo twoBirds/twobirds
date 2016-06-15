@@ -92,8 +92,7 @@ tb.namespace( 'demoapp', true ).Body = (function(){
      */
     function render(){
 
-        var that = this,
-            header;
+        var that = this;
 
         // header area
         new tb(
@@ -142,6 +141,9 @@ tb.namespace( 'demoapp', true ).Body = (function(){
         ).trigger( // deferred event triggering
             'setContent', // event name
             '- twoBirds -'
+        ).set(
+            'lazyProperty',
+            42
         );
 
     }

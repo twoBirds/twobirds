@@ -639,7 +639,17 @@ tb = (function(){
                             );
 
                             if ( !!tempInstance ){
+
+                                // copy properties from tempInstance, always shallow copy
+                                for ( var i in tempInstance ) if (
+                                    (['handlers', 'target']).indexOf(i) === -1
+                                    && tempInstance.hasOwnProperty(i)
+                                ){
+                                    thisTb[i] = tempInstance[i];
+                                }
+
                                 mergeHandlers( tempInstance, thisTb );
+
                             }
 
                         };
@@ -814,6 +824,70 @@ tb = (function(){
 
         return {
             // public methods and properties
+
+            /**
+             * set() method
+             *
+             * set an instance property
+             *
+             * @method set
+             *
+             * @param {string} [pKey] - name of the property
+             * @param [pValue] - any kind of value associated with the key
+             *
+             * @return {object} - TbSelector instance
+             */
+            set: function( pKey, pValue ){
+
+                var that = this;
+
+                if ( that instanceof TbSelector ) {
+
+                    [].forEach.call(
+                        that,
+                        function( pElement ){
+                            pElement.set( pKey, pValue );
+                        }
+                    );
+
+                    return that;
+
+                } else if ( that instanceof tb ){
+
+                    that[pKey] = pValue;
+
+                }
+
+                return that;
+            },
+
+            /**
+             * get() method
+             *
+             * get an instance property
+             *
+             * @method get
+             *
+             * @param {string} [pKey] - name of the property
+             *
+             * @return {object} - TbSelector instance
+             */
+            get: function( pKey, undefined ){
+
+                var that = this;
+
+                if ( that instanceof TbSelector ) {
+
+                    return that[0][ pKey ];
+
+                } else if ( that instanceof tb ){
+
+                    return that[ pKey ];
+
+                }
+
+                return undefined;
+            },
 
             /**
              * trigger an event, optionally with data and bubble indicator
