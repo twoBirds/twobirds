@@ -137,7 +137,6 @@ tb.namespace( 'demoapp', true ).Body = (function(){
             function setContentHandler( e ){ // associated function
                 var that = this;
 
-                console.log( 'setContent handler', e );
                 that.setContent( e.data );
             }
         );

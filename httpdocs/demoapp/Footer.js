@@ -119,7 +119,6 @@ tb.namespace( 'demoapp', true ).Footer = (function(){
 
         var that = this;
 
-        console.log( 'footer setContent() method' )
         // set footer content
         that.content.innerHTML = !!pContentHTML ? pContentHTML : '';
 
