@@ -4,7 +4,7 @@ Welcome Birdies ;-)
 
 ## I dont want to read a lot - give me a kick-start
 
-On console do...
+###On console do...
 
 git clone this repository
 
@@ -13,15 +13,15 @@ goto /httpdocs
 php -S 0.0.0.0:3000 &
 
 
-Open browser, adress:
+###Open browser, adress:
 
 
-(Example one)
+####(Example one)
 
 
 localhost:3000/tb.html
 
-Open dev tools, e.g. firebug
+####Open dev tools, e.g. firebug
 
 - inspect DOM to see how twoBirds instances reside in DOM structure, on HTML tab right-click on a div and select 'inspect in DOM' 
 
@@ -30,13 +30,13 @@ Open dev tools, e.g. firebug
 - view 'tb.html' file to see the app code
 
 
-(Example two)
+####(Example two)
 
 
 localhost:3000/index.html
 
 
-Open dev tools, e.g. firebug
+####Open dev tools, e.g. firebug
 
 - inspect DOM to see the structure
 
