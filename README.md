@@ -7,7 +7,7 @@ event-driven JavaScript framework that maps nested objects to DOM nodes.
 
 twoBirds strictly follows the KISS doctrine, it is the minimum possible solution for an application framework.
 
-It consists of 3 parts ( these examples using jQuery ):
+It consists of 3 parts:
 
 #### 1.) a simple client repository object structure + instanciation mechanism
 
@@ -38,7 +38,7 @@ or, somewhere in your js code:
 new tb(
 	demoapp.myClass,
 	{ ... config data ... },
-	$('body')
+	document.body
 );
 ```
 
@@ -63,7 +63,7 @@ twoBirds was created 2004 and saw its first commercial use in 2006.
 
 twoBirds has a selector ot its own, but can work with any selector lib that returns array-like objects.
 
-Comparision: twoBirds can be compared to Flight, Polymer / Web Components and most of all react.js.
+Comparision: twoBirds can be compared to Flight, Polymer, React and backbone JS.
 Unlike these frameworks it allows for complete separation of code and design. As mentioned it aims at making nesting of loose coupled objects into complex structures easier and more transparent. 
 Requirement loading is an inherent part of the system.
 
@@ -95,7 +95,7 @@ There are 3 property names in twoBirds objects that are reserved:
 
 * *namespace*: ... is the namespace of the repo object, and should be set accordingly, since both the regEx selector tb(/.../) as well as the .instanceOf("namespace") method checks against the "name" property.
 
-* *handlers*: ... is a plain object, where { key: value } is { eventName: function( params ){ /\*...\*/ } }. If for some reasons you need more than one handler for an eventName, eventName also can be an array of callback functions. Internally they are converted to array anyway.
+* *handlers*: ... is a plain object, where { key: value } is { eventName: function myHandler( pEvent ){ /\*...\*/ } }. If for some reasons you need more than one handler for an eventName, eventName also can be an array of callback functions. Internally they are converted to array anyway.
 
 As for handlers, there currently is 1 event name that is reserved:
 
@@ -109,7 +109,7 @@ There is a special convention inside twoBirds instances:
 
 IF NOT: twoBirds will convert the property name to a subdir string like so
 
-"tb.ui.scroll" ==> "/tb/ui/scroll.js"
+"demoapp.Body" ==> "/demoapp/Body.js"
 
 ...and starts loading the file.
 
@@ -123,38 +123,22 @@ If it is a plain object, the property value will be replaced with it, and when "
 
 Now lets see all of this in context:
 
-demoapp/body.js 
+demoapp/Body.js 
 ```js
 tb.namespace('demoapp', true).body = (function(){
 
-	function init(){
-		
-		var that = this;
-
-		new tb(
-			'tb.ui.panel',
-			{
-				title: '-no title-',
-				css: {
-					width: '100%'
-				}
-			},
-			$( '<div />' ).appendTo( that.target )
-		);
-
-	}
-
-	function body(){
+	// Constructor
+	function Body(){
 		
 		var that = this;
 
 		that.handlers = {
-			'init': init
+			init
 		};
 
 	}
 
-	body.prototype = {
+	Body.prototype = {
 
 		namespace: 'demoapp.body',
 
@@ -164,7 +148,16 @@ tb.namespace('demoapp', true).body = (function(){
 
 	};
 
-	return body;
+	return Body;
+
+	// Private Functions
+	function init(){
+		
+		var that = this;
+
+		// ...
+
+	}
 
 })();
 ```
@@ -177,16 +170,8 @@ The function will execute, starting the requirement loading. Further execution i
 
 You can also insert a twoBirds instance into an already existing instance at runtime, in this case inside some event handler you add this code ( the scroller is nott yet converted from V5 to V6, I will refactor the old demoapp later):
 ```
-this.scroll = new tb(
-	tb.ui.scroll,
-	{
-		content: this.content[0],
-		direction: 'y',
-		bubbleUp: true,
-		pixelsPerSecond: 2000,
-		attachDelay: 2000,
-		easing: 'swing'
-	}
+this.tbElement = new tb(
+	'demoapp.someElement'
 );
 ```
 
@@ -197,7 +182,6 @@ this.scroll = new tb(
 ```html
 <html>
 	<head>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="http://<yourPathTo>/tb.js"></script>
 	</head>
     <body data-tb="demoapp.body">
@@ -225,24 +209,24 @@ tb('body')
 
 // OBJECT: instances of a repo object inside page structure
 
-// find all demoapp.body sub-instances ( only one )
-tb( demoapp.body )
+// find all demoapp.Body sub-instances ( only one )
+tb( demoapp.Body )
 
-// find all tb.ui.scroll sub-instances ( may return many )
-tb( tb.ui.scroll )
+// find all demoapp.someElement sub-instances ( may return many )
+tb( demoapp.someElement )
 
 // REGEXP: as object, but matching to instance 'namespace' property 
 
 // always returns the root object
 
-tb( /app.bod/ ) // returns the demoapp.body object, its 'namespace' matches
+tb( /app.Bod/ ) // returns the demoapp.body object, its 'namespace' matches the regEx
 
 // OTHER:
 
 // both of the following return all toplevel objects in the current DOM, as expected.
 
 tb( /./ ) 
-tb( '*' )
+tb( '*' ) // invoking document.querySelectorAll()
 
 // THIS:
 
@@ -262,6 +246,8 @@ tb( ... ).prev() // the previous tb instance in this.parent().children()
 tb( ... ).next() // the next tb instance in this.parent().children()
 tb( ... ).first() // the previous tb instance in this.parent().children()
 tb( ... ).last() // the next tb instance in this.parent().children()
+
+// @todo: complete list
 
 // CHAINED SELECTOR RETURNS ARE ALWAYS UNIQUE
 ```
@@ -287,7 +273,7 @@ tb('body').off('myevent', myHandler);
 ### tb(selector).trigger(event, data, bubble)
 - communication between object instances on the page
 
-some trigger snippets from other projects:
+some trigger snippets:
 ```js 
 // get the $('body') DOM node, 
 // retrieve its tB toplevel object, 
@@ -296,11 +282,11 @@ tb('body').trigger('<myevent>' [, data] [, bubble])
 
 // find all demoapp.body instances (only one), 
 // trigger <myevent> bubbling down locally.
-tb( demoapp.body ).trigger('<myevent>' ,null ,'ld' )	
+tb( demoapp.Body ).trigger('<myevent>' ,null ,'ld' )	
 
 // find all tb.ui.scroll instances, 
 // and trigger 'scroll.update' on it, meaning its a local event that doesnt bubble. 
-tb( tb.ui.scroll ).trigger('scroll.update' );			
+tb( demoapp.SomeElement ).trigger('scroll.update' );			
 
 ```
 
@@ -318,7 +304,7 @@ copy tb.js from this and insert into your project. Have fun!
 - distributed programming
 - async on demand loading, recursive
 - effective multiple inheritance
-- web-components-like programming, defining repository objects
+- web-component programming, defining repository objects
 
 # Status:
 - core API stable, optimization and cleanup on the way
