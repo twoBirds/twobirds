@@ -233,9 +233,8 @@ tb = (function(){
                         if (index !== -1) {
                             classes.splice(index, 1);
 
-                            if ( classes.length ){
-                                pNode.setAttribute('class', classes.join(' '));
-                            }
+                            pNode.setAttribute('class', classes.join(' '));
+                            
                         }
 
                     }

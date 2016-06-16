@@ -94,6 +94,8 @@ tb.namespace( 'demoapp', true ).Body = (function(){
 
         var that = this;
 
+        
+        
         // header area
         new tb(
             'demoapp.Header',
@@ -108,6 +110,8 @@ tb.namespace( 'demoapp', true ).Body = (function(){
             }
         );
 
+        
+        
         // inner content area
         that.content = that
             .target
@@ -119,6 +123,8 @@ tb.namespace( 'demoapp', true ).Body = (function(){
         tb.dom( that.content )
             .addClass( 'demoapp-body-content' );
 
+        
+        
         // footer area
         new tb(
             'demoapp.Footer', // lazy loading!!!
