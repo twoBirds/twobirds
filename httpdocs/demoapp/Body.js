@@ -30,8 +30,8 @@ tb.namespace( 'demoapp', true ).Body = (function(){
          * @type object
          */
         that.handlers = {
-            init: init,
-            render: render
+            init,
+            render
         }
 
 
