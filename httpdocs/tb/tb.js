@@ -108,12 +108,15 @@ tb = (function(){
                 //own functions
                 add: add,
                 addClass: addClass,
-                removeClass: removeClass,
                 attr: attr,
+                hide: hide,
+                html: html,
+                removeClass: removeClass,
                 filter: filter,
                 not: not,
                 parents: parents,
                 push: push,
+                show: show,
                 toArray: toArray,
                 unique: unique
             };
@@ -121,6 +124,48 @@ tb = (function(){
             return new dom(pSelector, pDomNode);
 
             // private functions
+            function html( pHtml ) {
+                var that = this;
+
+                if ( !!pHtml ){
+                    that.forEach(
+                        function( pNode ){
+                            pNode.innerHTML = pHtml;
+                        }
+                    )
+                } else {
+                    return !!that[0] ? that[0].innerHTML : '';
+                }
+                return that;
+            }
+
+            function hide() {
+                var that = this;
+
+                that.forEach(
+                    function( pNode ){
+                        pNode.style.prevDisplay = ([ '', 'none']).indexOf( pNode.style.display ) === -1
+                            ? pNode.style.display
+                            : '';
+                        pNode.style.display = 'none';
+                    }
+                );
+
+                return that;
+            }
+
+            function show() {
+                var that = this;
+
+                that.forEach(
+                    function( pNode ){
+                        pNode.style.display = pNode.style.prevDisplay;
+                    }
+                );
+
+                return that;
+            }
+
             function unique() {
                 var that = this,
                     result = [];
@@ -234,7 +279,7 @@ tb = (function(){
                             classes.splice(index, 1);
 
                             pNode.setAttribute('class', classes.join(' '));
-                            
+
                         }
 
                     }
@@ -256,7 +301,18 @@ tb = (function(){
                 rootNodes = that.toArray();
                 rootNodes.forEach(
                     function (pNode) {
-                        pNode.setAttribute(pKey, pValue);
+                        if ( pKey.constructor === Object ){
+                            Object
+                                .keys( pKey )
+                                .forEach(
+                                    function( pValue, pKey ){
+                                        pNode.setAttribute(pKey, pValue);
+                                    }
+                                );
+                            return;
+                        } else {
+                            pNode.setAttribute(pKey, pValue);
+                        }
                     }
                 );
 
@@ -1809,11 +1865,11 @@ tb.namespace = function( pNamespace, pForceCreation, pObject ){
 
         if ( namespaceArray.length < 2 ){
 
-            return o[ namespaceArray[0] ] || false;
+            return o.hasOwnProperty( namespaceArray[0] ) ? o[ namespaceArray[0] ] : false;
 
         } else {
 
-            if ( !!o[ namespaceArray[0] ] ) {
+            if ( o.hasOwnProperty( namespaceArray[0] ) ) {
                 o = o[ namespaceArray[0] ];
                 namespaceArray.shift();
                 return walk( o, namespaceArray );
@@ -2255,22 +2311,24 @@ tb.Model.prototype = (function(){
  * @return {object} - other object
  */
 tb.extend = function( pObj ){ // any number of arguments may be given
-    var src = ( JSON.parse( JSON.stringify( pSrc ) ) );
+    var cp;
 
     while ( arguments[1] ){
+        cp = arguments[1];
         Object
-            .keys(src)
+            .keys(cp)
             .forEach(
                 function(key) {
-                    if ( (src[key]).constructor === Object ){
-                        pObj[key] = tb.extend( pObj[key] || {}, src[key] );
+                    if ( (cp[key]).constructor === Object ){
+                        pObj[key] = tb.extend( pObj[key] || {}, cp[key] );
                     } else {
-                        pObj[key] = src[key];
+                        pObj[key] = cp[key];
                     }
                 }
             );
         [].splice.call( arguments, 1, 1 ); // remove object that is done
     }
+
     return pObj;
 };
 
@@ -2290,39 +2348,47 @@ tb.extend = function( pObj ){ // any number of arguments may be given
  *  //@todo: missing parm description
  * @return {string} - result string
  */
-tb.parse = function( pText, pParse ){
-    var vars = pText.match( /\{.*\}/ ), // array of variables
-        v = '', // prop name
-        p = pParse, // object to parse
-        fail = false,   // true if property doesnt exist
-        value,  // value of the property
-        a = []; // namespace array
+tb.parse = function( pWhat, pParse ){
 
-    if ( !!vars ){
+    if ( typeof pWhat === 'string' ){
+        var vars = pWhat.match( /\{[^\{\}]*\}/ );
 
-        p = pParse;
+        if ( !!vars ) {
+            vars
+                .forEach(
+                    function (pPropname) {
+                        var propname = pPropname.substr(1, pPropname.length - 2),
+                            propValue = tb.namespace(propname, false, pParse) || propname + ' not found!';
 
-        vars.forEach(
-            function(v){
-                fail = false;
-                a = v.replace('{', '').replace('}', '').split('.');
-
-                while ( a.length > 0 && !fail ){
-                    if ( !!p[ a[0] ] ){
-                        p = p[ a[0] ];
-                        a.shift();
-                    } else {
-                        fail = true;
+                        pWhat = pWhat.replace( pPropname, propValue );
                     }
-
-                }
-                pText = pText.replace( v, !fail ? p : v );
-            }
-        );
-
+                );
+        }
+    } else if ( !!pWhat.constructor ){
+        switch ( pWhat.constructor ){
+            case Object:
+                Object
+                    .keys( pWhat )
+                    .forEach(
+                        function( pKey ){
+                            if ( pWhat.hasOwnProperty( pKey ) ){
+                                pWhat[ pKey ] = tb.parse( pWhat[ pKey ], pParse );
+                            }
+                        }
+                    );
+                break;
+            case Array:
+                pWhat
+                    .forEach(
+                        function( pValue, pKey ){
+                            pWhat[ pKey ] = tb.parse( pWhat[ pKey ], pParse );
+                        }
+                    );
+                break;
+        }
     }
 
-    return pText;
+    return pWhat;
 };
 
 
@@ -2852,6 +2918,8 @@ tb.request = (function () {
                     break;
             }
         }
+
+        console.log( 'request options', pOptions );
 
         inc();
 
