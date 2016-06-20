@@ -13,9 +13,9 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
     };
 
     var classes = {
-        info: 'tb-ui-validator-info',
-        warning: 'tb-ui-validator-warning',
-        error: 'tb-ui-validator-error'
+        'info': 'tb-ui-validator-info',
+        'warning': 'tb-ui-validator-warning',
+        'error': 'tb-ui-validator-error'
     };
 
     /**
@@ -32,144 +32,20 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
      */
     function FieldValidator( pConfig ){
 
-        var that = this,
-            config = pConfig;
+        var that = this;
 
-        that.config = config;
+        that.config = pConfig;
 
         that.handlers = {
             init,
             validate
         };
 
-        // VALIDATOR function factory
-        // must be in here (inner function) to bind <that> correctly via closure
-        function makeValidatorFunction( pStatus, pFunction, pMessage ){
-
-            var f;
-
-            f = function( value ){
-
-                var labelElement = that.target.labelElement,
-                    inputElement = that.target.inputElement,
-                    messageElement = that.target.messageElement,
-                    valid = pFunction( inputElement.val()),
-                    f = pFunction;
-
-                // remove previous message
-                messageElement.empty();
-
-                // remove previous classes
-                classes
-                    .forEach(
-                        function( statusName, statusClass ){
-                            labelElement.removeClass( statusClass );
-                            inputElement.removeClass( statusClass );
-                            messageElement.removeClass( statusClass );
-                        }
-                    );
-
-                // set message & visual class for this status code
-                if ( !valid ){
-
-                    // message is either defined as curry property on function, or standard given
-                    messageElement
-                        .html( f['message'] ? f['message'] : pMessage )
-                        .show();
-
-                    if ( !!classes[ pStatus ] ){
-                        labelElement.addClass( classes[ pStatus ] );
-                        inputElement.addClass( classes[ pStatus ] );
-                        messageElement.addClass( classes[ pStatus ] );
-                    }
-
-                    // send status to form validator
-                    that
-                        .parents('form')[0]
-                        ['tb.ui.FormValidator']
-                        .trigger(
-                            'setStatus',
-                            {
-                                valid: valid,
-                                status: pStatus,
-                                input: inputElement,
-                                message: f['message'] ? f['message'] : pMessage,
-                                label: labelElement.html()
-                            }
-                        );
-
-                }
-
-                return valid;
-
-            };
-
-            return f;
-
-        }
-
-        return; // @todo: implement tb.dom event handling
-        /*
-        // create validation functions and append them to input field
-        $.each(
-            config.validators, // <eventNames> property, format like jQ event names
-            function( pEventName, pStatusCollection ){
-                $.map(
-                    [ 'error', 'warning', 'info' ], // types of errors
-                    function( pStatusName ){
-
-
-                        var // first validator function is the most urgent, others follow in sequence
-                            functionCollection = config.validators[ pEventName ][ pStatusName ] || {};
-
-                        // execute all validation handlers on this field
-                        if ( !!functionCollection ) {
-                            $.each(
-                                functionCollection, // validation definition / functions
-                                function( pFactoryName, pFactoryValue  ){ // built-in factory parameter or function !
-
-                                    // that = validator instance, not field instance!
-                                    var isFunction = typeof pFactoryValue === 'function' ? true : false,
-                                        $labelElement = !!config.$labelElement ? config.$labelElement : $(), // label DOM node
-                                        $inputElement = !!config.$inputElement ? config.$inputElement : $(), // input DOM node
-                                        $messageElement =!!config.$messageElement ? config.$messageElement : $(), // message DOM node
-                                        f;
-
-                                    // attach standard or custom function to input element
-                                    if ( isFunction ){
-                                        // attach function directly
-                                        $inputElement.on(
-                                            pEventName,
-                                            makeValidatorFunction(
-                                                pStatusName,
-                                                pFactoryValue,
-                                                Validator.fn.invalid.message
-                                            )
-                                        );
-                                    } else {
-                                        // attach repository validator function
-                                        $inputElement.on(
-                                            pEventName,
-                                            makeValidatorFunction(
-                                                pStatusName,
-                                                that.fn[ pFactoryName ].validator( pFactoryValue ),
-                                                that.fn[ pFactoryName ].message
-                                            )
-                                        );
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-            }
-        );
-        */
     };
 
     FieldValidator.prototype = {
 
-        namespace: 'tb.ui.Validator',
+        namespace: 'tb.ui.FieldValidator',
 
         validate: validate,
 
@@ -293,21 +169,145 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
     return FieldValidator;
 
     // private functions
-
     function init(){
         var that = this;
 
+        // VALIDATOR function factory
+        // must be in here (inner function) to bind <that> correctly via closure
+        function makeValidatorFunction( pStatus, pFunction, pMessage ){
+
+            var f;
+
+            f = function( value ){
+
+                var inputElement = that.parent()[0].inputElement,
+                    valid = pFunction( inputElement.val() ),
+                    labelElement = that.parent()[0].labelElement,
+                    messageElement = that.parent()[0].messageElement,
+                    f = pFunction;
+
+                // remove previous message
+                messageElement.empty();
+
+                // remove previous classes
+                tb.dom( that.target.parentElement.children )
+                    .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+
+                // set message & visual class for this status code
+                if ( !valid ){
+
+                    // message is either defined as curry property on function, or standard given
+                    messageElement
+                        .html( f['message'] ? f['message'] : pMessage )
+                        .show();
+
+                    if ( !!classes[ pStatus ] ){
+                        labelElement.addClass( classes[ pStatus ] );
+                        inputElement.addClass( classes[ pStatus ] );
+                        messageElement.addClass( classes[ pStatus ] );
+                    }
+
+                    // send status to form validator
+                    that
+                        .parents('form')[0]
+                        ['tb.ui.FormValidator']
+                        .trigger(
+                            'setStatus',
+                            {
+                                valid: valid,
+                                status: pStatus,
+                                input: inputElement,
+                                message: f['message'] ? f['message'] : pMessage,
+                                label: labelElement.html()
+                            }
+                        );
+
+                }
+
+                return valid;
+
+            };
+
+            return f;
+
+        }
+
         // put a link to the validator in the data-tb attribute to aid in debugging
-        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
+        var dataTb = !!that.target.inputElement.attr('data-tb')
+            ? that.target.inputElement.attr('data-tb').split(' ')
+            : [];
 
         dataTb.push( that.namespace );
 
-        tb.dom( that.target.target ).attr('data-tb',
+        that.target.inputElement.attr('data-tb',
             dataTb.join(' ')
         );
 
-        // set target to parent element target, that is the DOM node
-        that.target = that.target.target;
+        // set target to parent element inputElement, that is the DOM node
+        that.target = that.target.inputElement[0];
+
+        // put that in target
+        that.target[ 'tb.ui.FieldValidator' ] = that;
+
+        // create validation functions and append them to input field
+        if ( !!that.config ) Object.keys( that.config ).forEach(
+            function( pEventName ){
+                ([ 'error', 'warning', 'info' ]).forEach(
+                    function( pStatusName ){
+
+                        var functionCollection = that.config[ pEventName ][ pStatusName ] || {};
+
+                        // execute all validation handlers on this field
+                        if ( !!functionCollection ) {
+                            Object.keys( functionCollection ).forEach(
+                                function( pFactoryName ){ // built-in factory parameter or function !
+                                    var pFactoryValue = functionCollection[ pFactoryName ],
+                                        isFunction = typeof pFactoryValue === 'function' ? true : false,
+                                        inputElement = that.parent()[0].inputElement;
+
+                                    // attach standard or custom function to input element
+                                    if ( isFunction ){
+                                        // attach function directly
+                                        inputElement.on(
+                                            pEventName,
+                                            makeValidatorFunction(
+                                                pStatusName,
+                                                pFactoryValue,
+                                                FieldValidator.fn.invalid.message
+                                            )
+                                        );
+                                    } else {
+                                        // attach repository validator function
+                                        inputElement.on(
+                                            pEventName,
+                                            makeValidatorFunction(
+                                                pStatusName,
+                                                that.fn[ pFactoryName ].validator( pFactoryValue ),
+                                                that.fn[ pFactoryName ].message
+                                            )
+                                        );
+                                    }
+                                }
+                            );
+                        }
+                    }
+                );
+            }
+        );
+
+        /*
+        // remove info class after blur anyway
+        tb.dom( that.target )
+            .on(
+                'blur',
+                function(){
+                    //console.log( 'remove classes ...info ...warning ...error from', tb.dom( that.target.parentElement.children ) );
+
+                    tb.dom( that.target.parentElement.children )
+                        .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+                }
+            );
+        */
     }
 
     /**
@@ -515,10 +515,9 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
      */
     function FormValidator( pConfig ){
 
-        var that = this,
-            config = pConfig;
+        var that = this;
 
-        that.config = config;
+        that.config = pConfig;
 
         // this indicates the number of field validations currently in progress,
         // when it reaches 0 callbacks are executed depending on status
@@ -532,6 +531,7 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
         // handlers for instance
         that.handlers = {
+            init,
             setStatus,
             validate,
             onStartFieldValidation,
@@ -564,6 +564,25 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
     // VARIABLES
 
     // PRIVATE FUNCTIONS
+    function init(){
+        var that = this;
+
+        // put a link to the validator in the data-tb attribute to aid in debugging
+        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
+
+        dataTb.push( that.namespace );
+
+        tb.dom( that.target.target ).attr('data-tb',
+            dataTb.join(' ')
+        );
+
+        // set target to parent element target, that is the DOM node
+        that.target = that.target.target;
+
+        // put that in target
+        that.target[ 'tb.ui.FormValidator' ] = that;
+    }
+
     /**
      form validate, handler & method
 
@@ -746,7 +765,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
      @event init
      @param e
      */
-    function init(e) {
+    function init() {
         this.render();
     }
 
@@ -787,11 +806,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
                 .addClass('tb-ui-field-tag')
                 .attr( !!config.tagAttributes ? config.tagAttributes : {} );
 
-            that.inputElement
-                .val(!!config.value ? config.value : '');
-
-            /*
-            tb.dom( that.inputElement ) @todo: implement dom event handling
+            tb.dom( that.inputElement )
                 .on(
                     'focusin focus',
                     function( e ){
@@ -803,7 +818,6 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
                     }
                 );
-             */
 
             that.target.appendChild( that.inputElement[0] );
 
@@ -817,13 +831,11 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
         that.target.appendChild(that.messageElement[0]);
         
         // keyhandler for direction
-        /* @todo: implement dom event handling
         that
             .inputElement
             .on(
                 'keypress',
                 function( ev ){
-                    var $input = $( this );
 
                     if ( ev.key === 'Tab' ){
                         that.direction = ev.shiftKey ? 'prev' : 'next';
@@ -842,7 +854,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
                 }
             );
-        */
+
 
         // if masked input field -> hide alltogether
         if (tb.namespace('input.type', false, config) === 'hidden') {
@@ -906,17 +918,10 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
     function scrollTo(){
         var that = this;
 
-        // console.log( 'scrollTo', that );
-        $('html, body').animate(
-            {
-                scrollTop: (
-                    $( that.target ).offset().top - 100 // top of input element
-                    // + ( $( $fieldset.target ).outerHeight() / 2 ) // + half of its height
-                    // - ( height / 2 ) // minus half of the inner browser window height
-                )
-            },
-            50
-        );
+        console.log( 'scrollTo', tb.dom( that.target )[0]. parentElement );
+        tb.dom('.demoapp-body')[0].scrollTop
+            = tb.dom( that.target )[0].parentElement.offsetTop - 200; // top of input element
+
     }
 
 })();
@@ -1013,7 +1018,7 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
             legend = that.target.appendChild( document.createElement( 'legend' ) );
             tb.dom( legend ).html( that.config.legend);
         }
-        
+
         that.config.fields
             .forEach(
                 function( pValue ){
@@ -1057,6 +1062,12 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
 
         that.config = pConfig;
 
+        tb.extend(
+            that,
+            pConfig
+        );
+
+
         /**
          * event handlers of this instance at creation time
          *
@@ -1070,8 +1081,8 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
          * @type object
          */
         that.handlers = {
-            init: init,
-            render: render
+            init,
+            render
         }
 
     };

@@ -33,11 +33,13 @@
       ]
     },
     {
+      "legend": "{Returnto}",
       "fields": [
         "SenderReturnPath"
       ]
     },
     {
+      "legend": "{Testto}",
       "fields": [
         "TestRecipient"
       ]

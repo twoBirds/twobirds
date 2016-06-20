@@ -52,12 +52,12 @@ tb = (function(){
                         }
                     );
                     return;
-                } else if (pSelector instanceof Array) {
+                } else if (pSelector instanceof Array || pSelector instanceof HTMLCollection ) {
                     [].forEach.call(
                         pSelector,
                         function (pElement) {   // copy only DOM nodes
                             if (!!pElement && !!pElement['nodeType']) {
-                                [].push.call(that, pElement);
+                                [].push.call(that, tb.dom( pElement )[0] );
                             }
                         }
                     );
@@ -122,23 +122,131 @@ tb = (function(){
                 removeClass: removeClass,
                 filter: filter,
                 not: not,
+                off: off,
+                on: on,
+                one: one,
                 parents: parents,
                 push: push,
                 removeAttr: removeAttr,
                 show: show,
                 toArray: toArray,
+                trigger: trigger,
                 unique: unique,
                 val: val
             };
 
-            return new dom(pSelector, pDomNode);
+            return new dom( pSelector, pDomNode );
 
             var regExReturn = /\r/g,
                 regExSpaces = /[\x20\t\r\n\f]+/g,
                 regExWord = /\S+/g;
 
+            // INTERNAL ONLY Private Functions
+            function _addEvent( pDomNode, pEventName, pHandler ) {
+                if (pDomNode.attachEvent) {
+                    pDomNode.attachEvent('on' + pEventName, pHandler);
+                } else {
+                    pDomNode.addEventListener(pEventName, pHandler);
+                }
+            }
 
-            // Private Functions
+            function _removeEvent( pDomNode, pEventName, pHandler ) {
+                if (pDomNode.detachEvent){
+                    pDomNode.detachEvent('on'+pEventName, pHandler);
+                } else {
+                    pDomNode.removeEventListener(pEventName, pHandler);
+                }
+            }
+
+            // Private Functions, exposed
+            function trigger( pEventName, pData ){
+                var that = this,
+                    eventNames = pEventName.split(' ');
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+                            eventNames.forEach(
+                                function( pThisEventName ){
+                                    if ('createEvent' in document) {
+                                        var e = document.createEvent('HTMLEvents');
+                                        e.data = pData;
+                                        e.initEvent(pThisEventName, false, true);
+                                        pDomNode.dispatchEvent(e);
+                                    } else {
+                                        var e = document.createEventObject();
+                                        e.data = pData;
+                                        e.eventType = pThisEventName;
+                                        pDomNode.fireEvent('on'+e.pThisEventName, e);
+                                    }
+                                }
+                            );
+                        }
+                    }
+                );
+
+            }
+
+            function on( pEventName, pHandler ){
+                var that = this,
+                    eventNames = pEventName.split(' '),
+                    onceHandler;
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+                            eventNames.forEach(
+                                function( pThisEventName ){
+
+                                    if ( !!pHandler['once'] ){
+                                        onceHandler = (function(pDomNode, pThisEventName, pHandler) {
+                                            return function(){
+                                                _removeEvent( pDomNode, pThisEventName, onceHandler );
+                                                pHandler.apply( pDomNode, arguments );
+                                            }
+                                        })(pDomNode, pThisEventName, pHandler);
+                                    }
+
+                                    _addEvent( pDomNode, pThisEventName, onceHandler || pHandler );
+                                }
+                            );
+                        }
+                    }
+                );
+
+                return that;
+            }
+
+            function one( pEventName, pHandler ){
+                var that = this,
+                    eventNames = pEventName.split(' ');
+
+                pHandler.once = true;
+
+                that.on( pEventName, pHandler );
+
+                return that;
+            }
+
+            function off( pEventName, pHandler ){
+                var that = this,
+                    eventNames = pEventName.split(' ');
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+                            eventNames.forEach(
+                                function( pThisEventName ){
+                                    _removeEvent( pDomNode, pThisEventName, pHandler );
+                                }
+                            );
+                        }
+                    }
+                );
+
+                return that;
+            }
+
             function empty() {
                 var that = this;
 
@@ -274,17 +382,17 @@ tb = (function(){
 
             function addClass(pClassName) {
 
-                var that = this,
-                    rootNodes = that.toArray();
+                var that = this;
 
-                rootNodes.forEach(
-                    function (pNode) {
-                        var classes = pNode.getAttribute('class') || '',
+                that.forEach(
+                    function (pDomNode) {
+                        var classes = pDomNode.getAttribute('class') || '',
                             classes = !!classes.length ? classes.split(' ') : [],
                             index = classes.indexOf(pClassName);
 
                         if (index === -1) {
-                            pNode.setAttribute('class', !!classes.length ? classes + ' ' + pClassName : pClassName);
+                            classes.push( pClassName );
+                            pDomNode.setAttribute('class', classes.join(' ') );
                         }
                     }
                 );
@@ -294,21 +402,33 @@ tb = (function(){
 
             function removeClass(pClassName) {
 
-                var that = this,
-                    rootNodes = that.toArray();
+                var that = this;
 
-                rootNodes.forEach(
-                    function (pNode) {
-                        var classes = pNode.getAttribute('class') || '',
-                            classes = !!classes.length ? classes.split(' ') : [],
-                            index = classes.indexOf(pClassName);
+                that.forEach(
+                    function (pDomNode) {
+                        var classes = pDomNode.getAttribute('class') || '';
 
-                        if ( index > -1 ) while ( index > -1 ) {
-                            classes.splice(index, 1);
+                        if ( classes ){
+                            if ( !!(classes.indexOf(' ') + 1) ){
+                                classes = classes.split(' ')
+                            } else {
+                                classes = [ classes ];
+                            }
 
-                            pNode.setAttribute('class', classes.join(' '));
+                            pClassName.split(' ')
+                                .forEach(
+                                    function( pRemoveClass ){
+                                        while ( classes.indexOf(pRemoveClass) > -1 ){
+                                            classes.splice(classes.indexOf(pRemoveClass), 1)
+                                        }
+                                    }
+                                );
 
-                            index = classes.indexOf(pClassName);
+                            if ( !!classes.length ){
+                                tb.dom( pDomNode ).attr('class', classes.join(' ') )
+                            } else {
+                                tb.dom( pDomNode ).removeAttr('class');
+                            }
                         }
 
                     }
@@ -367,13 +487,14 @@ tb = (function(){
 
                 var that = this,
                     attrNames = pKeys && pKeys.match(regExWord),
+                    name,
                     i;
 
                 that.forEach(
                     function (pDomNode) {
-                        if (attrNames && !!elem['nodeType'] && elem.nodeType === 1) {
+                        if (attrNames && !!pDomNode['nodeType'] && pDomNode.nodeType === 1) {
                             while ((name = attrNames[i++])) {
-                                elem.removeAttribute(name);
+                                pDomNode.removeAttribute(name);
                             }
                         }
                     }
@@ -450,7 +571,10 @@ tb = (function(){
                 return result;
             }
 
-            function val(){} val = (function() {
+            function val( pValue ){
+
+                var that = this,
+                    ret;
 
                 var valHandlers = {
 
@@ -469,7 +593,7 @@ tb = (function(){
                                     function( pThisSelectedOption ){
                                         if ( !option.disabled
                                             && ( !option.parentNode.disabled
-                                                || option.parentNode.nodeName !== "optgroup" )
+                                            || option.parentNode.nodeName !== "optgroup" )
                                         ){
                                             var value = pThisSelectedOption.value;
 
@@ -516,11 +640,11 @@ tb = (function(){
 
                         if ( ([ 'radio', 'checkbox' ]).indexOf( that.type ) > -1 ){ // input radio or checkbox
 
-                            if ( arguments.length ){
+                            if ( !!arguments.length ){ // setter
                                 that.checked = !!pValue;
                             }
 
-                            return that.checked;
+                            return that.checked; // getter
 
                         } else {
 
@@ -551,35 +675,55 @@ tb = (function(){
 
                 };
 
-                return function val(value){
-                    var that = this,
-                        element = that[0] ? that[0] : false,
-                        ret;
+                if ( arguments.length ){
 
                     that.forEach(
                         function ( pElement ) {
 
-                            var val = value,
-                                inputTags = [ 'input', 'select', 'option', 'textarea'],
-                                ret;
+                            var inputTags = [ 'input', 'select', 'option', 'textarea'];
 
-                            if ( pValue.nodeType !== 1
-                                || ( inputTags ).indexOf( element.tagName ) === -1
+                            if ( pElement.nodeType !== 1
+                                || ( inputTags ).indexOf( pElement.tagName.toLowerCase() ) === -1
                             ){
                                 return; // not an input element
                             }
 
-                            ret = valHandlers[ pElement.tagName ]
-                                ? valHandlers[ pElement.tagName ]( value )
-                                : valHandlers[ 'default' ]( value );
+                            ret = !!valHandlers[ pElement.tagName.toLowerCase() ]
+                                ? valHandlers[ pElement.tagName.toLowerCase() ].call( pElement, pValue )
+                                : valHandlers[ 'default' ].call( pElement, pValue );
 
                         }
                     );
 
                     return that;
-                };
 
-            })();
+                } else { // getter
+
+                    that.some(
+                        function ( pElement ) {
+
+                            var inputTags = [ 'input', 'select', 'option', 'textarea'];
+
+                            if ( pElement.nodeType !== 1
+                                || ( inputTags ).indexOf( pElement.tagName.toLowerCase() ) === -1
+                            ){
+                                return false; // not an input element
+                            }
+
+                            ret = !!valHandlers[ pElement.tagName.toLowerCase() ]
+                                ? valHandlers[ pElement.tagName.toLowerCase() ].call( pElement )
+                                : valHandlers[ 'default' ].call( pElement );
+
+                            return true; // not an input element
+
+                        }
+                    );
+
+                    return ret;
+
+                }
+
+            }
 
 
         };
@@ -675,15 +819,15 @@ tb = (function(){
 
         that.length = 0;
 
-        pSelector
-            .split( ',' )
-            .forEach(
-                function forEachTbSelector( pThisSelector ){
-                    switch (typeof pSelector) {
+        switch (typeof pSelector) {
 
-                        // selection by dom selector string
-                        case 'string':
+            // selection by dom selector string
+            case 'string':
 
+                pSelector
+                    .split(',')
+                    .forEach(
+                        function( pThisSelector ){
                             tb.dom( pSelector )
                                 .filter('[data-tb]')
                                 .filter(
@@ -704,92 +848,90 @@ tb = (function(){
                                         }
                                     }
                                 );
+                        }
+                    )
 
-                            break;
+                break;
 
-                        case 'object':  // either regEx or nodeType
+            case 'object':  // either regEx or nodeType
 
-                            if ( pSelector instanceof RegExp ){ // it is a regular expression
+                if ( pSelector instanceof RegExp ){ // it is a regular expression
 
-                                tb.dom( '[data-tb]' )
-                                    .map(
-                                        function ( pDomNode ) {
+                    tb.dom( '[data-tb]' )
+                        .map(
+                            function ( pDomNode ) {
 
-                                            var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
+                                var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
 
-                                            if ( !!namespaces['0'] ){
-                                                namespaces.forEach(
-                                                    function( pNamespace ){
-                                                        if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
-                                                            tbElements.push( pDomNode[ pNamespace ] );
-                                                        }
-                                                    }
-                                                );
-                                            }
-
-                                        }
-                                    );
-
-                            } else if ( !!pSelector['nodeType'] ){ // it is a dom node
-
-                                tb.dom( pSelector )
-                                    .map(
-                                        function ( pDomNode ) {
-
-                                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
-
-                                            if ( !!namespaces['0'] ) {
-                                                namespaces.forEach(
-                                                    function (pNamespace) {
-                                                        if ( pNamespace.match(pSelector)
-                                                            && !!pDomNode[pNamespace]
-                                                            && !!pDomNode[pNamespace] instanceof tb
-                                                        ){
-                                                            tbElements.push(pDomNode[pNamespace]);
-                                                        }
-                                                    }
-                                                );
-
+                                if ( !!namespaces['0'] ){
+                                    namespaces.forEach(
+                                        function( pNamespace ){
+                                            if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
+                                                tbElements.push( pDomNode[ pNamespace ] );
                                             }
                                         }
                                     );
+                                }
 
                             }
+                        );
 
-                            break;
+                } else if ( !!pSelector['nodeType'] ){ // it is a dom node
 
-                        // selection by constructor: get all tb instances from DOM,
-                        // check whether their prototype matches constructor prototype
-                        case 'function':
+                    tb.dom( pSelector )
+                        .map(
+                            function ( pDomNode ) {
 
-                            tb.dom( '[data-tb]' )
-                                .map(
-                                    function ( pDomNode ) {
+                                var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
 
-                                        var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
-
-                                        if ( !!namespaces['0'] ) {
-                                            namespaces.forEach(
-                                                function( pNamespace ){
-                                                    if ( !!pDomNode[pNamespace]
-                                                        && pDomNode[pNamespace] instanceof tb
-                                                        && pDomNode[pNamespace] instanceof pSelector
-                                                    ){
-                                                        tbElements.push( pDomNode[pNamespace] );
-                                                    }
-                                                }
-                                            );
+                                if ( !!namespaces['0'] ) {
+                                    namespaces.forEach(
+                                        function (pNamespace) {
+                                            if ( pNamespace.match(pSelector)
+                                                && !!pDomNode[pNamespace]
+                                                && !!pDomNode[pNamespace] instanceof tb
+                                            ){
+                                                tbElements.push(pDomNode[pNamespace]);
+                                            }
                                         }
+                                    );
 
+                                }
+                            }
+                        );
+
+                }
+
+                break;
+
+            // selection by constructor: get all tb instances from DOM,
+            // check whether their prototype matches constructor prototype
+            case 'function':
+
+                tb.dom( '[data-tb]' )
+                    .map(
+                        function ( pDomNode ) {
+
+                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
+
+                            if ( !!namespaces['0'] ) {
+                                namespaces.forEach(
+                                    function( pNamespace ){
+                                        if ( !!pDomNode[pNamespace]
+                                            && pDomNode[pNamespace] instanceof tb
+                                            && pDomNode[pNamespace] instanceof pSelector
+                                        ){
+                                            tbElements.push( pDomNode[pNamespace] );
+                                        }
                                     }
                                 );
+                            }
 
-                            break;
-                    }
-                }
-            );
+                        }
+                    );
 
-
+                break;
+        }
         // add all tb instances from dom into selector
         tbElements.map(
             function ( pTbObject ) {
@@ -994,6 +1136,11 @@ tb = (function(){
 
                 if ( !( tbInstance instanceof Nop ) ){
                     
+                    // trigger init directly if no requirement array
+                    if ( !tbInstance['tb.require'] ) {
+                        tbInstance.trigger( 'init' );
+                    } // otherwise tb.require will trigger it
+
                     // add property declared classes (prop contains ".") as tb objects
                     for ( var key in tbInstance ) {
                         if ( typeof key === 'string'
@@ -1002,11 +1149,6 @@ tb = (function(){
                             tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
                         }
                     }
-
-                    // trigger init directly if no requirement array
-                    if ( !tbInstance['tb.require'] ) {
-                        tbInstance.trigger( 'init' );
-                    } // otherwise tb.require will trigger it
 
                 }
 
