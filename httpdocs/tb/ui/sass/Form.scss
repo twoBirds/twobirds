@@ -33,6 +33,11 @@ fieldset.tb-ui-fieldset {
     float: right;
   }
 
+  & .tb-ui-field-tag {
+    clear: both;
+    display: block;
+  }
+
   & input,
   textarea,
   select {

@@ -29,7 +29,7 @@ tb = (function(){
             var dom;
 
             // dom constructor
-            dom = function (pSelector, pDomNode) {
+            dom = function tbDom(pSelector, pDomNode) {
 
                 var that = this,
                     domNode,
@@ -154,7 +154,7 @@ tb = (function(){
             function html( pHtml ) {
                 var that = this;
 
-                if ( !!pHtml ){
+                if ( typeof pHtml === 'string' ){
                     that.forEach(
                         function( pNode ){
                             pNode.innerHTML = pHtml;
@@ -322,7 +322,6 @@ tb = (function(){
                 var that = this,
                     rootNodes;
 
-                console.log( 'attr', that, pKey, pValue );
                 if ( pKey.constructor === Object ){ // hash given
 
                     Object
@@ -994,12 +993,13 @@ tb = (function(){
                 }
 
                 if ( !( tbInstance instanceof Nop ) ){
-
+                    
                     // add property declared classes (prop contains ".") as tb objects
-                    for ( var key in tbInstance ) if ( !tbInstance.hasOwnProperty( key ) ) {
+                    for ( var key in tbInstance ) {
                         if ( typeof key === 'string'
                             && key.indexOf( '.' ) > -1
                         ){ // prop name contains ".", treat as tb class
+                            console.log( 'create inner object', key, 'in', tbInstance );
                             tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
                         }
                     }

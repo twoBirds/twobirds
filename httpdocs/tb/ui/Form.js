@@ -41,6 +41,8 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
             validate: validate
         };
 
+        console.log( 'tb.ui.FieldValidator constructor', pConfig );
+
         // VALIDATOR function factory
         // must be in here (inner function) to bind <that> correctly via closure
         function makeValidatorFunction( pStatus, pFunction, pMessage ){
@@ -49,18 +51,18 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
             f = function( value ){
 
-                var labelElement = that.config.labelElement,
-                    inputElement = that.config.inputElement,
-                    messageElement = that.config.messageElement,
+                var labelElement = that.target.labelElement,
+                    inputElement = that.target.inputElement,
+                    messageElement = that.target.messageElement,
                     valid = pFunction( inputElement.val()),
                     f = pFunction;
 
                 // remove previous message
-                messageElement.innerHTML = '';
+                messageElement.empty();
 
                 // remove previous classes
                 classes
-                    forEach(
+                    .forEach(
                         function( statusName, statusClass ){
                             labelElement.removeClass( statusClass );
                             inputElement.removeClass( statusClass );
@@ -72,7 +74,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
                 if ( !valid ){
 
                     // message is either defined as curry property on function, or standard given
-                    messageElement.innerHTML = f['message'] ? f['message'] : pMessage;
                     messageElement
                         .html( f['message'] ? f['message'] : pMessage )
                         .show();
@@ -108,6 +109,8 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
         }
 
+        return; // @todo: implement tb.dom event handling
+        /*
         // create validation functions and append them to input field
         $.each(
             config.validators, // <eventNames> property, format like jQ event names
@@ -118,14 +121,13 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
 
                         var // first validator function is the most urgent, others follow in sequence
-                            // @todo: validate this...
                             functionCollection = config.validators[ pEventName ][ pStatusName ] || {};
 
                         // execute all validation handlers on this field
                         if ( !!functionCollection ) {
                             $.each(
                                 functionCollection, // validation definition / functions
-                                function( pFactoryName, pFactoryValue /* built-in factory parameter or function ! */ ){
+                                function( pFactoryName, pFactoryValue  ){ // built-in factory parameter or function !
 
                                     // that = validator instance, not field instance!
                                     var isFunction = typeof pFactoryValue === 'function' ? true : false,
@@ -163,6 +165,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
                 );
             }
         );
+        */
     };
 
     FieldValidator.prototype = {
@@ -656,10 +659,14 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
     function Field( pConfig ){
 
         // var
-        var that = this,
-            config;
+        var that = this;
 
-        config = that.config = pConfig;
+        that.config = pConfig;
+
+        tb.extend(
+            that,
+            pConfig
+        );
 
         /**
          event handlers of this instance at creation time
@@ -684,6 +691,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             validate
         }
 
+        console.log( 'tb.ui.Field constructor', that, pConfig);
     };
 
     Field.prototype = {
@@ -748,22 +756,18 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
         // create field elements
 
         // label element
-        if (!!config.label) {
-            that.labelElement = tb.dom( document.createElement('label') )
-                .addClass('tb-ui-field-label')
-                .html(config.label);
+        that.labelElement = tb.dom( document.createElement('label') )
+            .addClass('tb-ui-field-label')
+            .html(config['label'] || '');
 
-            that.target.appendChild(that.labelElement[0]);
-        }
+        that.target.appendChild(that.labelElement[0]);
 
         // hint element
-        if (!!config.hint) {
-            that.hintElement = tb.dom( document.createElement('span') )
-                .addClass('tb-ui-field-hint')
-                .html(config.hint);
+        that.hintElement = tb.dom( document.createElement('span') )
+            .addClass('tb-ui-field-hint')
+            .html(config['hint'] || '');
 
-            that.target.appendChild(that.hintElement[0]);
-        }
+        that.target.appendChild(that.hintElement[0]);
 
         // input element
         if (!!config.tagName) {
@@ -774,11 +778,9 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
             that.inputElement
                 .val(!!config.value ? config.value : '');
-
-            console.log( that.inputElement );
-
+            
             /*
-            tb( that.inputElement )
+            tb.dom( that.inputElement ) @todo: implement dom event handling
                 .on(
                     'focusin focus',
                     function( e ){
@@ -797,36 +799,16 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
         }
 
         // message element
-        if (!!config.message) {
-            that.messageElement = tb.dom( document.createElement('span') )
-                .addClass('tb-ui-field-message')
-                .html(config.hint);
+        that.messageElement = tb.dom( document.createElement('span') )
+            .addClass('tb-ui-field-message')
+            .html(config['message'] || '');
 
-            that.target.appendChild(that.messageElement[0]);
-        }
-
-        // attach custom input element(s)
-/*
-
-        that.config.forEach(
-            function( pKey, pValue ){
-                if ( pKey.indexOf( '.' ) > -1 ) { // it is a namespace
-                    // console.log( 'create Field input subelement:', key, value, that.inputElement )
-                    new tb(
-                        pKey, // namespace of class as a string
-                        value,
-                        that.$inputElement
-                    );
-                }
-            }
-        );
-
- */
-
+        that.target.appendChild(that.messageElement[0]);
+        
         // keyhandler for direction
-        /*
+        /* @todo: implement dom event handling
         that
-            .$inputElement
+            .inputElement
             .on(
                 'keypress',
                 function( ev ){
@@ -851,12 +833,16 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             );
         */
 
-        // if masked input field -> hide alltogether @todo: refactor
+        // if masked input field -> hide alltogether
         if (tb.namespace('input.type', false, config) === 'hidden') {
-            $target
+            tb.dom( that.target )
                 .attr({
                     overflow: 'hidden',
-                    height: '0'
+                    height: '0',
+                    width: '0',
+                    margin: '0',
+                    padding: '0',
+                    border: '0px none'
                 });
         } else {
             // get last field created before this one
@@ -865,28 +851,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
                 that.prevField = tb.ui.Field.prototype.prevField; // my prev field is the one linked in the prototype
             }
         }
-
-        // if validator defined -> attach validator
-        if (!!that.config.validate) {
-
-            // this validator is completely invisible in DOM structure!
-            that.validator = new tb(
-                tb.ui.FieldValidator,
-                $.extend(
-                    true,
-                    {},
-                    {
-                        $labelElement: that.$labelElement,
-                        $inputElement: that.$inputElement,
-                        $messageElement: that.$messageElement,
-                        validators: that.config.validate
-                    }
-                ),
-                that.target
-            );
-
-        }
-
+        
         // set last field created before this one
         tb.ui.Field.prototype.prevField = that;
 
@@ -1051,7 +1016,7 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
                     new tb(
                         tb.ui.Field,
                         pValue,
-                        that.target.appendChild( document.createElement( pValue.tagName ) )
+                        that.target.appendChild( document.createElement( 'div' ) )
                     );
 
                 }

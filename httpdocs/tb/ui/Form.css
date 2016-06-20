@@ -20,6 +20,9 @@ fieldset.tb-ui-fieldset {
     float: left; }
   fieldset.tb-ui-fieldset span.tb-ui-field-hint {
     float: right; }
+  fieldset.tb-ui-fieldset .tb-ui-field-tag {
+    clear: both;
+    display: block; }
   fieldset.tb-ui-fieldset input,
   fieldset.tb-ui-fieldset textarea,
   fieldset.tb-ui-fieldset select {
