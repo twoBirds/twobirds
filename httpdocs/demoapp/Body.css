@@ -1,7 +1,18 @@
-.demoapp-body > .demoapp-body-content {
-  overflow: hidden;
-  max-width: 1040px;
-  margin: 5.5rem auto;
-  text-align: left; }
+.demoapp-body {
+  width: 100%;
+  text-rendering: optimizeLegibility;
+  font-size: 1.5rem;
+  background-color: #ebebeb;
+  min-height: 100%;
+  margin: 0;
+  font-family: "Arial", Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  font-size: 1.5rem; }
+  .demoapp-body > .demoapp-body-content {
+    overflow: hidden;
+    max-width: 1040px;
+    margin: 5.5rem auto;
+    text-align: left; }
 
 /*# sourceMappingURL=Body.css.map */

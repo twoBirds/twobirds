@@ -1,0 +1,40 @@
+{
+
+  "status": 1,
+
+  "transport": {
+    "url": "/demoapp/configuration/demoapp-configuration-editData.json",
+    "urlParams": {
+    }
+  },
+
+  "method": "GET",
+
+  "header": {
+  },
+
+  "params": {
+
+    "POST": {
+    },
+
+    "GET": {
+      "ConfigurationID": 1
+    }
+
+  },
+
+  "data": {
+
+    "ConfigurationID": 1,
+    "ConfigurationName": "Beispielkonfiguration",
+    "ConfigurationDescription": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+    "SenderEmail": "hans.huckebein@mailserver.ch",
+    "SenderName": "Hans Huckebein",
+    "SenderReturnPath": "retour@mailserver.ch",
+    "TemplateID": 1
+  },
+
+  "message": "...optional..."
+
+}

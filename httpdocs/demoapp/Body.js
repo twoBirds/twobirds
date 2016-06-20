@@ -113,15 +113,19 @@ tb.namespace( 'demoapp', true ).Body = (function(){
         
         
         // inner content area
+
         that.content = that
             .target
             .appendChild( document.createElement("div") );
 
-        that.content
-            .innerHTML = 'test content';
-
         tb.dom( that.content )
             .addClass( 'demoapp-body-content' );
+
+        new tb(
+            'demoapp.configuration.Edit',
+            {},
+            that.content.appendChild( document.createElement('div') )
+        );
 
         
         
@@ -133,16 +137,12 @@ tb.namespace( 'demoapp', true ).Body = (function(){
         ).one( // deferred, execute only once
             'init', // when all requirements have loaded
             function setInitialFooter(){
-                var that = this;
-
-                that.setContent('- this will be overwritten, see in code below -');
+                this.setContent('- this will be overwritten, see in code below -');
             }
         ).on( // deferred, an example of how to map a prototype method to an event
             'setContent', // event name
             function setContentHandler( e ){ // associated function
-                var that = this;
-
-                that.setContent( e.data );
+                this.setContent( e.data );
             }
         ).trigger( // deferred event triggering
             'setContent', // event name

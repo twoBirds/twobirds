@@ -1,0 +1,270 @@
+fieldset.tb-ui-fieldset {
+
+  left: 0px;
+  right: 0px;
+  margin-top: 2px;
+  margin-bottom: 0;
+  color: rgb(133,133,133);
+
+  background-color: rgb( 255,255,255);
+
+  padding: 1.5rem 2.5rem;
+
+  & *:focus {
+    outline: none;
+    box-shadow: none;
+    border-radius: inherit;
+    border-color: inherit;
+  }
+
+  & *:focus:hover {
+    outline: none;
+    box-shadow: none;
+    border-radius: inherit;
+    border-color: inherit;
+  }
+
+  & label {
+    float: left;
+  }
+
+  & span.tb-ui-field-hint {
+
+    float: right;
+  }
+
+  & input,
+  textarea,
+  select {
+    padding: 0.75rem;
+    float: none;
+    clear: both;
+  }
+
+  & li.tb-ui-listedit-listelement {
+
+    padding: 0rem;
+    min-width: 100%;
+    clear: both;
+    float: none;
+
+    & > button {
+      float: right;
+    }
+
+    & > div {
+      overflow: hidden;
+      padding-right: 2px;
+
+      & > input {
+        padding: 0;
+        min-width: 100%;
+      }
+
+    }
+
+  }
+
+  & input:focus,
+    textarea:focus {
+
+    border: 1px solid darkgrey;
+  }
+
+  & label,
+  span.tb-ui-field-hint,
+  span.tb-ui-field-message,
+  input,
+  textarea,
+  select {
+
+    font-size: 0.875rem;
+    }
+
+  & label,
+  span.tb-ui-field-hint,
+  span.tb-ui-field-message {
+
+    letter-spacing: 0.05em;
+  }
+
+  & label,
+    span.tb-ui-field-hint {
+      line-height: 1.5rem;
+    }
+
+  & input,
+    textarea,
+    select,
+    li.tb-ui-listedit-listelement {
+
+    left: 0px;
+    right: 0px;
+    margin-bottom: 3px;
+    font-size: 1rem;
+    color: rgb(51,51,51);
+  }
+
+  & input,
+    textarea,
+    select,
+    li.tb-ui-listedit-listelement {
+
+    border: 0px none;
+    background-color: rgb( 240, 240, 240);
+  }
+
+  & li.tb-ui-listedit-listelement {
+
+    min-height: 2rem;
+    margin-bottom: 2px;
+  }
+
+  & li.tb-ui-listedit-listelement > * {
+
+    line-height: 2rem;
+  }
+
+  & li.tb-ui-listedit-listelement input {
+
+    font-size: 1rem;
+    height: 2rem;
+    left: 0;
+    margin: 0;
+  }
+
+  & li.tb-ui-listeditselect-listelement label {
+
+    font-size: 0.9rem;
+    height: 2rem;
+    left: 0;
+    margin: 0;
+    font-size: 1rem;
+    color: hsl(0, 0%, 40%);
+  }
+
+  & li.tb-ui-listeditselect-listelement > label > input {
+    margin-left: 0.9rem;
+    margin-right: 0.9rem;
+  }
+
+  & select {
+
+    width: 100%;
+    margin: 0;
+    border-radius: 0px;
+    box-shadow: none;
+    border: none;
+    outline: none;
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor:pointer;
+  }
+
+  & button {
+    padding: 0;
+    font-size: 1.5rem;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 0px;
+    border: 0px none;
+    background-color: hsl(0, 0%, 94%);
+    background-image: none;
+    text-shadow: none;
+    cursor:pointer;
+  }
+
+}
+
+.tb-ui-field-tag {
+  &.tb-ui-validator-error {
+    border: 1px solid red;
+
+    &:hover,
+    &:focus {
+      border: 1px solid red;
+    }
+  }
+}
+
+.tb-ui-field-message {
+  font-size: 0.875rem;
+
+  &.tb-ui-validator-info {
+    color: dodgerblue;
+
+    &:hover,
+    &:focus {
+      color: dodgerblue;
+    }
+  }
+
+  &.tb-ui-validator-warning {
+    color: orange;
+
+    &:hover,
+    &:focus {
+      color: orange;
+    }
+  }
+
+  &.tb-ui-validator-error {
+    color: red;
+
+    &:hover,
+    &:focus {
+      color: red;
+    }
+  }
+}
+
+.tb-ui-field-label {
+
+  &.tb-ui-validator-info {
+    color: dodgerblue;
+  }
+
+  &.tb-ui-validator-warning {
+    color: orange;
+  }
+
+  &.tb-ui-validator-error {
+    color: red;
+  }
+}
+
+
+.tb-ui-button {
+  text-decoration: none;
+  padding: 1rem 2rem;
+  margin: 0 1.5rem;
+  font-size: 1rem;
+  line-height: 1rem;
+  height: 3rem;
+  border-radius: 0px;
+  border: 0px none;
+  background-image: none;
+  cursor: pointer;
+
+  &.primary {
+    background-color: rgb(67,61,153);
+    color: rgb( 255, 255, 255);
+  }
+
+  &.primary:hover {
+    background-color: rgb(56,51,128);
+  }
+
+  .tb-ui-autocomplete {
+    text-decoration: none;
+    padding: 0;
+    border-radius: 0px;
+    border: 1px solid darkgrey;
+    display: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+}

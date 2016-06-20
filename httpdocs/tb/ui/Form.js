@@ -3,6 +3,21 @@
  */
 tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
+    var messages = {
+        'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
+        'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
+        'This value is too small!': 'Dieser Wert ist zu klein.',
+        'This value is too big!': 'Dieser Wert ist zu gross.',
+        'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
+        'resetMessage': ''
+    };
+
+    var classes = {
+        info: 'tb-ui-validator-info',
+        warning: 'tb-ui-validator-warning',
+        error: 'tb-ui-validator-error'
+    };
+
     /**
      @namespace tb.ui.FieldValidator
      */
@@ -34,38 +49,38 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
             f = function( value ){
 
-                var $labelElement = that.config.$labelElement,
-                    $inputElement = that.config.$inputElement,
-                    $messageElement = that.config.$messageElement,
-                    valid = pFunction( $inputElement.val()),
+                var labelElement = that.config.labelElement,
+                    inputElement = that.config.inputElement,
+                    messageElement = that.config.messageElement,
+                    valid = pFunction( inputElement.val()),
                     f = pFunction;
 
                 // remove previous message
-                $messageElement
-                    .html( '' );
+                messageElement.innerHTML = '';
 
                 // remove previous classes
-                $.each(
-                    classes,
-                    function( statusName, statusClass ){
-                        $labelElement.removeClass( statusClass );
-                        $inputElement.removeClass( statusClass );
-                        $messageElement.removeClass( statusClass );
-                    }
-                );
+                classes
+                    forEach(
+                        function( statusName, statusClass ){
+                            labelElement.removeClass( statusClass );
+                            inputElement.removeClass( statusClass );
+                            messageElement.removeClass( statusClass );
+                        }
+                    );
 
                 // set message & visual class for this status code
                 if ( !valid ){
 
-                    $messageElement
-                        // message is either defined as curry property on function, or standard given
+                    // message is either defined as curry property on function, or standard given
+                    messageElement.innerHTML = f['message'] ? f['message'] : pMessage;
+                    messageElement
                         .html( f['message'] ? f['message'] : pMessage )
                         .show();
 
                     if ( !!classes[ pStatus ] ){
-                        $labelElement.addClass( classes[ pStatus ] );
-                        $inputElement.addClass( classes[ pStatus ] );
-                        $messageElement.addClass( classes[ pStatus ] );
+                        labelElement.addClass( classes[ pStatus ] );
+                        inputElement.addClass( classes[ pStatus ] );
+                        messageElement.addClass( classes[ pStatus ] );
                     }
 
                     // send status to form validator
@@ -77,9 +92,9 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
                             {
                                 valid: valid,
                                 status: pStatus,
-                                input: $inputElement,
+                                input: inputElement,
                                 message: f['message'] ? f['message'] : pMessage,
-                                label: $labelElement.html()
+                                label: labelElement.html()
                             }
                         );
 
@@ -274,21 +289,6 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
     };
 
     return FieldValidator;
-
-    var messages = {
-        'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
-        'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
-        'This value is too small!': 'Dieser Wert ist zu klein.',
-        'This value is too big!': 'Dieser Wert ist zu gross.',
-        'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
-        'resetMessage': ''
-    };
-
-    var classes = {
-        info: 'tb-ui-validator-info',
-        warning: 'tb-ui-validator-warning',
-        error: 'tb-ui-validator-error'
-    };
 
     // private functions
 
@@ -515,10 +515,10 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
         // handlers for instance
         that.handlers = {
-            setStatus: setStatus,
-            validate: validate,
-            onStartFieldValidation: onStartFieldValidation,
-            onEndFieldValidation: onEndFieldValidation
+            setStatus,
+            validate,
+            onStartFieldValidation,
+            onEndFieldValidation
         }
 
     };
@@ -553,12 +553,10 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
      @event validate
      @param ev {object} - the different callbacks to execute after validation
      */
-    function validate( ev ){
+    function validate( e ){
 
         var that = this,
-            data = ev.data;
-
-        // console.log( 'formValidator::validate' );
+            data = e.data;
 
         that.validateCallbacks = data;
 
@@ -571,11 +569,8 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
         // this indicates the number of field validations currently in progress
         that.fieldValidationCount = 0;
 
-        // console.log( 'form fields', that.target.descendants( tb.ui.Field ), that );
-
         // trigger validation
-        that
-            .target
+        tb.dom( that.target ) // = tb form instance
             .descendants( tb.ui.Field )
             .trigger( 'validate' );
 
@@ -592,7 +587,6 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
         that.fieldValidationCount++;
 
-        // console.log(that.fieldValidationCount);
     }
 
     /**
@@ -631,10 +625,10 @@ tb.namespace( 'tb.ui', true ).FormValidator = (function() {
 
      @event setStatus
      */
-    function setStatus( ev ){
+    function setStatus( e ){
 
         var that = this,
-            data = ev.data;
+            data = e.data;
 
         if ( data.status === 'error' ){
             that.status.error.push( data );
@@ -683,11 +677,11 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
          @type object
          */
         that.handlers = {
-            init: init,
-            render: render,
-            focus: focus,
-            scrollTo: scrollTo,
-            validate: validate
+            init,
+            render,
+            focus,
+            scrollTo,
+            validate
         }
 
     };
@@ -711,17 +705,6 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
          @static
          */
         prevField: {},
-
-        /**
-         handles requirement loading, an array containing file name strings
-
-         @property tb.require
-         @type array
-         @static
-         */
-        'tb.require': [
-            '/namespace/tb/css/Form.css' /** @todo: export to path */
-        ],
 
         /**
          renders field html
@@ -755,60 +738,82 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
         var that = this,
             config = that.config,
-            $inputTag,
-            $target = $(that.target);
+            inputTag;
+
+        console.log( 'tb.ui.field render', that.config );
 
         // clear content (in case of re-render )
-        $target
-            .children()
-            .remove();
+        tb.dom( that.target ).html('');
 
         // create field elements
 
         // label element
         if (!!config.label) {
-            that.$labelElement = $('<label class="tb-ui-field-label" />').html(config.label);
-            $target.append(that.$labelElement);
+            that.labelElement = tb.dom( document.createElement('label') )
+                .addClass('tb-ui-field-label')
+                .html(config.label);
+
+            that.target.appendChild(that.labelElement[0]);
         }
 
         // hint element
         if (!!config.hint) {
-            that.$hintElement = $('<span class="tb-ui-field-hint" />').html(config.hint);
-            $target.append(that.$hintElement);
+            that.hintElement = tb.dom( document.createElement('span') )
+                .addClass('tb-ui-field-hint')
+                .html(config.hint);
+
+            that.target.appendChild(that.hintElement[0]);
         }
 
         // input element
-        if (!!config.tag) {
+        if (!!config.tagName) {
 
-            that.$inputElement = $('<' + config.tag + ' class="tb-ui-field-tag" />')
-                .attr(!!config[config.tag] ? config[config.tag] : {})
-                .val(!!config.value ? config.value : '')
-                .attr('name', !!config[config.tag].name ? config[config.tag].name : config.name);
+            that.inputElement = tb.dom( document.createElement( config.tagName ) )
+                .addClass('tb-ui-field-tag')
+                .attr( !!config.tagAttributes ? config.tagAttributes : {} );
 
-            that.$inputElement.on(
-                'focusin focus',
-                function( e ){
-                    // scoll field element into sight
+            that.inputElement
+                .val(!!config.value ? config.value : '');
 
-                    that.direction = ''; // reset direction
+            console.log( that.inputElement );
 
-                    that.trigger( 'scrollTo' );
+            /*
+            tb( that.inputElement )
+                .on(
+                    'focusin focus',
+                    function( e ){
+                        // scroll field element into sight
 
-                }
-            );
+                        that.direction = ''; // reset direction
 
-            $target.append( that.$inputElement );
+                        that.trigger( 'scrollTo' );
+
+                    }
+                );
+             */
+
+            that.target.appendChild( that.inputElement[0] );
 
         }
 
+        // message element
+        if (!!config.message) {
+            that.messageElement = tb.dom( document.createElement('span') )
+                .addClass('tb-ui-field-message')
+                .html(config.hint);
+
+            that.target.appendChild(that.messageElement[0]);
+        }
+
         // attach custom input element(s)
-        $.each(
-            that.config,
-            function( key, value ){
-                if ( key.indexOf( '.' ) > -1 ) { // it is a namespace
-                    // console.log( 'create Field input subelement:', key, value, that.$inputElement )
+/*
+
+        that.config.forEach(
+            function( pKey, pValue ){
+                if ( pKey.indexOf( '.' ) > -1 ) { // it is a namespace
+                    // console.log( 'create Field input subelement:', key, value, that.inputElement )
                     new tb(
-                        key, // namespace of class as a string
+                        pKey, // namespace of class as a string
                         value,
                         that.$inputElement
                     );
@@ -816,7 +821,10 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             }
         );
 
+ */
+
         // keyhandler for direction
+        /*
         that
             .$inputElement
             .on(
@@ -826,9 +834,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
                     if ( ev.key === 'Tab' ){
                         that.direction = ev.shiftKey ? 'prev' : 'next';
-                    } /* else if ( ev.keyCode === 13 ){
-                     that.direction = 'next';
-                     } */ else {
+                    } else {
                         // any non-directional key
                         that.direction = '';
                     }
@@ -843,13 +849,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
                 }
             );
-
-        // message element
-        that.$messageElement = $('<span class="tb-ui-field-message" />').html(!!config.message ? config.message : '');
-        $target.append(that.$messageElement);
-        if (!!config.message) {
-            that.$messageElement.hide();
-        }
+        */
 
         // if masked input field -> hide alltogether @todo: refactor
         if (tb.namespace('input.type', false, config) === 'hidden') {
@@ -967,6 +967,8 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
 
         that.config = pConfig;
 
+        console.log( 'tb.ui.fieldSet constructor', pConfig );
+
         /**
          * event handlers of this instance at creation time
          *
@@ -999,17 +1001,6 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
         namespace: 'tb.ui.FieldSet',
 
         /**
-         * handles requirement loading, an array containing file name strings
-         *
-         * @property tb.require
-         * @type array
-         * @static
-         */
-        'tb.require': [
-            // '/namespace/tb/ui/Input.js' /** @todo: export to path */
-        ],
-
-        /**
          * @method render
          */
         render: render
@@ -1040,30 +1031,31 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
 
         var that = this;
 
+        console.log( 'tb.ui.fieldSet render()', that );
+
         // clear content (in case of re-render )
-        $( that.target )
-            .children()
-            .remove();
+        tb.dom( that.target )
+            .empty()
+            .attr( that.config['tagAttributes'] || {} );
 
-        $.each(
-            that.config.fields,
-            function( key, value ){
+        that.config.fields
+            .forEach(
+                function( pValue ){
 
-                var field;
+                    /*
+                    if ( !pValue['name'] ){
+                        pValue.name = key;
+                    }
+                     */
 
-                if ( !value['name'] ){
-                    value.name = key;
+                    new tb(
+                        tb.ui.Field,
+                        pValue,
+                        that.target.appendChild( document.createElement( pValue.tagName ) )
+                    );
+
                 }
-
-                field = new tb(
-                    tb.ui.Field,
-                    value,
-                    $( '<div />' ).appendTo( that.target )
-                );
-
-            }
-
-        );
+            );
 
     }
 
@@ -1087,15 +1079,9 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
         // var
         var that = this; // for minification purposes
 
-        that.config = pConfig;
+        console.log( 'tb.ui.form constructor', pConfig );
 
-        if ( that.config.formValidator ){
-            that.formValidator = new tb(
-                tb.ui.FormValidator,
-                that.config.formValidator,
-                that
-            );
-        }
+        that.config = pConfig;
 
         /**
          * event handlers of this instance at creation time
@@ -1128,14 +1114,14 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
         namespace: 'tb.ui.Form',
 
         /**
-         * handles requirement loading, an array containing file name strings
-         *
-         * @property tb.require
-         * @type array
-         * @static
+         handles requirement loading, an array containing file name strings
+
+         @property tb.require
+         @type array
+         @static
          */
         'tb.require': [
-            // '/namespace/tb/ui/Input.js' /** @todo: export to path */
+            '/tb/ui/Form.css'
         ],
 
         /**
@@ -1157,7 +1143,11 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
      * @param e
      */
     function init( e ){
-        this.render();
+        var that = this;
+
+        console.log( 'tb.ui.form init()' );
+
+        that.render();
     }
 
     /**
@@ -1170,11 +1160,14 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
         var that = this,
             config = that.config;
 
+        console.log( 'tb.ui.form render()', that.config );
+
         // clear content (in case of re-render )
-        $( that.target)
-            .attr( !!config.form ? config.form : {} ) // set form attributes
-            .children()
-            .remove();
+        tb.dom( that.target )
+            .empty();
+
+        tb.dom( that.target )
+            .attr( !!config.formAttributes ? config.formAttributes : {} ); // set form attributes
 
         // reset last field created before this one
         tb.ui.Field.prototype.prevField = false;
@@ -1183,26 +1176,28 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
         if ( config.fieldSets ){
 
             // merge field definitions into fieldsets
-            $.each(
-                config.fieldSets,  // for each fieldset
-                function( fieldSetIndex, fieldSet ){
+            config
+                .fieldSets
+                .forEach(
+                    function( fieldSet ){
 
-                    // replace fields array in config with field definitions
-                    $.map(
-                        fieldSet.fields,
-                        function( value, key ){
-                            fieldSet.fields[key] = that.config.fields[value];
-                        }
-                    );
+                        // replace fields array in config with field definitions
+                        fieldSet
+                            .fields
+                            .forEach(
+                                function( value, key ){
+                                    fieldSet.fields[key] = that.config.fields[value];
+                                }
+                            );
 
-                    // make fieldset
-                    new tb(
-                        tb.ui.FieldSet,
-                        fieldSet,
-                        $('<fieldset />').appendTo( that.target )
-                    );
-                }
-            );
+                        // make fieldset
+                        new tb(
+                            tb.ui.FieldSet,
+                            fieldSet,
+                            that.target.appendChild( document.createElement( 'fieldset') )
+                        );
+                    }
+                );
 
         }
 

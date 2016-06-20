@@ -68,17 +68,24 @@ tb = (function(){
 
                 domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
 
-                nodeList = domNode.querySelectorAll(pSelector);
+                pSelector
+                    .split( ',' )
+                    .forEach(
+                        function forEachTbDomSelector( pThisSelector ){
+                            nodeList = domNode.querySelectorAll(pSelector);
 
-                if (!!nodeList.length) {
-                    [].forEach.call(
-                        nodeList,
-                        function (domElement) {
-                            that[that.length] = domElement;
-                            that.length++;
+                            if (!!nodeList.length) {
+                                [].forEach.call(
+                                    nodeList,
+                                    function (domElement) {
+                                        that[that.length] = domElement;
+                                        that.length++;
+                                    }
+                                );
+                            }
+
                         }
                     );
-                }
 
             };
 
@@ -109,6 +116,7 @@ tb = (function(){
                 add: add,
                 addClass: addClass,
                 attr: attr,
+                empty: empty,
                 hide: hide,
                 html: html,
                 removeClass: removeClass,
@@ -116,14 +124,33 @@ tb = (function(){
                 not: not,
                 parents: parents,
                 push: push,
+                removeAttr: removeAttr,
                 show: show,
                 toArray: toArray,
-                unique: unique
+                unique: unique,
+                val: val
             };
 
             return new dom(pSelector, pDomNode);
 
-            // private functions
+            var regExReturn = /\r/g,
+                regExSpaces = /[\x20\t\r\n\f]+/g,
+                regExWord = /\S+/g;
+
+
+            // Private Functions
+            function empty() {
+                var that = this;
+
+                that.forEach(
+                    function( pNode ){
+                        pNode.innerHTML = '';
+                    }
+                );
+
+                return that;
+            }
+
             function html( pHtml ) {
                 var that = this;
 
@@ -136,6 +163,7 @@ tb = (function(){
                 } else {
                     return !!that[0] ? that[0].innerHTML : '';
                 }
+
                 return that;
             }
 
@@ -275,11 +303,12 @@ tb = (function(){
                             classes = !!classes.length ? classes.split(' ') : [],
                             index = classes.indexOf(pClassName);
 
-                        if (index !== -1) {
+                        if ( index > -1 ) while ( index > -1 ) {
                             classes.splice(index, 1);
 
                             pNode.setAttribute('class', classes.join(' '));
 
+                            index = classes.indexOf(pClassName);
                         }
 
                     }
@@ -293,25 +322,60 @@ tb = (function(){
                 var that = this,
                     rootNodes;
 
-                if (!pValue && that.length > 0) { // if no value is given and there are elements, return attribute value of first in list
-                    return that[0].getAttribute(pKey);
+                console.log( 'attr', that, pKey, pValue );
+                if ( pKey.constructor === Object ){ // hash given
+
+                    Object
+                        .keys( pKey )
+                        .forEach(
+                            function( thisKey ){
+                                that.attr( thisKey, pKey[thisKey] );
+                            }
+                        );
+
+                } else { // key/value pair expected
+
+                    // if no value is given and there are elements, return attribute value of first in list
+                    if (!pValue && that.length > 0) {
+                        return that[0].getAttribute(pKey);
+                    }
+
+                    // if a value to set is given, apply to all nodes in list
+                    rootNodes = that.toArray();
+                    rootNodes.forEach(
+                        function (pNode) {
+                            if ( pKey.constructor === Object ){
+                                Object
+                                    .keys( pKey )
+                                    .forEach(
+                                        function( thisKey ){
+                                            pNode.setAttribute( thisKey, pKey[thisKey] );
+                                        }
+                                    );
+                                return;
+                            } else {
+                                pNode.setAttribute(pKey, pValue);
+                            }
+                        }
+                    );
+
                 }
 
-                // if a value to set is given, apply to all nodes in list
-                rootNodes = that.toArray();
-                rootNodes.forEach(
-                    function (pNode) {
-                        if ( pKey.constructor === Object ){
-                            Object
-                                .keys( pKey )
-                                .forEach(
-                                    function( pValue, pKey ){
-                                        pNode.setAttribute(pKey, pValue);
-                                    }
-                                );
-                            return;
-                        } else {
-                            pNode.setAttribute(pKey, pValue);
+                return that;
+            }
+
+            function removeAttr(pKeys) {
+
+                var that = this,
+                    attrNames = pKeys && pKeys.match(regExWord),
+                    i;
+
+                that.forEach(
+                    function (pDomNode) {
+                        if (attrNames && !!elem['nodeType'] && elem.nodeType === 1) {
+                            while ((name = attrNames[i++])) {
+                                elem.removeAttribute(name);
+                            }
                         }
                     }
                 );
@@ -345,7 +409,6 @@ tb = (function(){
 
                 if (pSelector === 'undefined') return that;    // unchanged
 
-                //console.log( 'filter', that, 'using pSelector', compare );
                 if (typeof pSelector === 'string') { // DOM selector given
                     result = [].filter.call(
                         that,
@@ -353,16 +416,12 @@ tb = (function(){
                             return -1 < compare.indexOf(pElement);
                         }
                     );
-                    //console.log( 'after [].filter.call() result => ', result );
                 } else if (typeof pSelector === 'function') { // function given
-                    //console.log( 'filter compare', that, 'with selector result ', pSelector );
                     result = [].filter.call(
                         that,
                         pSelector
                     );
                 }
-
-                //console.log( 'result, new dom', result, new tb.dom( result ) );
 
                 return new dom(result);
 
@@ -391,6 +450,138 @@ tb = (function(){
 
                 return result;
             }
+
+            function val(){} val = (function() {
+
+                var valHandlers = {
+
+                    'select': function selectVal( pValue ){
+
+                        var that = this,
+                            multiSelect = that.type === "select-multiple",
+                            ret;
+
+                        if ( !arguments.length ) { // getter
+
+                            ret = [];
+
+                            tb.dom( 'option:selected', that)
+                                .forEach(
+                                    function( pThisSelectedOption ){
+                                        if ( !option.disabled
+                                            && ( !option.parentNode.disabled
+                                                || option.parentNode.nodeName !== "optgroup" )
+                                        ){
+                                            var value = pThisSelectedOption.value;
+
+                                            if ( !multiSelect ) {
+                                                return value;
+                                            }
+
+                                            ret.push( value );
+                                        }                                    }
+                                );
+
+                            return ret;
+
+                        } else { // setter
+
+                            // if single value given convert to array
+                            pValue = multiSelect && pValue.constructor !== Array ? [ pValue ] : pValue;
+
+                            // if not multiSelect but array given set array to first value
+                            pValue = !multiSelect && pValue.constructor === Array ? [ pValue[0] ] : pValue;
+
+                            // remove all 'selected' attributes
+                            tb.dom( 'option', that )
+                                .removeAttr( 'selected' );
+
+                            // set given 'selected' attributes
+                            pValue
+                                .forEach(
+                                    function( pThisOptionValue ){
+                                        tb.dom( 'option[value="' + pThisOptionValue + '"]', that )
+                                            .attr( { 'selected': 'selected' } );
+                                    }
+                                );
+
+                        }
+
+                        return that;
+                    },
+
+                    'default':function defaultVal( pValue ){
+
+                        var that = this,
+                            ret;
+
+                        if ( ([ 'radio', 'checkbox' ]).indexOf( that.type ) > -1 ){ // input radio or checkbox
+
+                            if ( arguments.length ){
+                                that.checked = !!pValue;
+                            }
+
+                            return that.checked;
+
+                        } else {
+
+                            if ( !arguments.length ) { // getter
+
+                                ret = that.value;
+
+                                return typeof ret === "string" ?
+                                    ret :
+                                    ret == null ? "" : ret;
+
+                            } else { // setter
+
+                                // Treat null/undefined as ""; convert numbers to string
+                                if (pValue == null) {
+                                    pValue = "";
+                                } else if (typeof val === "number") {
+                                    pValue += "";
+                                }
+
+                                that.value = pValue;
+
+                            }
+
+                        }
+
+                    }
+
+                };
+
+                return function val(value){
+                    var that = this,
+                        element = that[0] ? that[0] : false,
+                        ret;
+
+                    that.forEach(
+                        function ( pElement ) {
+
+                            var val = value,
+                                inputTags = [ 'input', 'select', 'option', 'textarea'],
+                                ret;
+
+                            if ( pValue.nodeType !== 1
+                                || ( inputTags ).indexOf( element.tagName ) === -1
+                            ){
+                                return; // not an input element
+                            }
+
+                            ret = valHandlers[ pElement.tagName ]
+                                ? valHandlers[ pElement.tagName ]( value )
+                                : valHandlers[ 'default' ]( value );
+
+                        }
+                    );
+
+                    return that;
+                };
+
+            })();
+
 
         };
     })();
@@ -485,113 +676,120 @@ tb = (function(){
 
         that.length = 0;
 
-        switch (typeof pSelector) {
+        pSelector
+            .split( ',' )
+            .forEach(
+                function forEachTbSelector( pThisSelector ){
+                    switch (typeof pSelector) {
 
-            // selection by dom selector string
-            case 'string':
+                        // selection by dom selector string
+                        case 'string':
 
-                tb.dom( pSelector )
-                    .filter('[data-tb]')
-                    .filter(
-                        function ( pDomNode ) {
+                            tb.dom( pSelector )
+                                .filter('[data-tb]')
+                                .filter(
+                                    function ( pDomNode ) {
 
-                            var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
+                                        var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
 
-                            if ( !!namespaces['0'] ) {
-                                namespaces.forEach(
-                                    function (pNamespace) {
-                                        if ( !!pDomNode[pNamespace]
-                                            && pDomNode[pNamespace] instanceof tb
-                                        ) {
-                                            tbElements.push(pDomNode[pNamespace]);
+                                        if ( !!namespaces['0'] ) {
+                                            namespaces.forEach(
+                                                function (pNamespace) {
+                                                    if ( !!pDomNode[pNamespace]
+                                                        && pDomNode[pNamespace] instanceof tb
+                                                    ) {
+                                                        tbElements.push(pDomNode[pNamespace]);
+                                                    }
+                                                }
+                                            );
                                         }
                                     }
                                 );
-                            }
-                        }
-                    );
 
-                break;
+                            break;
 
-            case 'object':  // either regEx or nodeType
+                        case 'object':  // either regEx or nodeType
 
-                if ( pSelector instanceof RegExp ){ // it is a regular expression
+                            if ( pSelector instanceof RegExp ){ // it is a regular expression
 
-                    tb.dom( '[data-tb]' )
-                        .map(
-                            function ( pDomNode ) {
+                                tb.dom( '[data-tb]' )
+                                    .map(
+                                        function ( pDomNode ) {
 
-                                var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
+                                            var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
 
-                                if ( !!namespaces['0'] ){
-                                    namespaces.forEach(
-                                        function( pNamespace ){
-                                            if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
-                                                tbElements.push( pDomNode[ pNamespace ] );
+                                            if ( !!namespaces['0'] ){
+                                                namespaces.forEach(
+                                                    function( pNamespace ){
+                                                        if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
+                                                            tbElements.push( pDomNode[ pNamespace ] );
+                                                        }
+                                                    }
+                                                );
+                                            }
+
+                                        }
+                                    );
+
+                            } else if ( !!pSelector['nodeType'] ){ // it is a dom node
+
+                                tb.dom( pSelector )
+                                    .map(
+                                        function ( pDomNode ) {
+
+                                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
+
+                                            if ( !!namespaces['0'] ) {
+                                                namespaces.forEach(
+                                                    function (pNamespace) {
+                                                        if ( pNamespace.match(pSelector)
+                                                            && !!pDomNode[pNamespace]
+                                                            && !!pDomNode[pNamespace] instanceof tb
+                                                        ){
+                                                            tbElements.push(pDomNode[pNamespace]);
+                                                        }
+                                                    }
+                                                );
+
                                             }
                                         }
                                     );
-                                }
 
                             }
-                        );
 
-                } else if ( !!pSelector['nodeType'] ){ // it is a dom node
+                            break;
 
-                    tb.dom( pSelector )
-                        .map(
-                            function ( pDomNode ) {
+                        // selection by constructor: get all tb instances from DOM,
+                        // check whether their prototype matches constructor prototype
+                        case 'function':
 
-                                var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
+                            tb.dom( '[data-tb]' )
+                                .map(
+                                    function ( pDomNode ) {
 
-                                if ( !!namespaces['0'] ) {
-                                    namespaces.forEach(
-                                        function (pNamespace) {
-                                            if ( pNamespace.match(pSelector)
-                                                && !!pDomNode[pNamespace]
-                                                && !!pDomNode[pNamespace] instanceof tb
-                                            ){
-                                                tbElements.push(pDomNode[pNamespace]);
-                                            }
+                                        var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
+
+                                        if ( !!namespaces['0'] ) {
+                                            namespaces.forEach(
+                                                function( pNamespace ){
+                                                    if ( !!pDomNode[pNamespace]
+                                                        && pDomNode[pNamespace] instanceof tb
+                                                        && pDomNode[pNamespace] instanceof pSelector
+                                                    ){
+                                                        tbElements.push( pDomNode[pNamespace] );
+                                                    }
+                                                }
+                                            );
                                         }
-                                    );console.log( tbInstance );
-                
-                                }
-                            }
-                        );
 
-                }
-
-                break;
-
-            // selection by constructor: get all tb instances from DOM,
-            // check whether their prototype matches constructor prototype
-            case 'function':
-
-                tb.dom( '[data-tb]' )
-                    .map(
-                        function ( pDomNode ) {
-
-                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
-
-                            if ( !!namespaces['0'] ) {
-                                namespaces.forEach(
-                                    function( pNamespace ){
-                                        if ( !!pDomNode[pNamespace]
-                                            && pDomNode[pNamespace] instanceof tb
-                                            && pDomNode[pNamespace] instanceof pSelector
-                                        ){
-                                            tbElements.push( pDomNode[pNamespace] );
-                                        }
                                     }
                                 );
-                            }
 
-                        }
-                    );
+                            break;
+                    }
+                }
+            );
 
-                break;
-        }
 
         // add all tb instances from dom into selector
         tbElements.map(
@@ -606,7 +804,7 @@ tb = (function(){
 
     // empty class def for temporary handler storage, needed for on(), one(), off() and trigger()
     function Nop(){};
-    Nop.prototype = {};
+    Nop.prototype = { namespace: 'Nop' };
 
     // HINT: TbSelector (class) prototype definition after Tb prototype definition
 
@@ -681,7 +879,7 @@ tb = (function(){
 
             if ( isNamespace && !tbClass ){
                 fileName = arguments[0].replace( /\./g, '/' ) + '.js';
-                tempInstance = new tb( Nop ); // construct temp tb instance from empty constructor -> temp handler store
+                tempInstance = new tb( Nop, arguments[1] || {}, arguments[2] || false ); // construct temp tb instance from empty constructor -> temp handler store
 
                 tb.loader.load(
                     fileName,
@@ -727,7 +925,9 @@ tb = (function(){
                 tbInstance = new tbClass( arguments[1] || {}, arguments[2] ); // hidden parameter target
 
                 // prepare .namespace property of tb object
-                if ( !tbInstance.namespace ){
+                if ( !tbInstance.namespace
+                    && !( tbInstance instanceof Nop )
+                ){
                     tbInstance.namespace = typeof arguments[0] === 'string'
                         ? arguments[0]
                         : arguments[0].namespace || tb.getId(); // if nothing helps, a unique id
@@ -751,7 +951,7 @@ tb = (function(){
                 // if target is a DOM element
                 // - add class to DOM data
                 // - if not already there add namespace to target data-tb attribute
-                if ( tbInstance.target && tbInstance.target.nodeType ){
+                if ( tbInstance.target && tbInstance.target.nodeType && !( tbInstance instanceof Nop ) ){
 
                     // put tb instance in dom node
                     tbInstance.target[ tbInstance.namespace ] = tbInstance;
@@ -761,8 +961,9 @@ tb = (function(){
 
                     // add class
                     if ( tbInstance.target.nodeName !== 'head'
-                        && dom.parents().toArray().indexOf( document.head ) === -1 )
-                    {
+                        && dom.parents().toArray().indexOf( document.head ) === -1
+                        && !!tbInstance['namespace']
+                    ){
                         dom.addClass( tbInstance.namespace.replace( /\./g, '-').toLowerCase() );
                     }
 
@@ -792,19 +993,23 @@ tb = (function(){
                     }
                 }
 
-                // add property declared classes (prop contains ".") as tb objects
-                for ( var key in tbInstance ) if ( !tbInstance.hasOwnProperty( key ) ) {
-                    if ( typeof key === 'string'
-                        && key.indexOf( '.' ) > -1
-                    ){ // prop name contains ".", treat as tb class
-                        tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
-                    }
-                }
+                if ( !( tbInstance instanceof Nop ) ){
 
-                // trigger init directly if no requirement array
-                if ( !tbInstance['tb.require'] ) {
-                    tbInstance.trigger( 'init' );
-                } // otherwise tb.require will trigger it
+                    // add property declared classes (prop contains ".") as tb objects
+                    for ( var key in tbInstance ) if ( !tbInstance.hasOwnProperty( key ) ) {
+                        if ( typeof key === 'string'
+                            && key.indexOf( '.' ) > -1
+                        ){ // prop name contains ".", treat as tb class
+                            tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
+                        }
+                    }
+
+                    // trigger init directly if no requirement array
+                    if ( !tbInstance['tb.require'] ) {
+                        tbInstance.trigger( 'init' );
+                    } // otherwise tb.require will trigger it
+
+                }
 
                 return tbInstance;
 
@@ -960,7 +1165,6 @@ tb = (function(){
                     tbEvent;
 
                 if( tb.stop() ){ // @todo rethink this
-                    // console.info( 'stopped TbEvent', arguments );
                     return;
                 }
 
@@ -1041,7 +1245,6 @@ tb = (function(){
                             // bubble up
                             if ( tbEvent.bubble.indexOf('u') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
-                                //console.log( 'bubble event', tbEvent, 'up to', that.parent() );
                                 var done = false,
                                     tbObject = that;
 
@@ -1059,7 +1262,6 @@ tb = (function(){
                             // bubble down
                             if ( tbEvent.bubble.indexOf('d') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
-                                //console.log( 'bubble event', tbEvent, 'down to', that.children() );
                                 [].map.call(
                                     that.children().toArray(),
                                     function( tbObject ){
@@ -1494,8 +1696,6 @@ tb = (function(){
                     return that;
                 }
 
-                console.log( 'filter that, compare', that, compare );
-
                 if ( that instanceof TbSelector ) {
                     [].map.call(
                         tb.dom().toArray.call( that ),     // convert these results to true array
@@ -1510,8 +1710,6 @@ tb = (function(){
                         [].push.call( ret, that );
                     }
                 }
-
-                console.log( 'filter ret', ret );
 
                 return ret;
             },
@@ -1669,7 +1867,6 @@ tb = (function(){
                 } else if ( that instanceof tb) {
 
                     if ( !that.handlers ){
-                        // console.log( 'adding handlers object for', that);
                         that.handlers = {};
                     }
 
@@ -1952,7 +2149,6 @@ tb.bind = function( pSelector ){
             namespaces.forEach(
                 function( namespace ){
                     if ( !selectedElement[namespace] ){
-                        //console.log( namespace );
                         selectedElement[namespace] = new tb( namespace, null, selectedElement );        // create tb object
                     }
                 }
@@ -2144,8 +2340,6 @@ tb.Model.prototype = (function(){
         // make a deep copy of target object
         against = ( JSON.parse( JSON.stringify( pAgainst ) ) );
 
-        // console.log( ' pre parmCheck', pCompare, pAgainst );
-
         Object
             .keys( against )
             .forEach(
@@ -2170,8 +2364,6 @@ tb.Model.prototype = (function(){
                     }
                 }
             );
-
-        //console.log( 'post parmCheck parameters:', pAgainst );
 
         return pAgainst;
     }
@@ -2403,7 +2595,7 @@ tb.parse = function( pWhat, pParse ){
     }
 
     // requirement constructor
-    var _Requirement = function( pConfig ){
+    function _Requirement( pConfig ){
 
         var that = this,
             type = getTypeFromSrc( pConfig.src ), // filename extension
@@ -2431,7 +2623,6 @@ tb.parse = function( pWhat, pParse ){
         if ( !!tb.loader.requirementGroups[type][pConfig.src.split('?')[0]]
             &&  !!tb.loader.requirementGroups[type][pConfig.src.split('?')[0]].done ){ // already loaded
 
-            console.log( ' rqLoader already requirementLoaded', src.split('?')[0], 'u' );
             that.trigger( 'requirementLoaded', src.split('?')[0], 'u' );
 
             return;
@@ -2456,15 +2647,12 @@ tb.parse = function( pWhat, pParse ){
         // element 'load' callback
         function onLoad( e ){
 
-            //console.log( 'onload', e);
-
             if ( !!e && e.data ){
                 that.data( e.data );
             }
 
             that.done = true;
 
-            // console.log( '::onLoad()', element.src, element.href );
             if ( that.type === 'js' ) {
                 setTimeout(
                     function(){
@@ -2498,7 +2686,6 @@ tb.parse = function( pWhat, pParse ){
             element.onreadystatechange = element.onload = function() {
                 var state = element.readyState;
                 if (!that.done && (!state || /loaded|complete/.test(state))) {
-                    // console.log( 'loaded', element );
                     tb.status.loadCount( tb.status.loadCount() - 1 ); // decrease loadCount
                     that.trigger( 'onLoad', element );
                 }
@@ -2553,7 +2740,7 @@ tb.parse = function( pWhat, pParse ){
 
 
     // requirement group constructor
-    var _RequirementGroup = function( pConfig ){
+    function _RequirementGroup( pConfig ){
 
         var that = this;
 
@@ -2593,7 +2780,6 @@ tb.parse = function( pWhat, pParse ){
             }
 
             if ( !!rq.done ){ // already loaded
-                console.log( 'already loaded', pSrc );
                 rq.trigger( 'onLoad' );
 
             }
@@ -2605,7 +2791,7 @@ tb.parse = function( pWhat, pParse ){
 
 
 
-    var Loader = function( pConfig ){
+    function Loader( pConfig ){
         var that = this;
 
         that.config = pConfig;
@@ -2647,7 +2833,7 @@ tb.parse = function( pWhat, pParse ){
                                     type: type
                                 },
                                 that.requirementGroups
-                            )
+                            );
 
                             that.requirementGroups[ type ].target = tb.loader; // needed for event bubbling
                         }
@@ -2662,10 +2848,8 @@ tb.parse = function( pWhat, pParse ){
             pSrc.callback = pCallback;
 
             pSrc.done = function( pFilename ){ // will be called when each file 'requirementLoaded' was triggered
-                var index = pSrc.indexOf( pFilename );
-
-                if ( index > -1 ){
-                    pSrc.splice( index, 1 );
+                if ( pSrc.indexOf( pFilename ) > -1 ){
+                    pSrc.splice( pSrc.indexOf( pFilename ), 1 );
                 }
             };
 
@@ -2693,17 +2877,22 @@ tb.parse = function( pWhat, pParse ){
         var that = this,
             filename  = e.data.split('?')[0];
 
-        //console.log( '<requirement loaded> handler in loader', filename, e, that );
         that
             .rqSets
             .forEach(
                 function( pRqSet ){
                     pRqSet.done( filename );
-                    if ( !pRqSet.length ){ // every file loaded
-                        //console.log( '<requirement loaded> CALLBACK in loader', filename, e, that );
+                    if ( pRqSet.length === 0 ){ // every file loaded
                         pRqSet.callback();
-                        that.rqSets.splice( that.rqSets.indexOf( pRqSet ), 1 );
                     }
+                }
+            );
+
+        that.rqSets = that
+            .rqSets
+            .filter(
+                function( pElement ){
+                    return pElement.length > 0;
                 }
             );
 
@@ -2822,7 +3011,6 @@ tb.request = (function () {
         }
         else {
             var responseObject = createResponseObject(pReq, tb.extend( {}, pOptions ) );
-            console.log( 'failure pCallback call', pReq.src );
             pFailure.call( pFailure, pReq );
         }
         release(pReq);
@@ -2918,8 +3106,6 @@ tb.request = (function () {
                     break;
             }
         }
-
-        console.log( 'request options', pOptions );
 
         inc();
 

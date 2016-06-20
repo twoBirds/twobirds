@@ -1,0 +1,365 @@
+{
+  "formAttributes": {
+    "name": "configurationForm",
+    "action": "#"
+  },
+  "tb.ui.FormValidator": {
+
+  },
+  "fieldSets": [
+    {
+      "fields": [
+        "ConfigurationID",
+        "ConfigurationName"
+      ]
+    },
+    {
+      "fields": [
+        "ConfigurationDescription"
+      ]
+    },
+    {
+      "tagAttributes": {
+        "legend": "{Sender}"
+      },
+      "fields": [
+        "SenderEmail",
+        "SenderName"
+      ]
+    },
+    {
+      "tagAttributes": {
+        "legend": "{Replyto}"
+      },
+      "fields": [
+        "SenderReplytoEmail",
+        "SenderReplytoName"
+      ]
+    },
+    {
+      "fields": [
+        "SenderReturnPath"
+      ]
+    },
+    {
+      "fields": [
+        "TestRecipient"
+      ]
+    },
+    {
+      "fields": [
+        "TemplateID"
+      ]
+    }
+  ],
+  "fields": {
+    "ConfigurationID": {
+      "name": "ConfigurationID",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "hidden",
+        "autocomplete": "off",
+        "name": "ConfigurationID"
+      },
+      "label": "",
+      "hint": ""
+    },
+    "ConfigurationName": {
+      "name": "ConfigurationName",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "value": "",
+        "autocomplete": "off",
+        "placeholder": "{your configuration title}"
+      },
+      "label": "{ConfigurationName}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "required": true
+          }
+        },
+        "blur": {
+          "error": {
+            "required": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": true
+          }
+        }
+      }
+    },
+    "ConfigurationDescription": {
+      "name": "ConfigurationDescription",
+      "tagName": "textarea",
+      "tagAttributes": {
+        "rows": "5",
+        "cols": "80",
+        "value": "",
+        "maxlength": "255"
+      },
+      "label": "{ConfigurationDescription}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "required": true
+          }
+        },
+        "blur": {
+          "error": {
+            "required": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": true
+          }
+        }
+      }
+    },
+    "SenderEmail": {
+      "name": "SenderEmail",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{SenderEmail}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "email": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "email": true
+          }
+        },
+        "blur": {
+          "error": {
+            "email": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "email": true
+          }
+        }
+      }
+    },
+    "SenderName": {
+      "name": "SenderName",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{SenderName}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "required": true
+          }
+        },
+        "blur": {
+          "error": {
+            "required": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": true
+          }
+        }
+      }
+    },
+    "SenderReplytoEmail": {
+      "name": "SenderReplytoEmail",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{SenderReplytoEmail}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "email": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "email": true
+          }
+        },
+        "blur": {
+          "error": {
+            "email": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "email": true
+          }
+        }
+      }
+    },
+    "SenderReplytoName": {
+      "name": "SenderReplytoName",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{SenderReplytoName}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "required": true
+          }
+        },
+        "blur": {
+          "error": {
+            "required": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": true
+          }
+        }
+      }
+    },
+    "SenderReturnPath": {
+      "name": "SenderReturnPath",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{SenderReturnPath}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "email": true
+          }
+        },
+        "keyup": {
+          "info": {
+            "email": true
+          }
+        },
+        "blur": {
+          "error": {
+            "email": true
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "email": false
+          }
+        }
+      }
+    },
+    "TestRecipient": {
+      "name": "TestRecipient",
+      "tagName": "input",
+      "tagAttributes": {
+        "type": "text",
+        "autocomplete": "off",
+        "value": ""
+      },
+      "label": "{TestRecipient}",
+      "hint": "",
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "message": "Es können auch mehrere E-Mailadressen eingegeben werden, getrennt durch ein Semikolon. Beispiel: adresse1@test.ch;adresse2@test.ch"
+          }
+        },
+        "keyup": {
+          "info": {
+            "message": "Es können auch mehrere E-Mailadressen eingegeben werden, getrennt durch ein Semikolon. Beispiel: adresse1@test.ch;adresse2@test.ch"
+          }
+        },
+        "blur": {
+          "error": {
+            "email": ";"
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "email": ";"
+          }
+        }
+      }
+    },
+    "TemplateID": {
+      "name": "TemplateID",
+      "tagName": "input",
+      "tagAttributes": {
+        "name": "TemplateID"
+      },
+      "label": "{TemplateID}",
+      "demoapp.configuration.TemplateSelector": {},
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "change": {
+          "info": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "blur": {
+          "error": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        }
+      }
+    }
+  }
+}

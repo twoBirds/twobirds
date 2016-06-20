@@ -1,0 +1,29 @@
+.nl-ui-templateselector[name="TemplateID"]{
+  max-height: 0 !important;
+  border: 0 none !important;
+  padding:0 !important;
+}
+
+.nl-ui-templateselector[name="TemplateID"] + div {
+  clear: both;
+  height: 280px !important;
+  overflow: hidden;
+  overflow-y: auto;
+
+  & .nl-ui-templateselectoritem {
+    font-size: 0.9rem;
+    max-width: 200px;
+    padding: 2rem 2rem;
+    display: inline-block;
+
+
+    &.selectedTemplate {
+      background-color: lightgrey;
+    }
+
+    & > div {
+      text-overflow: ellipsis;
+    }
+  }
+
+}

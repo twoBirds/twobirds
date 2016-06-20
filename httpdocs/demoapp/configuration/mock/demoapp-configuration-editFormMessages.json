@@ -1,0 +1,39 @@
+{
+
+  "create configuration": "Konfiguration anlegen",
+  "edit configuration": "Konfiguration editieren",
+
+  "Sender": "Absender",
+  "Replyto": "Antwort an",
+
+  "ConfigurationName": "Bezeichnung",
+  "ConfigurationDescription": "Beschreibung",
+  "your configuration title": "Ihre Konfigurations-Beschreibung",
+  "SenderEmail": "Absenderadresse",
+  "SenderName": "Absendername",
+  "SenderReplytoEmail": "Antwortadresse",
+  "SenderReplytoName": "Antwortname",
+  "SenderReturnPath": "Retouradresse",
+  "TestRecipient": "Adresse(n) für Test-Newsletter",
+  "TemplateID": "Template",
+  "TemplateFooter": "Inhalt E-Mail Footer",
+  "rssFeeds": "RSS News Quellen",
+
+  "cancel": "Abbrechen",
+  "delete": "Löschen",
+  "duplicate": "Kopieren",
+  "copy of": "Kopie von: ",
+  "save": "Speichern",
+
+  "Do you really want to duplicate this record?": "Wollen Sie diese Konfiguration wirklich kopieren?",
+  "Do you really want to delete this record?": "Wollen Sie diese Konfiguration wirklich löschen?<br />Dieser Vorgang kann nicht rückgängig gemacht werden.",
+  "Error": "Fehler",
+  "Warning": "Warnung",
+  "There are errors in this form:": "Es gibt noch Fehler im Formular",
+  "There are warnings in this form:": "Es gibt noch Warnungen im Formular",
+  "Back to form": "Zurück zum Formular",
+  "Save anyway": "Trotzdem speichern",
+
+  "optional": "optional"
+
+}
