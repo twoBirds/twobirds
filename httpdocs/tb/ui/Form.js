@@ -38,10 +38,9 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
         that.config = config;
 
         that.handlers = {
-            validate: validate
+            init,
+            validate
         };
-
-        console.log( 'tb.ui.FieldValidator constructor', pConfig );
 
         // VALIDATOR function factory
         // must be in here (inner function) to bind <that> correctly via closure
@@ -87,7 +86,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
                     // send status to form validator
                     that
                         .parents('form')[0]
-                        .formValidator
+                        ['tb.ui.FormValidator']
                         .trigger(
                             'setStatus',
                             {
@@ -295,6 +294,22 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
     // private functions
 
+    function init(){
+        var that = this;
+
+        // put a link to the validator in the data-tb attribute to aid in debugging
+        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
+
+        dataTb.push( that.namespace );
+
+        tb.dom( that.target.target ).attr('data-tb',
+            dataTb.join(' ')
+        );
+
+        // set target to parent element target, that is the DOM node
+        that.target = that.target.target;
+    }
+
     /**
      message factory, sets message
 
@@ -392,8 +407,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
             var adresses = delimiter ? value.split( delimiter ) : [ value ],
                 valid = true;
 
-            $.map(
-                adresses,
+            adresses.forEach(
                 function( email ){
                     if ( !eMailRegEx( email ) ){
                         valid = false;
@@ -458,13 +472,13 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
         that
             .parents('form')[0]
-            .formValidator
+            ['tb.ui.FormValidator']
             .trigger( 'onStartFieldValidation' );
 
         // execute beforeSubmit() validation
         that
-            .config
-            .$inputElement
+            .target
+            .inputElement
             .one(
                 'beforeSubmit',
                 function(){
@@ -472,7 +486,7 @@ tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
                         function(){
                             that
                                .parents('form')[0]
-                               .formValidator
+                                ['tb.ui.FormValidator']
                                .trigger( 'onEndFieldValidation' );
 
                         },
@@ -691,7 +705,6 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             validate
         }
 
-        console.log( 'tb.ui.Field constructor', that, pConfig);
     };
 
     Field.prototype = {
@@ -748,8 +761,6 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             config = that.config,
             inputTag;
 
-        console.log( 'tb.ui.field render', that.config );
-
         // clear content (in case of re-render )
         tb.dom( that.target ).html('');
 
@@ -778,7 +789,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
             that.inputElement
                 .val(!!config.value ? config.value : '');
-            
+
             /*
             tb.dom( that.inputElement ) @todo: implement dom event handling
                 .on(
@@ -881,11 +892,9 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
         var that = this;
 
-        // console.log( 'field focus', that.$inputElement.attr('name') );
-
         that.trigger( 'scrollTo' ); // also in focus() but necessary
 
-        that.$inputElement.trigger( 'focus' ); // jQ event
+        that.inputElement.trigger( 'focus' ); // jQ event
 
     }
 
@@ -931,8 +940,6 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
         var that = this;
 
         that.config = pConfig;
-
-        console.log( 'tb.ui.fieldSet constructor', pConfig );
 
         /**
          * event handlers of this instance at creation time
@@ -994,15 +1001,19 @@ tb.namespace( 'tb.ui', true ).FieldSet = (function(){
      */
     function render(){
 
-        var that = this;
-
-        console.log( 'tb.ui.fieldSet render()', that );
+        var that = this,
+            legend;
 
         // clear content (in case of re-render )
         tb.dom( that.target )
             .empty()
             .attr( that.config['tagAttributes'] || {} );
 
+        if ( !!that.config['legend'] ){
+            legend = that.target.appendChild( document.createElement( 'legend' ) );
+            tb.dom( legend ).html( that.config.legend);
+        }
+        
         that.config.fields
             .forEach(
                 function( pValue ){
@@ -1043,8 +1054,6 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
 
         // var
         var that = this; // for minification purposes
-
-        console.log( 'tb.ui.form constructor', pConfig );
 
         that.config = pConfig;
 
@@ -1110,8 +1119,6 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
     function init( e ){
         var that = this;
 
-        console.log( 'tb.ui.form init()' );
-
         that.render();
     }
 
@@ -1124,8 +1131,6 @@ tb.namespace( 'tb.ui', true ).Form = (function(){
 
         var that = this,
             config = that.config;
-
-        console.log( 'tb.ui.form render()', that.config );
 
         // clear content (in case of re-render )
         tb.dom( that.target )

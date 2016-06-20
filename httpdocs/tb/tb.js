@@ -999,7 +999,6 @@ tb = (function(){
                         if ( typeof key === 'string'
                             && key.indexOf( '.' ) > -1
                         ){ // prop name contains ".", treat as tb class
-                            console.log( 'create inner object', key, 'in', tbInstance );
                             tbInstance[key] = new tb( key, tbInstance[key], tbInstance );
                         }
                     }

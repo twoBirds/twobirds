@@ -19,18 +19,14 @@
       ]
     },
     {
-      "tagAttributes": {
-        "legend": "{Sender}"
-      },
+      "legend": "{Sender}",
       "fields": [
         "SenderEmail",
         "SenderName"
       ]
     },
     {
-      "tagAttributes": {
-        "legend": "{Replyto}"
-      },
+      "legend": "{Replyto}",
       "fields": [
         "SenderReplytoEmail",
         "SenderReplytoName"

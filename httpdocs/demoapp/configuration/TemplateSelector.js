@@ -82,8 +82,6 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
     return TemplateSelectorItem;
 
     
-    
-    
     /**
      render handler
 
@@ -209,11 +207,23 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
 
         var that = this;
 
+        // put a link to the validator in the data-tb attribute to aid in debugging
+        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
+
+        dataTb.push( that.namespace );
+
+        tb.dom( that.target.target ).attr('data-tb',
+            dataTb.join(' ')
+        );
+
+        // set target to parent element target, that is the DOM node
+        that.target = that.target.target;
+
         // append DIV tag after input tag
         that.$outerContainer = $( '<div><div /></div>');
         that.$outerContainer.insertAfter( that.target );
         that.$content = that.$outerContainer.children().first();
-
+        
     }
 
     /**

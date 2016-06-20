@@ -38,8 +38,6 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
             }
         });
 
-        console.log( 'configurationModel', that.configurationModel );
-
     };
 
     Edit.prototype = {

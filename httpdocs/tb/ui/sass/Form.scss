@@ -36,6 +36,7 @@ fieldset.tb-ui-fieldset {
   & .tb-ui-field-tag {
     clear: both;
     display: block;
+    width: 100%;
   }
 
   & input,
@@ -76,7 +77,8 @@ fieldset.tb-ui-fieldset {
     border: 1px solid darkgrey;
   }
 
-  & label,
+  & legend,
+  label,
   span.tb-ui-field-hint,
   span.tb-ui-field-message,
   input,
