@@ -918,7 +918,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
     function scrollTo(){
         var that = this;
 
-        console.log( 'scrollTo', tb.dom( that.target )[0]. parentElement );
+        //console.log( 'scrollTo', tb.dom( that.target )[0]. parentElement );
         tb.dom('.demoapp-body')[0].scrollTop
             = tb.dom( that.target )[0].parentElement.offsetTop - 200; // top of input element
 
