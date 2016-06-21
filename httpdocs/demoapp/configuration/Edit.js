@@ -154,13 +154,11 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
         // replace message placeholders
         formData = tb.parse(formData, messages);
 
-        // merge data into fields
+        // merge data into fields @todo:put in method
         for (var i in data.data) {
 
             if (!!formData.fields.hasOwnProperty(i)) {
-
                 tb.namespace('tagAttributes', true, formData.fields[i]); // create if necessary
-
                 formData.fields[i].tagAttributes.value = data.data[i]; // add value to field defnition
             } else {
                 console.warn('error processing data for input field', i);

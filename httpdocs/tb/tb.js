@@ -7,6 +7,32 @@
  *
  */
 
+// POLYFILLS @todo: refactor
+
+// matches polyfill
+this.Element && function(ElementPrototype) {
+    ElementPrototype.matches = ElementPrototype.matches ||
+        ElementPrototype.matchesSelector ||
+        ElementPrototype.webkitMatchesSelector ||
+        ElementPrototype.msMatchesSelector ||
+        function(selector) {
+            var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
+            while (nodes[++i] && nodes[i] != node);
+            return !!nodes[i];
+        }
+}(Element.prototype);
+
+// closest polyfill
+this.Element && function(ElementPrototype) {
+    ElementPrototype.closest = ElementPrototype.closest ||
+        function(selector) {
+            var el = this;
+            while (el.matches && !el.matches(selector)) el = el.parentNode;
+            return el.matches ? el : null;
+        }
+}(Element.prototype);
+
+
 tb = (function(){
 
     //private
@@ -23,6 +49,7 @@ tb = (function(){
      * @return {string} - result string
      */
     var dom;
+    
     dom = (function () {
         return function (pSelector, pDomNode) {
 
@@ -158,6 +185,15 @@ tb = (function(){
                 }
             }
 
+            // @todo: refactor
+            function _live(selector, event, callback, context) {
+                addEvent(context || document, event, function(e) {
+                    var found, el = e.target || e.srcElement;
+                    while (el && el.matches && el !== context && !(found = el.matches(selector))) el = el.parentElement;
+                    if (found) callback.call(el, e);
+                });
+            }
+
             // Private Functions, exposed
             function trigger( pEventName, pData ){
                 var that = this,
@@ -189,7 +225,7 @@ tb = (function(){
 
             function on( pEventName, pHandler ){
                 var that = this,
-                    eventNames = pEventName.split(' '),
+                    eventNames = pEventName.indexOf(' ') > -1 ? pEventName.split(' ') : [ pEventName ],
                     onceHandler;
 
                 that.forEach(
@@ -218,8 +254,7 @@ tb = (function(){
             }
 
             function one( pEventName, pHandler ){
-                var that = this,
-                    eventNames = pEventName.split(' ');
+                var that = this;
 
                 pHandler.once = true;
 
@@ -230,16 +265,20 @@ tb = (function(){
 
             function off( pEventName, pHandler ){
                 var that = this,
-                    eventNames = pEventName.split(' ');
+                    eventNames = pEventName.indexOf(' ') > -1 ? pEventName.split(' ') : [ pEventName ];
 
                 that.forEach(
                     function( pDomNode ){
                         if ( !!pDomNode.nodeType ){
-                            eventNames.forEach(
-                                function( pThisEventName ){
-                                    _removeEvent( pDomNode, pThisEventName, pHandler );
-                                }
-                            );
+                            if ( !!pHandler ){
+                                eventNames.forEach(
+                                    function( pThisEventName ){
+                                        _removeEvent( pDomNode, pThisEventName, pHandler );
+                                    }
+                                );
+                            } else {
+                                // @todo: remove all event handlers
+                            }
                         }
                     }
                 );

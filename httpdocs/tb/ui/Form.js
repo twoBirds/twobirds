@@ -750,7 +750,13 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
          renders field html
          @method render
          */
-        render: render
+        render: render,
+
+        /**
+         scrolls field in sight
+         @method scrollTo
+         */
+        scrollTo: scrollTo
 
     };
 
@@ -806,20 +812,19 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
                 .addClass('tb-ui-field-tag')
                 .attr( !!config.tagAttributes ? config.tagAttributes : {} );
 
+            that.target.appendChild( that.inputElement[0] );
+
+            // @todo: never fires?
             tb.dom( that.inputElement )
                 .on(
-                    'focusin focus',
+                    'focus',
                     function( e ){
                         // scroll field element into sight
-
+                        console.log( 'dom focus', that.inputElement );
                         that.direction = ''; // reset direction
-
-                        that.trigger( 'scrollTo' );
-
+                        that.trigger( 'focus' );
                     }
                 );
-
-            that.target.appendChild( that.inputElement[0] );
 
         }
 
@@ -904,9 +909,9 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
         var that = this;
 
-        that.trigger( 'scrollTo' ); // also in focus() but necessary
+        that.scrollTo(); // also in focus() but necessary
 
-        that.inputElement.trigger( 'focus' ); // jQ event
+        tb.dom( that.inputElement.trigger( 'focus' ) ); // dom event
 
     }
 
@@ -918,7 +923,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
     function scrollTo(){
         var that = this;
 
-        //console.log( 'scrollTo', tb.dom( that.target )[0]. parentElement );
+        console.log( 'scrollTo', that.config.name );
         tb.dom('.demoapp-body')[0].scrollTop
             = tb.dom( that.target )[0].parentElement.offsetTop - 200; // top of input element
 
