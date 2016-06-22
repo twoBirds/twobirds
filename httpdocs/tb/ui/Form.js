@@ -1,1194 +1,1193 @@
-/**
- @namespace tb.ui.FieldValidator
- */
-tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
+(function(){
 
-    var messages = {
-        'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
-        'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
-        'This value is too small!': 'Dieser Wert ist zu klein.',
-        'This value is too big!': 'Dieser Wert ist zu gross.',
-        'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
-        'resetMessage': ''
-    };
+    // some form related globals
+    var prevField;
 
-    var classes = {
-        'info': 'tb-ui-validator-info',
-        'warning': 'tb-ui-validator-warning',
-        'error': 'tb-ui-validator-error'
-    };
+    // form factories
 
     /**
      @namespace tb.ui.FieldValidator
      */
+    tb.namespace( 'tb.ui', true ).FieldValidator = (function(){
 
-    /**
-     FieldValidator constructor
-
-     @class tb.ui.FieldValidator
-     @constructor
-
-     @param pConfig
-     */
-    function FieldValidator( pConfig ){
-
-        var that = this;
-
-        that.config = pConfig;
-
-        that.handlers = {
-            init,
-            validate
+        var messages = {
+            'This is not a valid eMail adress!': 'Im Eingabefeld muss eine gültige E-Mailadresse erfasst werden.',
+            'This is not a valid input for this field!': 'Das ist kein gültiger Wert in diesem Feld.',
+            'This value is too small!': 'Dieser Wert ist zu klein.',
+            'This value is too big!': 'Dieser Wert ist zu gross.',
+            'You have to fill this field!': 'Bitte erfassen Sie Daten im Eingabefeld.',
+            'resetMessage': ''
         };
 
-    };
-
-    FieldValidator.prototype = {
-
-        namespace: 'tb.ui.FieldValidator',
-
-        validate: validate,
+        var classes = {
+            'info': 'tb-ui-validator-info',
+            'warning': 'tb-ui-validator-warning',
+            'error': 'tb-ui-validator-error'
+        };
 
         /**
-         validator standard functions array
-
-         @property fn {object}
+         @namespace tb.ui.FieldValidator
          */
-        fn: {
+
+        /**
+         FieldValidator constructor
+
+         @class tb.ui.FieldValidator
+         @constructor
+
+         @param pConfig
+         */
+        function FieldValidator( pConfig ){
+
+            var that = this;
+
+            that.config = pConfig;
+
+            that.handlers = {
+                init,
+                validate
+            };
+
+        };
+
+        FieldValidator.prototype = {
+
+            namespace: 'tb.ui.FieldValidator',
+
+            validate: validate,
 
             /**
-             @property fn.message {object}
-             */
-            message: {
-                /**
-                 @property fn.message.validator {function} - the factory
-                 */
-                validator: message, // always false : display message
-                /**
-                 @property fn.message.message {object} - the standard error message
-                 */
-                message: ''
-            },
+             validator standard functions array
 
-            /**
-             @property fn.reset {object}
+             @property fn {object}
              */
-            reset: {
-                /**
-                 @property fn.reset.validator {function} - the factory
-                 */
-                validator: reset, // remove message from field
-                /**
-                 @property fn.reset.message {object} - the standard error message
-                 */
-                message: ''
-            },
+            fn: {
 
-            /**
-             @property fn.invalid {object}
-             */
-            invalid: {
                 /**
-                 @property fn.invalid.validator {function} - the factory
+                 @property fn.message {object}
                  */
-                validator: function(){ return false; }, // standard error message
-                /**
-                 @property fn.invalid.message {object} - the standard error message
-                 */
-                message: messages['This entry is invalid!']
-            },
+                message: {
+                    /**
+                     @property fn.message.validator {function} - the factory
+                     */
+                    validator: message, // always false : display message
+                    /**
+                     @property fn.message.message {object} - the standard error message
+                     */
+                    message: ''
+                },
 
-            /**
-             @property fn.required {object}
-             */
-            required: {
                 /**
-                 @property fn.required.validator {function} - the factory
+                 @property fn.reset {object}
                  */
-                validator: required,
+                reset: {
+                    /**
+                     @property fn.reset.validator {function} - the factory
+                     */
+                    validator: reset, // remove message from field
+                    /**
+                     @property fn.reset.message {object} - the standard error message
+                     */
+                    message: ''
+                },
+
                 /**
-                 @property fn.required.message {object} - the standard error message
+                 @property fn.invalid {object}
                  */
-                message: messages['You have to fill this field!']
-            },
-            /**
-             @property fn.email {object}
-             */
-            email: {
+                invalid: {
+                    /**
+                     @property fn.invalid.validator {function} - the factory
+                     */
+                    validator: function(){ return false; }, // standard error message
+                    /**
+                     @property fn.invalid.message {object} - the standard error message
+                     */
+                    message: messages['This entry is invalid!']
+                },
+
                 /**
-                 @property fn.email.validator {function} - the factory
+                 @property fn.required {object}
                  */
-                validator: email,
+                required: {
+                    /**
+                     @property fn.required.validator {function} - the factory
+                     */
+                    validator: required,
+                    /**
+                     @property fn.required.message {object} - the standard error message
+                     */
+                    message: messages['You have to fill this field!']
+                },
                 /**
-                 @property fn.email.message {object} - the standard error message
+                 @property fn.email {object}
                  */
-                message: messages['This is not a valid eMail adress!']
-            },
-            /**
-             @property fn.regex {object}
-             */
-            regex: {
+                email: {
+                    /**
+                     @property fn.email.validator {function} - the factory
+                     */
+                    validator: email,
+                    /**
+                     @property fn.email.message {object} - the standard error message
+                     */
+                    message: messages['This is not a valid eMail adress!']
+                },
                 /**
-                 @property fn.regex.validator {function} - the factory
+                 @property fn.regex {object}
                  */
-                validator: regex,
+                regex: {
+                    /**
+                     @property fn.regex.validator {function} - the factory
+                     */
+                    validator: regex,
+                    /**
+                     @property fn.regex.message {object} - the standard error message
+                     */
+                    message: messages['This is not a valid input for this field!']
+                },
                 /**
-                 @property fn.regex.message {object} - the standard error message
+                 @property fn.min {object}
                  */
-                message: messages['This is not a valid input for this field!']
-            },
-            /**
-             @property fn.min {object}
-             */
-            min: {
+                min: {
+                    /**
+                     @property fn.min.validator {function} - the factory
+                     */
+                    validator: min,
+                    /**
+                     @property fn.min.message {object} - the standard error message
+                     */
+                    message: messages['This value is too small!']
+                },
                 /**
-                 @property fn.min.validator {function} - the factory
+                 @property fn.max {object}
                  */
-                validator: min,
-                /**
-                 @property fn.min.message {object} - the standard error message
-                 */
-                message: messages['This value is too small!']
-            },
-            /**
-             @property fn.max {object}
-             */
-            max: {
-                /**
-                 @property fn.max.validator {function} - the factory
-                 */
-                validator: max,
-                /**
-                 @property fn.max.message {object} - the standard error message
-                 */
-                message: messages['This value is too big!']
+                max: {
+                    /**
+                     @property fn.max.validator {function} - the factory
+                     */
+                    validator: max,
+                    /**
+                     @property fn.max.message {object} - the standard error message
+                     */
+                    message: messages['This value is too big!']
+                }
             }
-        }
-    };
+        };
 
-    return FieldValidator;
+        return FieldValidator;
 
-    // private functions
-    function init(){
-        var that = this;
+        // private functions
+        function init(){
+            var that = this;
 
-        // VALIDATOR function factory
-        // must be in here (inner function) to bind <that> correctly via closure
-        function makeValidatorFunction( pStatus, pFunction, pMessage ){
+            // VALIDATOR function factory
+            // must be in here (inner function) to bind <that> correctly via closure
+            function makeValidatorFunction( pStatus, pFunction, pMessage ){
 
-            var f;
+                var f;
 
-            f = function( value ){
+                f = function( value ){
 
-                var inputElement = that.parent()[0].inputElement,
-                    valid = pFunction( inputElement.val() ),
-                    labelElement = that.parent()[0].labelElement,
-                    messageElement = that.parent()[0].messageElement,
-                    f = pFunction;
+                    var inputElement = that.parent()[0].inputElement,
+                        valid = pFunction( inputElement.val() ),
+                        labelElement = that.parent()[0].labelElement,
+                        messageElement = that.parent()[0].messageElement,
+                        f = pFunction;
 
-                // remove previous message
-                messageElement.empty();
+                    // remove previous message
+                    messageElement.empty();
 
-                // remove previous classes
-                tb.dom( that.target.parentElement.children )
-                    .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+                    // remove previous classes
+                    tb.dom( that.target.parentElement.children )
+                        .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
 
-                // set message & visual class for this status code
-                if ( !valid ){
+                    // set message & visual class for this status code
+                    if ( !valid ){
 
-                    // message is either defined as curry property on function, or standard given
-                    messageElement
-                        .html( f['message'] ? f['message'] : pMessage )
-                        .show();
+                        // message is either defined as curry property on function, or standard given
+                        messageElement
+                            .html( f['message'] ? f['message'] : pMessage )
+                            .show();
 
-                    if ( !!classes[ pStatus ] ){
-                        labelElement.addClass( classes[ pStatus ] );
-                        inputElement.addClass( classes[ pStatus ] );
-                        messageElement.addClass( classes[ pStatus ] );
+                        if ( !!classes[ pStatus ] ){
+                            labelElement.addClass( classes[ pStatus ] );
+                            inputElement.addClass( classes[ pStatus ] );
+                            messageElement.addClass( classes[ pStatus ] );
+                        }
+
+                        // send status to form validator
+                        that
+                            .parents('form')[0]
+                            ['tb.ui.FormValidator']
+                            .trigger(
+                                'setStatus',
+                                {
+                                    valid: valid,
+                                    status: pStatus,
+                                    input: inputElement,
+                                    message: f['message'] ? f['message'] : pMessage,
+                                    label: labelElement.html()
+                                }
+                            );
+
                     }
 
-                    // send status to form validator
-                    that
-                        .parents('form')[0]
-                        ['tb.ui.FormValidator']
-                        .trigger(
-                            'setStatus',
-                            {
-                                valid: valid,
-                                status: pStatus,
-                                input: inputElement,
-                                message: f['message'] ? f['message'] : pMessage,
-                                label: labelElement.html()
+                    return valid;
+
+                };
+
+                return f;
+
+            }
+
+            // put a link to the validator in the data-tb attribute to aid in debugging
+            var dataTb = !!that.target.inputElement.attr('data-tb')
+                ? that.target.inputElement.attr('data-tb').split(' ')
+                : [];
+
+            dataTb.push( that.namespace );
+
+            that.target.inputElement.attr('data-tb',
+                dataTb.join(' ')
+            );
+
+            // set target to parent element inputElement, that is the DOM node
+            that.target = that.target.inputElement[0];
+
+            // put that in target
+            that.target[ 'tb.ui.FieldValidator' ] = that;
+
+            // create validation functions and append them to input field
+            if ( !!that.config ) Object.keys( that.config ).forEach(
+                function( pEventName ){
+                    ([ 'error', 'warning', 'info' ]).forEach(
+                        function( pStatusName ){
+
+                            var functionCollection = that.config[ pEventName ][ pStatusName ] || {};
+
+                            // execute all validation handlers on this field
+                            if ( !!functionCollection ) {
+                                Object.keys( functionCollection ).forEach(
+                                    function( pFactoryName ){ // built-in factory parameter or function !
+                                        var pFactoryValue = functionCollection[ pFactoryName ],
+                                            isFunction = typeof pFactoryValue === 'function' ? true : false,
+                                            inputElement = that.parent()[0].inputElement;
+
+                                        // attach standard or custom function to input element
+                                        if ( isFunction ){
+                                            // attach function directly
+                                            inputElement.on(
+                                                pEventName,
+                                                makeValidatorFunction(
+                                                    pStatusName,
+                                                    pFactoryValue,
+                                                    FieldValidator.fn.invalid.message
+                                                )
+                                            );
+                                        } else {
+                                            // attach repository validator function
+                                            inputElement.on(
+                                                pEventName,
+                                                makeValidatorFunction(
+                                                    pStatusName,
+                                                    that.fn[ pFactoryName ].validator( pFactoryValue ),
+                                                    that.fn[ pFactoryName ].message
+                                                )
+                                            );
+                                        }
+                                    }
+                                );
                             }
-                        );
-
+                        }
+                    );
                 }
+            );
 
-                return valid;
+            /*
+             // remove info class after blur anyway
+             tb.dom( that.target )
+             .on(
+             'blur',
+             function(){
+             //console.log( 'remove classes ...info ...warning ...error from', tb.dom( that.target.parentElement.children ) );
 
+             tb.dom( that.target.parentElement.children )
+             .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+             }
+             );
+             */
+        }
+
+        /**
+         message factory, sets message
+
+         @function message
+         @returns function
+         */
+        function message( pMessage ){
+            var f;
+
+            f = function( value ) {
+                return false; // always display message
+            };
+
+            if ( !!pMessage && typeof pMessage === 'string' ){
+                f.message = pMessage;
+            }
+
+            return f;
+
+        }
+
+        /**
+         reset factory, deletes messages
+
+         @function reset
+         @returns function
+         */
+        function reset(){
+            var f;
+
+            f = function( value ) {
+                return true;
             };
 
             return f;
 
         }
 
-        // put a link to the validator in the data-tb attribute to aid in debugging
-        var dataTb = !!that.target.inputElement.attr('data-tb')
-            ? that.target.inputElement.attr('data-tb').split(' ')
-            : [];
+        /**
+         required factory, checks input for existence
 
-        dataTb.push( that.namespace );
+         @function required
+         @param pMessage {string} - the message to display on error
+         @returns function
+         */
+        function required( pMessage ){
+            var f;
 
-        that.target.inputElement.attr('data-tb',
-            dataTb.join(' ')
-        );
+            f = function( value ) {
+                return !!value;
+            };
 
-        // set target to parent element inputElement, that is the DOM node
-        that.target = that.target.inputElement[0];
+            if ( !!pMessage && typeof pMessage === 'string' ){
+                f.message = pMessage;
+            }
 
-        // put that in target
-        that.target[ 'tb.ui.FieldValidator' ] = that;
+            return f;
 
-        // create validation functions and append them to input field
-        if ( !!that.config ) Object.keys( that.config ).forEach(
-            function( pEventName ){
-                ([ 'error', 'warning', 'info' ]).forEach(
-                    function( pStatusName ){
+        }
 
-                        var functionCollection = that.config[ pEventName ][ pStatusName ] || {};
+        /**
+         regex factory, checks input for regex match
 
-                        // execute all validation handlers on this field
-                        if ( !!functionCollection ) {
-                            Object.keys( functionCollection ).forEach(
-                                function( pFactoryName ){ // built-in factory parameter or function !
-                                    var pFactoryValue = functionCollection[ pFactoryName ],
-                                        isFunction = typeof pFactoryValue === 'function' ? true : false,
-                                        inputElement = that.parent()[0].inputElement;
+         @function regex
+         @param pMessage {string} - the message to display on error
+         @returns function
+         */
+        function regex( pRegEx ){
+            var f;
 
-                                    // attach standard or custom function to input element
-                                    if ( isFunction ){
-                                        // attach function directly
-                                        inputElement.on(
-                                            pEventName,
-                                            makeValidatorFunction(
-                                                pStatusName,
-                                                pFactoryValue,
-                                                FieldValidator.fn.invalid.message
-                                            )
-                                        );
-                                    } else {
-                                        // attach repository validator function
-                                        inputElement.on(
-                                            pEventName,
-                                            makeValidatorFunction(
-                                                pStatusName,
-                                                that.fn[ pFactoryName ].validator( pFactoryValue ),
-                                                that.fn[ pFactoryName ].message
-                                            )
-                                        );
-                                    }
-                                }
-                            );
+            f = function( value ){
+                return !!value.match( pRegEx );
+            };
+
+            return f;
+
+        }
+
+        /**
+         email factory, checks input for valid email adress
+
+         @function regex
+         @param pMessage {string} - the message to display on error
+         @returns function
+         */
+        function email( pDelimiter ){
+            var delimiter = typeof pDelimiter === 'string' && pDelimiter.length === 1
+                    ? pDelimiter
+                    : false,
+                eMailRegEx = regex( /^[A-Z0-9._%+-]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i ), // regex function
+                f;
+
+            f = function( value ){
+
+                var adresses = delimiter ? value.split( delimiter ) : [ value ],
+                    valid = true;
+
+                adresses.forEach(
+                    function( email ){
+                        if ( !eMailRegEx( email ) ){
+                            valid = false;
                         }
                     }
                 );
-            }
-        );
 
-        /*
-        // remove info class after blur anyway
-        tb.dom( that.target )
-            .on(
-                'blur',
-                function(){
-                    //console.log( 'remove classes ...info ...warning ...error from', tb.dom( that.target.parentElement.children ) );
+                return valid;
+            };
 
-                    tb.dom( that.target.parentElement.children )
-                        .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
-                }
-            );
-        */
-    }
+            return f;
 
-    /**
-     message factory, sets message
-
-     @function message
-     @returns function
-     */
-    function message( pMessage ){
-        var f;
-
-        f = function( value ) {
-            return false; // always display message
-        };
-
-        if ( !!pMessage && typeof pMessage === 'string' ){
-            f.message = pMessage;
         }
 
-        return f;
+        /**
+         min factory, checks parseInt( input ) < manimal value given
 
-    }
+         @function min
+         @param pMinValue {string} - the minimium value
+         @returns function
+         */
+        function min( pMinValue ){
+            var f;
 
-    /**
-     reset factory, deletes messages
+            f = function( value ){
+                return !!parseFloat(pMinValue) <= parseFloat(value);
+            };
 
-     @function reset
-     @returns function
-     */
-    function reset(){
-        var f;
+            return f;
 
-        f = function( value ) {
-            return true;
-        };
-
-        return f;
-
-    }
-
-    /**
-     required factory, checks input for existence
-
-     @function required
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function required( pMessage ){
-        var f;
-
-        f = function( value ) {
-            return !!value;
-        };
-
-        if ( !!pMessage && typeof pMessage === 'string' ){
-            f.message = pMessage;
         }
 
-        return f;
+        /**
+         max factory, checks parseInt( input ) > maximal value given
 
-    }
+         @function max
+         @param pMaxValue {string} - the maximium value
+         @returns function
+         */
+        function max( pMaxValue ){
+            var f;
 
-    /**
-     regex factory, checks input for regex match
+            f = function( value ){
+                return !!parseFloat(pMaxValue) >= parseFloat(value);
+            };
 
-     @function regex
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function regex( pRegEx ){
-        var f;
+            return f;
 
-        f = function( value ){
-            return !!value.match( pRegEx );
-        };
-
-        return f;
-
-    }
-
-    /**
-     email factory, checks input for valid email adress
-
-     @function regex
-     @param pMessage {string} - the message to display on error
-     @returns function
-     */
-    function email( pDelimiter ){
-        var delimiter = typeof pDelimiter === 'string' && pDelimiter.length === 1
-                ? pDelimiter
-                : false,
-            eMailRegEx = regex( /^[A-Z0-9._%+-]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i ), // regex function
-            f;
-
-        f = function( value ){
-
-            var adresses = delimiter ? value.split( delimiter ) : [ value ],
-                valid = true;
-
-            adresses.forEach(
-                function( email ){
-                    if ( !eMailRegEx( email ) ){
-                        valid = false;
-                    }
-                }
-            );
-
-            return valid;
-        };
-
-        return f;
-
-    }
-
-    /**
-     min factory, checks parseInt( input ) < manimal value given
-
-     @function min
-     @param pMinValue {string} - the minimium value
-     @returns function
-     */
-    function min( pMinValue ){
-        var f;
-
-        f = function( value ){
-            return !!parseFloat(pMinValue) <= parseFloat(value);
-        };
-
-        return f;
-
-    }
-
-    /**
-     max factory, checks parseInt( input ) > maximal value given
-
-     @function max
-     @param pMaxValue {string} - the maximium value
-     @returns function
-     */
-    function max( pMaxValue ){
-        var f;
-
-        f = function( value ){
-            return !!parseFloat(pMaxValue) >= parseFloat(value);
-        };
-
-        return f;
-
-    }
-
-    /**
-     validate handler
-
-     @event validate
-     @param e
-     */
-    function validate( pConfig ){
-
-        var that = this;
-
-        // console.log( 'fieldValidator::validate' );
-
-        that
-            .parents('form')[0]
-            ['tb.ui.FormValidator']
-            .trigger( 'onStartFieldValidation' );
-
-        // execute beforeSubmit() validation
-        that
-            .target
-            .inputElement
-            .one(
-                'beforeSubmit',
-                function(){
-                    setTimeout(
-                        function(){
-                            that
-                               .parents('form')[0]
-                                ['tb.ui.FormValidator']
-                               .trigger( 'onEndFieldValidation' );
-
-                        },
-                        100
-                    );
-                }
-            )
-            .trigger( 'beforeSubmit' );
-
-    }
-
-})();
-
-/**
- * @namespace tb.ui.FormValidator
- */
-tb.namespace( 'tb.ui', true ).FormValidator = (function() {
-
-    /**
-     FormValidator constructor
-
-     @class tb.ui.FormValidator
-     @constructor
-
-     @param pConfig
-     */
-    function FormValidator( pConfig ){
-
-        var that = this;
-
-        that.config = pConfig;
-
-        // this indicates the number of field validations currently in progress,
-        // when it reaches 0 callbacks are executed depending on status
-        that.fieldValidationCount = 0;
-
-        // this will contain all errors and warnings after validation
-        that.status = {
-            warning: [],
-            error: []
-        };
-
-        // handlers for instance
-        that.handlers = {
-            init,
-            setStatus,
-            validate,
-            onStartFieldValidation,
-            onEndFieldValidation
         }
 
-    };
-
-    FormValidator.prototype = {
-
         /**
-         used to identify instance(s) via tb( /&lt;string&gt;/ )
+         validate handler
 
-         @property namespace
-         @type string
-         @static
+         @event validate
+         @param e
          */
-        namespace: 'tb.ui.FormValidator',
-
-        /**
-         validate form
-
-         @method validate
-         */
-        validate: validate
-    };
-
-    return FormValidator;
-
-    // VARIABLES
-
-    // PRIVATE FUNCTIONS
-    function init(){
-        var that = this;
-
-        // put a link to the validator in the data-tb attribute to aid in debugging
-        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
-
-        dataTb.push( that.namespace );
-
-        tb.dom( that.target.target ).attr('data-tb',
-            dataTb.join(' ')
-        );
-
-        // set target to parent element target, that is the DOM node
-        that.target = that.target.target;
-
-        // put that in target
-        that.target[ 'tb.ui.FormValidator' ] = that;
-    }
-
-    /**
-     form validate, handler & method
-
-     @event validate
-     @param ev {object} - the different callbacks to execute after validation
-     */
-    function validate( e ){
-
-        var that = this,
-            data = e.data;
-
-        that.validateCallbacks = data;
-
-        // reset form status
-        that.status = {
-            warning: [],
-            error: []
-        };
-
-        // this indicates the number of field validations currently in progress
-        that.fieldValidationCount = 0;
-
-        // trigger validation
-        tb.dom( that.target ) // = tb form instance
-            .descendants( tb.ui.Field )
-            .trigger( 'validate' );
-
-    }
-
-    /**
-     onStartFieldValidation handler
-
-     @event onStartFieldValidation
-     */
-    function onStartFieldValidation(){
-
-        var that = this;
-
-        that.fieldValidationCount++;
-
-    }
-
-    /**
-     onEndFieldValidation handler
-
-     @event onEndFieldValidation
-     */
-    function onEndFieldValidation(){
-
-        var that = this;
-
-        that.fieldValidationCount--;
-
-        // console.log(that.fieldValidationCount);
-
-        // if form validation succeeds, execute callback
-        if ( that.fieldValidationCount === 0 ){
-
-            //console.log( 'status', that.status );
-
-            if( !!that.status.error.length > 0 ){
-                // console.log( 'formValidation error', that.status );
-                that.validateCallbacks.errorCallback( that.status );
-            } else if( !!that.status.warning.length > 0 ){
-                // console.log( 'formValidation warning', that.status );
-                that.validateCallbacks.warnCallback( that.status );
-            } else {
-                // console.log( 'formValidation OK', that.status );
-                that.validateCallbacks.successCallback( that.status );
-            }
-        }
-    }
-
-    /**
-     setStatus handler
-
-     @event setStatus
-     */
-    function setStatus( e ){
-
-        var that = this,
-            data = e.data;
-
-        if ( data.status === 'error' ){
-            that.status.error.push( data );
-        } else if ( data.status === 'warning' ){
-            that.status.warning.push( data );
-        }
-
-    }
-
-})();
-
-/**
- * @namespace tb.ui.Field
- */
-tb.namespace( 'tb.ui', true ).Field = (function() {
-
-    /**
-     Field constructor
-
-     @class Field
-     @constructor
-
-     @param pConfig
-     */
-    function Field( pConfig ){
-
-        // var
-        var that = this;
-
-        that.config = pConfig;
-
-        tb.extend(
-            that,
-            pConfig
-        );
-
-        /**
-         event handlers of this instance at creation time
-
-         @example
-
-            //the object &lt;property name&gt; equals the event name you trigger, like
-            handlers = { &lt;event name&gt;: &lt;function name&gt; }
-
-         @example
-
-            &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
-
-         @property handlers
-         @type object
-         */
-        that.handlers = {
-            init,
-            render,
-            focus,
-            scrollTo,
-            validate
-        }
-
-    };
-
-    Field.prototype = {
-
-        /**
-         used to identify instance(s) via tb( /&lt;string&gt;/ )
-
-         @property namespace
-         @type string
-         @static
-         */
-        namespace: 'tb.ui.Field',
-
-        /**
-         static helper variable for last field generated
-
-         @property prevField
-         @type {object} - tb.ui.Field
-         @static
-         */
-        prevField: {},
-
-        /**
-         renders field html
-         @method render
-         */
-        render: render,
-
-        /**
-         scrolls field in sight
-         @method scrollTo
-         */
-        scrollTo: scrollTo
-
-    };
-
-    return Field;
-
-    // VARIABLES
-
-    // PRIVATE FUNCTIONS
-    /**
-     init handler
-
-     @event init
-     @param e
-     */
-    function init() {
-        this.render();
-    }
-
-    /**
-     render function, both used in handlers and as a method
-
-     @event render
-     */
-    function render() {
-
-        var that = this,
-            config = that.config,
-            inputTag;
-
-        // clear content (in case of re-render )
-        tb.dom( that.target ).html('');
-
-        // create field elements
-
-        // label element
-        that.labelElement = tb.dom( document.createElement('label') )
-            .addClass('tb-ui-field-label')
-            .html(config['label'] || '');
-
-        that.target.appendChild(that.labelElement[0]);
-
-        // hint element
-        that.hintElement = tb.dom( document.createElement('span') )
-            .addClass('tb-ui-field-hint')
-            .html(config['hint'] || '');
-
-        that.target.appendChild(that.hintElement[0]);
-
-        // input element
-        if (!!config.tagName) {
-
-            that.inputElement = tb.dom( document.createElement( config.tagName ) )
-                .addClass('tb-ui-field-tag')
-                .attr( !!config.tagAttributes ? config.tagAttributes : {} );
-
-            that.target.appendChild( that.inputElement[0] );
-
-            // @todo: never fires?
-            tb.dom( that.inputElement[0] )
-                .on(
-                    'focus',
+        function validate( pConfig ){
+
+            var that = this;
+
+            // console.log( 'fieldValidator::validate' );
+
+            that
+                .parents('form')[0]
+                ['tb.ui.FormValidator']
+                .trigger( 'onStartFieldValidation' );
+
+            // execute beforeSubmit() validation
+            that
+                .target
+                .inputElement
+                .one(
+                    'beforeSubmit',
                     function(){
-                        // scroll field element into sight
-                        console.log( 'dom focus', that.inputElement );
-                        that.scrollTo();
-                    }
-                );
-
-        }
-
-        // message element
-        that.messageElement = tb.dom( document.createElement('span') )
-            .addClass('tb-ui-field-message')
-            .html(config['message'] || '');
-
-        that.target.appendChild(that.messageElement[0]);
-        
-        // keyhandler for direction
-        that
-            .inputElement
-            .on(
-                'keypress',
-                function( ev ){
-
-                    if ( ev.key === 'Tab' ){
-                        that.direction = ev.shiftKey ? 'prev' : 'next';
-                    } else {
-                        // any non-directional key
-                        that.direction = '';
-                    }
-
-                    if ( !!that.direction ){
-                        if ( that.direction === 'next' && that.nextField ){
-                            that.nextField.trigger( 'focus' );
-                        } else if ( that.direction === 'prev' && that.prevField ){
-                            that.prevField.trigger( 'focus' );
-                        }
-                    }
-
-                }
-            );
-
-
-        // if masked input field -> hide alltogether
-        if (tb.namespace('input.type', false, config) === 'hidden') {
-            tb.dom( that.target )
-                .attr({
-                    overflow: 'hidden',
-                    height: '0',
-                    width: '0',
-                    margin: '0',
-                    padding: '0',
-                    border: '0px none'
-                });
-        } else {
-            // get last field created before this one
-            if ( tb.ui.Field.prototype.prevField ){
-                tb.ui.Field.prototype.prevField.nextField = that; // this one is the next field
-                that.prevField = tb.ui.Field.prototype.prevField; // my prev field is the one linked in the prototype
-            }
-        }
-        
-        // set last field created before this one
-        tb.ui.Field.prototype.prevField = that;
-
-    }
-
-    /**
-     validate handler
-
-     @event validate
-     */
-    function validate() {
-
-        var that = this;
-
-        if ( !!that.validator ){
-            that.validator.trigger( 'validate' );
-        }
-
-    }
-
-    /**
-     focus function handler
-
-     @event focus
-     */
-    function focus() {
-
-        var that = this;
-
-        that.scrollTo(); // also in focus() but necessary
-
-        //tb.dom( that.inputElement.trigger( 'focus' ) ); // dom event
-
-    }
-
-    /**
-     scrollTo function handler
-
-     @event scrollTo
-     */
-    function scrollTo(){
-        var that = this;
-
-        console.log( 'scrollTo', that.config.name );
-        tb.dom('.demoapp-body')[0].scrollTop
-            = tb.dom( that.target )[0].parentElement.offsetTop - 200; // top of input element
-
-    }
-
-})();
-
-/**
- * @namespace tb.ui.FieldSet
- */
-tb.namespace( 'tb.ui', true ).FieldSet = (function(){
-
-    /**
-     * FieldSet constructor
-     *
-     * @class FieldSet
-     * @constructor
-     *
-     * @param pConfig
-     */
-    function FieldSet( pConfig ){
-
-        // var
-        var that = this;
-
-        that.config = pConfig;
-
-        /**
-         * event handlers of this instance at creation time
-         *
-         * the object &lt;property name&gt; equals the event name you trigger, like
-         *
-         * @example handlers = { &lt;event name&gt;: &lt;function name&gt; }
-         *
-         * @example &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
-
-         * @property handlers
-         * @type object
-         */
-        that.handlers = {
-            init: init,
-            render: render
-        }
-
-
-    };
-
-    FieldSet.prototype = {
-
-        /**
-         * used to identify instance(s) via tb( /&lt;string&gt;/ )
-         *
-         * @property namespace
-         * @type string
-         * @static
-         */
-        namespace: 'tb.ui.FieldSet',
-
-        /**
-         * @method render
-         */
-        render: render
-
-    };
-
-    return FieldSet;
-
-    // VARIABLES
-
-    // PRIVATE FUNCTIONS
-    /**
-     * init handler
-     *
-     * @event init
-     * @param e
-     */
-    function init( e ){
-        this.render();
-    }
-
-    /**
-     * render function, both used in handlers and as a method
-     *
-     * @event render
-     */
-    function render(){
-
-        var that = this,
-            legend;
-
-        // clear content (in case of re-render )
-        tb.dom( that.target )
-            .empty()
-            .attr( that.config['tagAttributes'] || {} );
-
-        if ( !!that.config['legend'] ){
-            legend = that.target.appendChild( document.createElement( 'legend' ) );
-            tb.dom( legend ).html( that.config.legend);
-        }
-
-        that.config.fields
-            .forEach(
-                function( pValue ){
-
-                    /*
-                    if ( !pValue['name'] ){
-                        pValue.name = key;
-                    }
-                     */
-
-                    new tb(
-                        tb.ui.Field,
-                        pValue,
-                        that.target.appendChild( document.createElement( 'div' ) )
-                    );
-
-                }
-            );
-
-    }
-
-})();
-
-/**
- * @namespace tb.ui.Form
- */
-tb.namespace( 'tb.ui', true ).Form = (function(){
-
-    /**
-     * Form constructor
-     *
-     * @class Form
-     * @constructor
-     *
-     * @param pConfig
-     */
-    function Form( pConfig ){
-
-        // var
-        var that = this; // for minification purposes
-
-        that.config = pConfig;
-
-        tb.extend(
-            that,
-            pConfig
-        );
-
-
-        /**
-         * event handlers of this instance at creation time
-         *
-         * the object &lt;property name&gt; equals the event name you trigger, like
-         *
-         * @example handlers = { &lt;event name&gt;: &lt;function name&gt; }
-         *
-         * @example &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
-
-         * @property handlers
-         * @type object
-         */
-        that.handlers = {
-            init,
-            render
-        }
-
-    };
-
-    Form.prototype = {
-
-        /**
-         * used to identify instance(s) via tb( /&lt;string&gt;/ )
-         *
-         * @property namespace
-         * @type string
-         * @static
-         */
-        namespace: 'tb.ui.Form',
-
-        /**
-         handles requirement loading, an array containing file name strings
-
-         @property tb.require
-         @type array
-         @static
-         */
-        'tb.require': [
-            '/tb/ui/Form.css'
-        ],
-
-        /**
-         * @method render
-         */
-        render: render
-
-    };
-
-    return Form;
-
-    // VARIABLES
-
-    // PRIVATE FUNCTIONS
-    /**
-       * init handler
-     *
-     * @event init
-     * @param e
-     */
-    function init( e ){
-        var that = this;
-
-        that.render();
-    }
-
-    /**
-     * render function, both used in handlers and as a method
-     *
-     * @event render
-     */
-    function render(){
-
-        var that = this,
-            config = that.config;
-
-        // clear content (in case of re-render )
-        tb.dom( that.target )
-            .empty();
-
-        tb.dom( that.target )
-            .attr( !!config.formAttributes ? config.formAttributes : {} ); // set form attributes
-
-        // reset last field created before this one
-        tb.ui.Field.prototype.prevField = false;
-
-        // create fields
-        if ( config.fieldSets ){
-
-            // merge field definitions into fieldsets
-            config
-                .fieldSets
-                .forEach(
-                    function( fieldSet ){
-
-                        // replace fields array in config with field definitions
-                        fieldSet
-                            .fields
-                            .forEach(
-                                function( value, key ){
-                                    fieldSet.fields[key] = that.config.fields[value];
-                                }
-                            );
-
-                        // make fieldset
-                        new tb(
-                            tb.ui.FieldSet,
-                            fieldSet,
-                            that.target.appendChild( document.createElement( 'fieldset') )
+                        setTimeout(
+                            function(){
+                                that
+                                    .parents('form')[0]
+                                    ['tb.ui.FormValidator']
+                                    .trigger( 'onEndFieldValidation' );
+
+                            },
+                            100
                         );
                     }
+                )
+                .trigger( 'beforeSubmit' );
+
+        }
+
+    })();
+
+    /**
+     * @namespace tb.ui.FormValidator
+     */
+    tb.namespace( 'tb.ui', true ).FormValidator = (function() {
+
+        /**
+         FormValidator constructor
+
+         @class tb.ui.FormValidator
+         @constructor
+
+         @param pConfig
+         */
+        function FormValidator( pConfig ){
+
+            var that = this;
+
+            that.config = pConfig;
+
+            // this indicates the number of field validations currently in progress,
+            // when it reaches 0 callbacks are executed depending on status
+            that.fieldValidationCount = 0;
+
+            // this will contain all errors and warnings after validation
+            that.status = {
+                warning: [],
+                error: []
+            };
+
+            // handlers for instance
+            that.handlers = {
+                init,
+                setStatus,
+                validate,
+                onStartFieldValidation,
+                onEndFieldValidation
+            }
+
+        };
+
+        FormValidator.prototype = {
+
+            /**
+             used to identify instance(s) via tb( /&lt;string&gt;/ )
+
+             @property namespace
+             @type string
+             @static
+             */
+            namespace: 'tb.ui.FormValidator',
+
+            /**
+             validate form
+
+             @method validate
+             */
+            validate: validate
+        };
+
+        return FormValidator;
+
+        // VARIABLES
+
+        // PRIVATE FUNCTIONS
+        function init(){
+            var that = this;
+
+            // put a link to the validator in the data-tb attribute to aid in debugging
+            var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
+
+            dataTb.push( that.namespace );
+
+            tb.dom( that.target.target ).attr('data-tb',
+                dataTb.join(' ')
+            );
+
+            // set target to parent element target, that is the DOM node
+            that.target = that.target.target;
+
+            // put that in target
+            that.target[ 'tb.ui.FormValidator' ] = that;
+        }
+
+        /**
+         form validate, handler & method
+
+         @event validate
+         @param ev {object} - the different callbacks to execute after validation
+         */
+        function validate( e ){
+
+            var that = this,
+                data = e.data;
+
+            that.validateCallbacks = data;
+
+            // reset form status
+            that.status = {
+                warning: [],
+                error: []
+            };
+
+            // this indicates the number of field validations currently in progress
+            that.fieldValidationCount = 0;
+
+            // trigger validation
+            tb.dom( that.target ) // = tb form instance
+                .descendants( tb.ui.Field )
+                .trigger( 'validate' );
+
+        }
+
+        /**
+         onStartFieldValidation handler
+
+         @event onStartFieldValidation
+         */
+        function onStartFieldValidation(){
+
+            var that = this;
+
+            that.fieldValidationCount++;
+
+        }
+
+        /**
+         onEndFieldValidation handler
+
+         @event onEndFieldValidation
+         */
+        function onEndFieldValidation(){
+
+            var that = this;
+
+            that.fieldValidationCount--;
+
+            // console.log(that.fieldValidationCount);
+
+            // if form validation succeeds, execute callback
+            if ( that.fieldValidationCount === 0 ){
+
+                //console.log( 'status', that.status );
+
+                if( !!that.status.error.length > 0 ){
+                    // console.log( 'formValidation error', that.status );
+                    that.validateCallbacks.errorCallback( that.status );
+                } else if( !!that.status.warning.length > 0 ){
+                    // console.log( 'formValidation warning', that.status );
+                    that.validateCallbacks.warnCallback( that.status );
+                } else {
+                    // console.log( 'formValidation OK', that.status );
+                    that.validateCallbacks.successCallback( that.status );
+                }
+            }
+        }
+
+        /**
+         setStatus handler
+
+         @event setStatus
+         */
+        function setStatus( e ){
+
+            var that = this,
+                data = e.data;
+
+            if ( data.status === 'error' ){
+                that.status.error.push( data );
+            } else if ( data.status === 'warning' ){
+                that.status.warning.push( data );
+            }
+
+        }
+
+    })();
+
+    /**
+     * @namespace tb.ui.Field
+     */
+    tb.namespace( 'tb.ui', true ).Field = (function() {
+
+        /**
+         Field constructor
+
+         @class Field
+         @constructor
+
+         @param pConfig
+         */
+        function Field( pConfig ){
+
+            // var
+            var that = this;
+
+            that.config = pConfig;
+
+            tb.extend(
+                that,
+                pConfig
+            );
+
+            /**
+             event handlers of this instance at creation time
+
+             @example
+
+             //the object &lt;property name&gt; equals the event name you trigger, like
+             handlers = { &lt;event name&gt;: &lt;function name&gt; }
+
+             @example
+
+             &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+
+             @property handlers
+             @type object
+             */
+            that.handlers = {
+                init,
+                render,
+                focus,
+                scrollTo,
+                validate
+            }
+
+        };
+
+        Field.prototype = {
+
+            /**
+             used to identify instance(s) via tb( /&lt;string&gt;/ )
+
+             @property namespace
+             @type string
+             @static
+             */
+            namespace: 'tb.ui.Field',
+
+            /**
+             static helper variable for last field generated
+
+             @property prevField
+             @type {object} - tb.ui.Field
+             @static
+             */
+            prevField: {},
+
+            /**
+             renders field html
+             @method render
+             */
+            render: render,
+
+            /**
+             scrolls field in sight
+             @method scrollTo
+             */
+            scrollTo: scrollTo
+
+        };
+
+        return Field;
+
+        // VARIABLES
+
+        // PRIVATE FUNCTIONS
+        /**
+         init handler
+
+         @event init
+         @param e
+         */
+        function init() {
+            this.render();
+        }
+
+        /**
+         render function, both used in handlers and as a method
+
+         @event render
+         */
+        function render() {
+
+            var that = this,
+                config = that.config;
+
+            // clear content (in case of re-render )
+            tb.dom( that.target ).html('');
+
+            // create field elements
+
+            // label element
+            that.labelElement = tb.dom( document.createElement('label') )
+                .addClass('tb-ui-field-label')
+                .html(config['label'] || '');
+
+            that.target.appendChild(that.labelElement[0]);
+
+            // hint element
+            that.hintElement = tb.dom( document.createElement('span') )
+                .addClass('tb-ui-field-hint')
+                .html(config['hint'] || '');
+
+            that.target.appendChild(that.hintElement[0]);
+
+            // input element
+            if (!!config.tagName) {
+
+                that.inputElement = tb.dom( document.createElement( config.tagName ) )
+                    .addClass('tb-ui-field-tag')
+                    .attr( !!config.tagAttributes ? config.tagAttributes : {} );
+
+                that.target.appendChild( that.inputElement[0] );
+
+                // attach native event
+                tb.dom( that.inputElement[0] )
+                    .on(
+                        'focus',
+                        function(){
+                            // scroll field element into sight
+                            that.scrollTo();
+                        }
+                    );
+
+            }
+
+            // message element
+            that.messageElement = tb.dom( document.createElement('span') )
+                .addClass('tb-ui-field-message')
+                .html(config['message'] || '');
+
+            that.target.appendChild(that.messageElement[0]);
+
+            // keyhandler for direction
+            tb.dom( that.inputElement[0] )
+                .on(
+                    'keypress',
+                    function( ev ){
+
+                        if ( ev.key === 'Tab' ){
+                            that.direction = ev.shiftKey ? 'prev' : 'next';
+                        } else {
+                            // any non-directional key
+                            that.direction = '';
+                        }
+
+                        if ( !!that.direction ){
+                            if ( that.direction === 'next' && that.nextField ){
+                                that.nextField.trigger( 'focus' );
+                            } else if ( that.direction === 'prev' && that.prevField ){
+                                that.prevField.trigger( 'focus' );
+                            }
+                        }
+
+                    }
+                );
+
+
+            // if masked input field -> hide alltogether
+            if (tb.namespace('input.type', false, config) === 'hidden') {
+                tb.dom( that.target )
+                    .attr({
+                        overflow: 'hidden',
+                        height: '0',
+                        width: '0',
+                        margin: '0',
+                        padding: '0',
+                        border: '0px none'
+                    });
+            } else {
+                // set previous and next field
+                if ( prevField ){
+                    that.prevField = prevField; // my prev field from global var
+                    that.prevField.nextField = that; // this one is the next field in the previous one
+                } else {
+                    that.prevField = false;
+                }
+                that.nextField = false; // next field not known yet
+            }
+
+            // global set previous field
+            prevField = that;
+        }
+
+        /**
+         validate handler
+
+         @event validate
+         */
+        function validate() {
+
+            var that = this;
+
+            if ( !!that.validator ){
+                that.validator.trigger( 'validate' );
+            }
+
+        }
+
+        /**
+         focus function handler
+
+         @event focus
+         */
+        function focus() {
+            var that = this;
+
+            that.scrollTo();
+        }
+
+        /**
+         scrollTo function handler
+
+         @event scrollTo
+         */
+        function scrollTo(){
+            var that = this;
+
+            tb.dom('.demoapp-body')[0].scrollTop
+                = tb.dom( that.target )[0].parentElement.offsetTop - 200; // top of input element
+        }
+
+    })();
+
+    /**
+     * @namespace tb.ui.FieldSet
+     */
+    tb.namespace( 'tb.ui', true ).FieldSet = (function(){
+
+        /**
+         * FieldSet constructor
+         *
+         * @class FieldSet
+         * @constructor
+         *
+         * @param pConfig
+         */
+        function FieldSet( pConfig ){
+
+            // var
+            var that = this;
+
+            that.config = pConfig;
+
+            /**
+             * event handlers of this instance at creation time
+             *
+             * the object &lt;property name&gt; equals the event name you trigger, like
+             *
+             * @example handlers = { &lt;event name&gt;: &lt;function name&gt; }
+             *
+             * @example &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+
+             * @property handlers
+             * @type object
+             */
+            that.handlers = {
+                init: init,
+                render: render
+            }
+
+
+        };
+
+        FieldSet.prototype = {
+
+            /**
+             * used to identify instance(s) via tb( /&lt;string&gt;/ )
+             *
+             * @property namespace
+             * @type string
+             * @static
+             */
+            namespace: 'tb.ui.FieldSet',
+
+            /**
+             * @method render
+             */
+            render: render
+
+        };
+
+        return FieldSet;
+
+        // VARIABLES
+
+        // PRIVATE FUNCTIONS
+        /**
+         * init handler
+         *
+         * @event init
+         * @param e
+         */
+        function init( e ){
+            this.render();
+        }
+
+        /**
+         * render function, both used in handlers and as a method
+         *
+         * @event render
+         */
+        function render(){
+
+            var that = this,
+                legend;
+
+            // clear content (in case of re-render )
+            tb.dom( that.target )
+                .empty()
+                .attr( that.config['tagAttributes'] || {} );
+
+            if ( !!that.config['legend'] ){
+                legend = that.target.appendChild( document.createElement( 'legend' ) );
+                tb.dom( legend ).html( that.config.legend);
+            }
+
+            that.config.fields
+                .forEach(
+                    function( pValue ){
+
+                        /*
+                         if ( !pValue['name'] ){
+                         pValue.name = key;
+                         }
+                         */
+
+                        new tb(
+                            tb.ui.Field,
+                            pValue,
+                            that.target.appendChild( document.createElement( 'div' ) )
+                        );
+
+                    }
                 );
 
         }
 
-        // reset last field created before this one
-        tb.ui.Field.prototype.prevField = false;
+    })();
 
-    }
+    /**
+     * @namespace tb.ui.Form
+     */
+    tb.namespace( 'tb.ui', true ).Form = (function(){
+
+        /**
+         * Form constructor
+         *
+         * @class Form
+         * @constructor
+         *
+         * @param pConfig
+         */
+        function Form( pConfig ){
+
+            // var
+            var that = this; // for minification purposes
+
+            // reset global vars since new form is being constructed
+            prevField = nextField = false;
+
+            that.config = pConfig;
+
+            tb.extend(
+                that,
+                pConfig
+            );
+
+
+            /**
+             * event handlers of this instance at creation time
+             *
+             * the object &lt;property name&gt; equals the event name you trigger, like
+             *
+             * @example handlers = { &lt;event name&gt;: &lt;function name&gt; }
+             *
+             * @example &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+
+             * @property handlers
+             * @type object
+             */
+            that.handlers = {
+                init,
+                render
+            }
+
+        };
+
+        Form.prototype = {
+
+            /**
+             * used to identify instance(s) via tb( /&lt;string&gt;/ )
+             *
+             * @property namespace
+             * @type string
+             * @static
+             */
+            namespace: 'tb.ui.Form',
+
+            /**
+             handles requirement loading, an array containing file name strings
+
+             @property tb.require
+             @type array
+             @static
+             */
+            'tb.require': [
+                '/tb/ui/Form.css'
+            ],
+
+            /**
+             * @method render
+             */
+            render: render
+
+        };
+
+        return Form;
+
+        // VARIABLES
+
+        // PRIVATE FUNCTIONS
+        /**
+         * init handler
+         *
+         * @event init
+         * @param e
+         */
+        function init( e ){
+            var that = this;
+
+            that.render();
+        }
+
+        /**
+         * render function, both used in handlers and as a method
+         *
+         * @event render
+         */
+        function render(){
+
+            var that = this,
+                config = that.config;
+
+            // clear content (in case of re-render )
+            tb.dom( that.target )
+                .empty();
+
+            tb.dom( that.target )
+                .attr( !!config.formAttributes ? config.formAttributes : {} ); // set form attributes
+
+            // create fields
+            if ( config.fieldSets ){
+
+                // merge field definitions into fieldsets
+                config
+                    .fieldSets
+                    .forEach(
+                        function( fieldSet ){
+
+                            // replace fields array in config with field definitions
+                            fieldSet
+                                .fields
+                                .forEach(
+                                    function( value, key ){
+                                        fieldSet.fields[key] = that.config.fields[value];
+                                    }
+                                );
+
+                            // make fieldset
+                            new tb(
+                                tb.ui.FieldSet,
+                                fieldSet,
+                                that.target.appendChild( document.createElement( 'fieldset') )
+                            );
+                        }
+                    );
+
+            }
+
+        }
+
+    })();
 
 })();

@@ -175,7 +175,8 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
 
     }
 
-
+    // private functions
+    
     /**
      save function
      */
@@ -227,6 +228,5 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
     function setTitle( pTitle ){
         tb.dom( '.demoapp-configuration-form-title' ).html( pTitle );
     }
-
 
 })();
