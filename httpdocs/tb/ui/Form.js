@@ -815,14 +815,13 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
             that.target.appendChild( that.inputElement[0] );
 
             // @todo: never fires?
-            tb.dom( that.inputElement )
+            tb.dom( that.inputElement[0] )
                 .on(
                     'focus',
-                    function( e ){
+                    function(){
                         // scroll field element into sight
                         console.log( 'dom focus', that.inputElement );
-                        that.direction = ''; // reset direction
-                        that.trigger( 'focus' );
+                        that.scrollTo();
                     }
                 );
 
@@ -911,7 +910,7 @@ tb.namespace( 'tb.ui', true ).Field = (function() {
 
         that.scrollTo(); // also in focus() but necessary
 
-        tb.dom( that.inputElement.trigger( 'focus' ) ); // dom event
+        //tb.dom( that.inputElement.trigger( 'focus' ) ); // dom event
 
     }
 
