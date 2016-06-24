@@ -312,7 +312,6 @@
                                     .on(
                                         'blur',
                                         function(){
-                                            console.log( 'default blur', that.config.name, tb.dom( that.target.parentElement.children ));
                                             tb.dom( that.target.parentElement.children )
                                                 .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
                                         }

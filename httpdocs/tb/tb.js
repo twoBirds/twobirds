@@ -149,6 +149,8 @@ tb = (function(){
                 empty: empty,
                 hide: hide,
                 html: html,
+                insertBefore: insertBefore,
+                insertAfter: insertAfter,
                 removeClass: removeClass,
                 filter: filter,
                 not: not,
@@ -169,7 +171,8 @@ tb = (function(){
 
             var regExReturn = /\r/g,
                 regExSpaces = /[\x20\t\r\n\f]+/g,
-                regExWord = /\S+/g;
+                regExWord = /\S+/g,
+                regExHtml = /^<?[^<]+>$/g;
 
             // INTERNAL ONLY Private Functions
             function _addEvent( pDomNode, pEventName, pHandler ) {
@@ -205,31 +208,89 @@ tb = (function(){
                 );
             }
 
+            function _create( pElement ){
+                var docFrag = document.createDocumentFragment();
+
+                switch ( pElement.type ){
+                    case 'string':
+                        if ( !!regExHtml.match( pElement )['0'] ){
+                            docFrag.innerHTML = pElement;
+                        } else if ( !!!!regExWord.match( pElement )['0'] ){
+                            docFrag.appendChild( document.createElement( regExWord.match( pElement )[0] ) );
+                        }
+                        break;
+                    case 'object':
+                        if ( !!pElement.nodeType ){
+                            docFrag.appendChild( pElement );
+                        }
+                        break;
+                }
+
+                return docFrag;
+            }
+
+
+
+
             // Private Functions, exposed @todo: test
             function append( pElement ){
-                var that = this,
-                    docFrag = document.createDocumentFragment();
+                var that = this;
 
                 that.forEach(
                     function( pDomNode ){
                         if ( !!pDomNode.nodeType ){
-                            switch ( pElement.type ){
-                                case 'string':
-                                    docFrag.innerHTML = pElement;
-                                    break;
-                                case 'object':
-                                    if ( !!pElement.nodeType ){
-                                        docFrag.appendChild( pElement );
-                                    }
-                                    break;
-                            }
-                            tb.dom( docfrag )[0]
-                                .childNodes
-                                .forEach(
-                                    function( pChild ){
-                                        pDomNode.appendChild( pChild );
-                                    }
+
+                            pDomNode
+                                .appendChild( _create( pElement ).cloneNode(deep) );
+
+                        }
+                    }
+                );
+
+                return that;
+            }
+
+            function insertBefore( pElement ){
+                var that = this;
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+
+                            pDomNode
+                                .parentElement
+                                .insertBefore(
+                                    _create( pElement ).cloneNode(deep),
+                                    pDomNode
                                 );
+
+                        }
+                    }
+                );
+
+                return that;
+            }
+
+            function insertAfter( pElement ){
+                var that = this;
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+
+                            if ( pDomNode.nextSibling ){
+                                pDomNode
+                                    .parentElement
+                                    .insertBefore(
+                                        _create( pElement ).cloneNode(deep),
+                                        pDomNode.nextSibling
+                                    );
+                            } else {
+                                pDomNode
+                                    .parentElement
+                                    .appendChild( _create( pElement ).cloneNode(deep) );
+                            }
+
                         }
                     }
                 );

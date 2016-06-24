@@ -198,9 +198,11 @@ fieldset.tb-ui-fieldset {
 
 .tb-ui-field-message {
   font-size: 0.875rem;
+  display: none;
 
   &.tb-ui-validator-info {
     color: dodgerblue;
+    display: inherit;
 
     &:hover,
     &:focus {
@@ -210,6 +212,7 @@ fieldset.tb-ui-fieldset {
 
   &.tb-ui-validator-warning {
     color: orange;
+    display: inherit;
 
     &:hover,
     &:focus {
@@ -219,6 +222,7 @@ fieldset.tb-ui-fieldset {
 
   &.tb-ui-validator-error {
     color: red;
+    display: inherit;
 
     &:hover,
     &:focus {

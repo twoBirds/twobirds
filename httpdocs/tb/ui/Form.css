@@ -126,17 +126,21 @@ fieldset.tb-ui-fieldset {
     border: 1px solid red; }
 
 .tb-ui-field-message {
-  font-size: 0.875rem; }
+  font-size: 0.875rem;
+  display: none; }
   .tb-ui-field-message.tb-ui-validator-info {
-    color: dodgerblue; }
+    color: dodgerblue;
+    display: inherit; }
     .tb-ui-field-message.tb-ui-validator-info:hover, .tb-ui-field-message.tb-ui-validator-info:focus {
       color: dodgerblue; }
   .tb-ui-field-message.tb-ui-validator-warning {
-    color: orange; }
+    color: orange;
+    display: inherit; }
     .tb-ui-field-message.tb-ui-validator-warning:hover, .tb-ui-field-message.tb-ui-validator-warning:focus {
       color: orange; }
   .tb-ui-field-message.tb-ui-validator-error {
-    color: red; }
+    color: red;
+    display: inherit; }
     .tb-ui-field-message.tb-ui-validator-error:hover, .tb-ui-field-message.tb-ui-validator-error:focus {
       color: red; }
 

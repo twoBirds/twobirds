@@ -217,11 +217,6 @@
             "email": true
           }
         },
-        "blur": {
-          "error": {
-            "email": true
-          }
-        },
         "beforeSubmit": {
           "error": {
             "email": true
