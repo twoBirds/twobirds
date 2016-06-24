@@ -119,8 +119,8 @@
           }
         },
         "blur": {
-          "error": {
-            "required": true
+          "info": {
+            "reset": true
           }
         },
         "beforeSubmit": {

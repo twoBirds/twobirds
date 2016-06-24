@@ -7,7 +7,7 @@
  *
  */
 
-// POLYFILLS @todo: refactor
+// POLYFILLS
 
 // matches polyfill
 this.Element && function(ElementPrototype) {
@@ -16,7 +16,8 @@ this.Element && function(ElementPrototype) {
         ElementPrototype.webkitMatchesSelector ||
         ElementPrototype.msMatchesSelector ||
         function(selector) {
-            var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
+            var node = this,
+                nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
             while (nodes[++i] && nodes[i] != node);
             return !!nodes[i];
         }
@@ -32,6 +33,7 @@ this.Element && function(ElementPrototype) {
         }
 }(Element.prototype);
 
+// twoBirds
 
 tb = (function(){
 
@@ -49,7 +51,7 @@ tb = (function(){
      * @return {string} - result string
      */
     var dom;
-    
+
     dom = (function () {
         return function (pSelector, pDomNode) {
 
@@ -142,6 +144,7 @@ tb = (function(){
                 //own functions
                 add: add,
                 addClass: addClass,
+                append: append,
                 attr: attr,
                 empty: empty,
                 hide: hide,
@@ -185,16 +188,55 @@ tb = (function(){
                 }
             }
 
-            // @todo: refactor
-            function _live(selector, event, callback, context) {
-                addEvent(context || document, event, function(e) {
-                    var found, el = e.target || e.srcElement;
-                    while (el && el.matches && el !== context && !(found = el.matches(selector))) el = el.parentElement;
-                    if (found) callback.call(el, e);
-                });
+            // @todo: integrate into on(), one()
+            function _live( pDomNode, pEventName, pHandler, pContext ) {
+                _addEvent(
+                    pContext || document,
+                    pEventName,
+                    function(e) {
+                        var found,
+                            el = e.target || e.srcElement;
+
+                        while (el && el.matches && el !== pContext && !(found = el.matches(pDomNode)))
+                            el = el.parentElement;
+
+                        if (found) pHandler.call(el, e);
+                    }
+                );
             }
 
-            // Private Functions, exposed
+            // Private Functions, exposed @todo: test
+            function append( pElement ){
+                var that = this,
+                    docFrag = document.createDocumentFragment();
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType ){
+                            switch ( pElement.type ){
+                                case 'string':
+                                    docFrag.innerHTML = pElement;
+                                    break;
+                                case 'object':
+                                    if ( !!pElement.nodeType ){
+                                        docFrag.appendChild( pElement );
+                                    }
+                                    break;
+                            }
+                            tb.dom( docfrag )[0]
+                                .childNodes
+                                .forEach(
+                                    function( pChild ){
+                                        pDomNode.appendChild( pChild );
+                                    }
+                                );
+                        }
+                    }
+                );
+
+                return that;
+            }
+
             function trigger( pEventName, pData ){
                 var that = this,
                     eventNames = pEventName.split(' ');

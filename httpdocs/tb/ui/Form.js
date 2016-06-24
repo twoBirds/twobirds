@@ -177,7 +177,8 @@
 
         // private functions
         function init(){
-            var that = this;
+            var that = this,
+                isBlur = false;
 
             // VALIDATOR function factory
             // must be in here (inner function) to bind <that> correctly via closure
@@ -264,6 +265,8 @@
 
                             var functionCollection = that.config[ pEventName ][ pStatusName ] || {};
 
+                            isBlur = false;
+
                             // execute all validation handlers on this field
                             if ( !!functionCollection ) {
                                 Object.keys( functionCollection ).forEach(
@@ -294,27 +297,33 @@
                                                 )
                                             );
                                         }
+
+                                        // detect blur function present
+                                        if ( pEventName === 'blur' ){
+                                            isBlur = true;
+                                        }
                                     }
                                 );
                             }
+
+                            // remove all classes after blur if no blur validator function given
+                            if ( !isBlur ){
+                                tb.dom( that.target )
+                                    .on(
+                                        'blur',
+                                        function(){
+                                            console.log( 'default blur', that.config.name, tb.dom( that.target.parentElement.children ));
+                                            tb.dom( that.target.parentElement.children )
+                                                .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+                                        }
+                                    );
+
+                            }
+
                         }
                     );
                 }
             );
-
-            /*
-             // remove info class after blur anyway
-             tb.dom( that.target )
-             .on(
-             'blur',
-             function(){
-             //console.log( 'remove classes ...info ...warning ...error from', tb.dom( that.target.parentElement.children ) );
-
-             tb.dom( that.target.parentElement.children )
-             .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
-             }
-             );
-             */
         }
 
         /**

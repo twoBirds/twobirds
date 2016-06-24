@@ -1,12 +1,12 @@
 /**
- * @namespace nl.ui
+ * @namespace demoapp.configuration
  */
 
 // CLASS TemplateSelectorItem CLASS
-tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
+tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function(){
 
     /**
-    @for nl.ui.TemplateSelectorItem
+    @for demoapp.configuration.TemplateSelectorItem
      */
 
 
@@ -21,14 +21,14 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
     @example
 
          new tb(
-            nl.ui.TemplateSelectorItem,                                  // class
+            demoapp.configuration.TemplateSelectorItem,                                  // class
             {                                                                       // configuration
                 TemplateID: '1',
                 TemplatePreviewImagePath: '/img/image.png',
                 TemplateUpdateDate: '12.12.2015',
                 $TemplateInput: <jquery: parent input tag, contains template id>
             },
-            $( '<span />' ).appendTo( <someContainerNodeInDOM> )                    // DOM node to insert the object item
+            target.appendChild( document.createElement( 'span' ) )                    // DOM node to insert the object item
          );
 
      */
@@ -62,7 +62,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
          @type string
          @static
          */
-        namespace: 'nl.ui.TemplateSelectorItem',
+        namespace: 'demoapp.configuration.TemplateSelectorItem',
 
         /**
          render method - adds element to DOM
@@ -92,7 +92,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
         var that = this,
             html = tb.parse( that.template, that.config );
 
-        $( that.target )
+        tb.dom( that.target )
             .append( html )
             .on(
                 'click',
@@ -103,7 +103,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
                 }
             );
 
-        if ( that.config.TemplateID === $( that.config.templateSelector.target ).val() ){
+        if ( that.config.TemplateID === tb.dom( that.config.templateSelector.target ).val() ){
             that.trigger( 'select' );
         }
 
@@ -117,13 +117,13 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
     function select(){
 
         var that = this,
-            $target = $( that.target );
+            target = tb.dom( that.target );
 
         // set selected item in TemplateSelector
         that.config.templateSelector.selectedItem = that;
 
         // put selected template id in input field
-        $( that.config.templateSelector.target )
+        that.config.templateSelector.target
             .val( that.config.TemplateID )
             .trigger( 'change' );
 
@@ -147,33 +147,25 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
 
         var that = this,
             id = ev.data,
-            $target = $( that.target),
+            target = tb.dom( that.target ),
             templateSelector =  that.config.templateSelector,
-            $outerContainer = templateSelector.$outerContainer,
-            $container = templateSelector.$content,
+            outerContainer = templateSelector.outerContainer,
             position;
 
-        $target.removeClass( 'selectedTemplate active' );
+        target.removeClass( 'selectedTemplate active' );
 
         if ( id === that.config.TemplateID ){
-            $target.addClass( 'selectedTemplate active' );
+            target.addClass( 'selectedTemplate active' );
 
             // scrollto active element
-            position = $( that.target ).offset().top
-                - $outerContainer.offset().top
-                - $outerContainer.scrollTop();
+            position = target[0]
+                    .offsetTop
+                - outerContainer.offsetTop
+                - outerContainer.scrollTop;
 
             // console.log( 'tS scrollTo', position );
 
-            $outerContainer.animate(
-                {
-                    scrollTop: (
-                        position
-                    )
-                },
-                50
-            );
-
+            outerContainer.scrollTop =  position;
         }
 
     }
@@ -185,7 +177,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelectorItem = (function(){
 
 
 // CLASS TemplateSelector CLASS
-tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
+tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     // VARIABLES
     var messages = {
@@ -193,7 +185,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
 
     // PRIVATE FUNCTIONS
     /**
-    @for nl.ui.TemplateSelector
+    @for demoapp.configuration.TemplateSelector
      */
 
 
@@ -205,7 +197,8 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
      */
     function init(){
 
-        var that = this;
+        var that = this,
+            docFrag;
 
         // put a link to the validator in the data-tb attribute to aid in debugging
         var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
@@ -220,9 +213,10 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
         that.target = that.target.target;
 
         // append DIV tag after input tag
-        that.$outerContainer = $( '<div><div /></div>');
-        that.$outerContainer.insertAfter( that.target );
-        that.$content = that.$outerContainer.children().first();
+        that.outerContainer = document.createDocumentFragment();
+        that.outerContainer.innerHTML = '<div><div /></div>';
+        that.target.appendChild( that.outerContainer );
+        that.content = that.outerContainer.childNodes[0];
         
     }
 
@@ -235,30 +229,27 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
 
         var that = this,
             data = that.templatesModel.data(),
-            $target = $( that.target ),
-            id = $target.val();
+            target = that.target;
 
         // render template items
-        $.each(
-            data,
-            function( key, value ) {
+        data.forEach(
+            function( value ) {
                 new tb(
-                    nl.ui.TemplateSelectorItem,
-                    $.extend(
-                        true, // deep
+                    demoapp.configuration.TemplateSelectorItem,
+                    tb.extend(
                         {}, // make this a copy
                         value, // the config data
                         {   // extend: templateSelector
                             templateSelector: that
                         }
                     ),
-                    $('<span />').appendTo(that.$content)
+                    that.content.append( document.createElement('span') )
                 ).render(); // we can render right away
             }
         );
 
         // append keypress handlers ( ArrowDown, ArrowUp, Return)
-        $target
+        tb.dom( target )
             .on(
                 'keypress',
                 function( ev ) {
@@ -320,18 +311,18 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
     function focus(){
 
         var that = this,
-            $target = $( that.target );
+            target = tb.dom( that.target );
 
         // if no template selected yet, select first template
-        if ( !$target.val() ){
+        if ( !target.val() ){
             that
                 .parent() // Field
-                .children( nl.ui.TemplateSelectorItem )[0]
+                .children( demoapp.configuration.TemplateSelectorItem )[0]
                 .trigger( 'select' );
         }
 
         // focus on input field
-        $target.focus();
+        target.focus();
     }
 
     /**
@@ -399,8 +390,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
         // templates crud model
         that.templatesModel = new tb.Model({
             'read': {
-                // url: baseUrl + 'namespace/nl/mock/newsletter_configuration_ajax-fetch-templates.mock.json', // mock data
-                url: baseUrl + school +'/newsletter/configuration/ajax-fetch-templates',
+                url: '/demoapp/configuration/mock/demoapp-configuration-templates.mock.json', // mock data
                 method: 'GET',
                 params: {
                 },
@@ -432,7 +422,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
         @type string
         @static
          */
-        namespace: 'nl.ui.TemplateSelector',
+        namespace: 'demoapp.configuration.TemplateSelector',
 
         /**
         handles requirement loading, an array containing file name strings
@@ -442,7 +432,7 @@ tb.namespace( 'nl.ui', true ).TemplateSelector = (function(){
         @static
          */
         'tb.require': [
-            '/namespace/nl/css/TemplateSelector.css'
+            'demoapp/configuration/TemplateSelector.css'
         ]
     };
 
