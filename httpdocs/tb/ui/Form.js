@@ -306,7 +306,7 @@
                                 );
                             }
 
-                            
+
                             // remove all classes after blur if no blur validator function given
                             if ( !isBlur ){
                                 tb.dom( that.target )
@@ -1029,7 +1029,30 @@
 
             if ( !!that.config['legend'] ){
                 legend = that.target.appendChild( document.createElement( 'legend' ) );
-                tb.dom( legend ).html( that.config.legend);
+
+                tb.dom(
+                    tb.dom( legend )
+                        .html( that.config.legend )
+                        [0]
+                        .querySelectorAll( 'input[type="checkbox"]' )
+                        [0]
+                ).on(
+                    'click',
+                    function toogleLegend( ev ){
+                        console.log( ev, that.target, tb.dom( that.target ).children() );
+                        if ( this.checked ){
+                            tb.dom( that.target )
+                                .children()
+                                .show();
+                        } else {
+                            tb.dom( that.target )
+                                .children()
+                                .not( 'legend' )
+                                .hide();
+                        }
+                    }
+                );
+
             }
 
             that.config.fields

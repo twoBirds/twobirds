@@ -146,6 +146,7 @@ tb = (function(){
                 addClass: addClass,
                 append: append,
                 attr: attr,
+                children: children,
                 empty: empty,
                 hide: hide,
                 html: html,
@@ -517,6 +518,29 @@ tb = (function(){
 
                 if (!!pSelector) {
                     result = result.filter(pSelector);
+                }
+
+                return result;
+            }
+
+            function children(pSelector) {
+
+                var that = this,
+                    result = new dom();
+
+                that.forEach(
+                    function (pDomNode) {
+                        [].forEach.call(
+                            pDomNode.children,
+                            function( pDomNode ){
+                                result.push( pDomNode );
+                            }
+                        );
+                    }
+                );
+
+                if (!!pSelector) {
+                    result = result.filter( pSelector );
                 }
 
                 return result;

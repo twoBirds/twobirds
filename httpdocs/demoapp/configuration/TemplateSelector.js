@@ -339,7 +339,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
              TemplateID: '1',
              TemplatePreviewImagePath: '/img/image.png',
              TemplateUpdateDate: '12.12.2015',
-             $TemplateInput: <jquery: parent input tag, contains template id>
+             TemplateInput: input tag
          },
          $( '<span />' ).appendTo( <someContainerNodeInDOM> )
      );

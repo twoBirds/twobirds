@@ -19,7 +19,7 @@
       ]
     },
     {
-      "legend": "{Sender}",
+      "legend": "<input type='checkbox' />{Sender}",
       "fields": [
         "SenderEmail",
         "SenderName"
