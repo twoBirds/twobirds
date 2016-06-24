@@ -257,6 +257,8 @@
             // put that in target
             that.target[ 'tb.ui.FieldValidator' ] = that;
 
+            isBlur = false;
+
             // create validation functions and append them to input field
             if ( !!that.config ) Object.keys( that.config ).forEach(
                 function( pEventName ){
@@ -264,8 +266,6 @@
                         function( pStatusName ){
 
                             var functionCollection = that.config[ pEventName ][ pStatusName ] || {};
-
-                            isBlur = false;
 
                             // execute all validation handlers on this field
                             if ( !!functionCollection ) {
