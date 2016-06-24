@@ -306,6 +306,7 @@
                                 );
                             }
 
+                            
                             // remove all classes after blur if no blur validator function given
                             if ( !isBlur ){
                                 tb.dom( that.target )
