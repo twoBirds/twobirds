@@ -1527,7 +1527,11 @@ tb = (function(){
                                     && !tbEvent.__immediateStopped__
                                     && !!handler
                                 ){
-                                    handler.apply(that, [tbEvent]);
+                                    try{
+                                        handler.apply(that, [tbEvent]);
+                                    } catch (e){
+                                        console.error(e);
+                                    }
 
                                     if ( !handler.once ) {
                                         temp.push( handler );

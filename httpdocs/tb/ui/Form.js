@@ -1031,21 +1031,20 @@
                 legend = that.target.appendChild( document.createElement( 'legend' ) );
 
                 tb.dom(
-                    tb.dom( legend )
-                        .html( that.config.legend )
-                        [0]
-                        .querySelectorAll( 'input[type="checkbox"]' )
-                        [0]
-                ).on(
+                    tb.dom( legend ) // the legend node
+                        .html( that.config.legend ) // insert html
+                        [0] // get the first dom node in collection
+                        .querySelectorAll( 'input[type="checkbox"]' ) // find checkbox
+                        [0] // null or checkbox node
+                ).on( // implicit if not null
                     'click',
                     function toogleLegend( ev ){
-                        console.log( ev, that.target, tb.dom( that.target ).children() );
-                        if ( this.checked ){
-                            tb.dom( that.target )
+                        if ( this.checked ){ // if checkbox checked
+                            tb.dom( that.target ) // show fields
                                 .children()
                                 .show();
                         } else {
-                            tb.dom( that.target )
+                            tb.dom( that.target ) // hide fields
                                 .children()
                                 .not( 'legend' )
                                 .hide();
