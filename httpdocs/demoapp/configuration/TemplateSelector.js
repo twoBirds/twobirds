@@ -105,7 +105,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
                 }
             );
 
-        if ( that.config.TemplateID === tb.dom( that.config.templateSelector.target ).val() ){
+        if ( that.config.TemplateID === that.config.templateSelector.inputElement.val() ){
             that.trigger( 'select' );
         }
 
@@ -122,7 +122,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             ts = that.config.templateSelector;
 
         // set selected item in TemplateSelector
-        ts.selectedItem = that.config.TemplateID;
+        ts.selectedItem = that;
 
         // put selected template id in input field
         ts.inputElement
@@ -156,13 +156,13 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
         if ( id === that.config.TemplateID ){
             target.addClass( 'selectedTemplate active' );
 
-            console.log( 'onSelect', id, target[0].offsetTop, outerContainer.offsetTop, outerContainer.scrollTop );
+            //console.log( 'onSelect', id, target[0].offsetTop, outerContainer.offsetTop, outerContainer.scrollTop );
 
             // scrollto active element
             position = target[0].offsetTop
                 - outerContainer.offsetTop;
 
-            console.log( 'tS scrollTo', position );
+            //console.log( 'tS scrollTo', position );
 
             outerContainer.scrollTop =  position;
         }
@@ -308,10 +308,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
             .insertAfter( inputElement[0] );
 
         // hide original input field
-        inputElement
-            .attr({ // hide original input DOM node
-                'type': 'hidden'
-            });
+        inputElement[0]
+            .style = 'height:0; width:0; border:0px none;margin: 0;padding: 0';
 
         // set target
         that.target = inputElement[0].nextSibling;
@@ -346,8 +344,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     function render(){
 
         var that = this,
-            data = that.templatesModel.data(),
-            target = that.target;
+            data = that.templatesModel.data();
 
         // render template items
         data.forEach(
@@ -367,11 +364,15 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
         );
 
         // append keypress handlers ( ArrowDown, ArrowUp, Return)
-        tb.dom( target )
+        //console.log( that.inputElement );
+        that.inputElement
             .on(
                 'keypress',
                 function( ev ) {
-                    // console.log( 'key', ev.keyCode );
+                    var selectedItem = that.selectedItem;
+
+                    //console.log( 'key', ev.keyCode, ev );
+
                     switch ( ev.keyCode ){
                         case 13:
 
@@ -381,11 +382,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
                             break;
                         case 37:
 
-                            var selectedItem = that.selectedItem;
-
                             selectedItem
                                 .prev()
-                                .is(  tb.ui.TemplateSelectorItem  )
                                 .trigger( 'select' );
 
                             ev.preventDefault();
@@ -393,11 +391,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
                         case 39:
 
-                            var selectedItem = that.selectedItem;
-
                             selectedItem
                                 .next()
-                                .is(  tb.ui.TemplateSelectorItem  )
                                 .trigger( 'select' );
 
                             ev.preventDefault();
@@ -410,13 +405,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
                 function(){
                     that.trigger( 'focus' );
                 }
-            )
-            .on(
-                'blur',
-                function(){
-                    $target.removeClass( 'selectedTemplate active' );
-                }
-
             );
     }
 
@@ -428,13 +416,12 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
      */
     function focus(){
 
-        var that = this,
-            selectedItem = that.selectedItem || false;
+        var that = this;
 
         // if no template selected yet, select first template
         if ( !that.inputElement.val() ){
             that
-                .children( demoapp.configuration.TemplateSelectorItem )[0]
+                .children()[0]
                 .trigger( 'select' );
         }
 
