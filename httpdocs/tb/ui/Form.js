@@ -306,24 +306,25 @@
                                 );
                             }
 
-
-                            // remove all classes after blur if no blur validator function given
-                            if ( !isBlur ){
-                                tb.dom( that.target )
-                                    .on(
-                                        'blur',
-                                        function(){
-                                            tb.dom( that.target.parentElement.children )
-                                                .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
-                                        }
-                                    );
-
-                            }
-
                         }
                     );
                 }
             );
+
+
+            // remove all classes after blur if no blur validator function given
+            if ( !isBlur ){
+                tb.dom( that.target )
+                    .on(
+                        'blur',
+                        function(){
+                            tb.dom( that.target.parentElement.children )
+                                .removeClass('tb-ui-validator-info tb-ui-validator-warning tb-ui-validator-error');
+                        }
+                    );
+
+            }
+            
         }
 
         /**

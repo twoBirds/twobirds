@@ -47,7 +47,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             // doesnt need init()
             render: render,
             select: select,
-            onSelect: onSelect
+            onSelect: onSelect,
+            activate: activate,
+            onActivate: onActivate
         }
 
     };
@@ -76,7 +78,14 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
          @method select
          */
-        select: select
+        select: select,
+
+        /**
+         activate method - selects a single template to be the active one
+
+         @method activate
+         */
+        activate: activate
     };
 
     return TemplateSelectorItem;
@@ -99,14 +108,70 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             .on(
                 'click',
                 function( ev ){
-                    that.config.templateSelector.trigger( 'focus' );
-                    that.trigger( 'select' );
+                    tb.dom( that.config.templateSelector.inputElement[0] )
+                        .trigger( 'focus' );
+
+                    that
+                        .activate()
+                        .select();
+
                     ev.stopPropagation();
                 }
             );
 
         if ( that.config.TemplateID === that.config.templateSelector.inputElement.val() ){
             that.trigger( 'select' );
+        }
+
+    }
+
+    /**
+     activate handler, both event and method
+
+     @event select
+     */
+    function activate(){
+
+        var that = this,
+            ts = that.config.templateSelector;
+
+        // set active item in TemplateSelector
+        ts.activeItem = that;
+
+        that.config.templateSelector
+            .trigger(
+                'onActivate',
+                that.config.TemplateID,
+                'd'
+            );
+
+        return that;
+    }
+
+    /**
+     onActivate handler
+
+     @event onActivate
+     */
+    function onActivate( ev ){
+
+        var that = this,
+            id = ev.data,
+            target = tb.dom( that.target ),
+            templateSelector =  that.config.templateSelector,
+            outerContainer = templateSelector.outerContainer,
+            position;
+
+        target.removeClass( 'active' );
+
+        if ( id === that.config.TemplateID ){
+            target.addClass( 'active' );
+
+            // scroll to active element
+            position = target[0].offsetTop
+                - outerContainer.offsetTop;
+
+            outerContainer.scrollTop =  position;
         }
 
     }
@@ -135,6 +200,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
                 'd'
             );
 
+        return that;
     }
 
     /**
@@ -146,25 +212,12 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
         var that = this,
             id = ev.data,
-            target = tb.dom( that.target ),
-            templateSelector =  that.config.templateSelector,
-            outerContainer = templateSelector.outerContainer,
-            position;
+            target = tb.dom( that.target );
 
-        target.removeClass( 'selectedTemplate active' );
+        target.removeClass( 'selected' );
 
         if ( id === that.config.TemplateID ){
-            target.addClass( 'selectedTemplate active' );
-
-            //console.log( 'onSelect', id, target[0].offsetTop, outerContainer.offsetTop, outerContainer.scrollTop );
-
-            // scrollto active element
-            position = target[0].offsetTop
-                - outerContainer.offsetTop;
-
-            //console.log( 'tS scrollTo', position );
-
-            outerContainer.scrollTop =  position;
+            target.addClass( 'selected' );
         }
 
     }
@@ -307,7 +360,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
         tb.dom( '<div><div /></div>' )
             .insertAfter( inputElement[0] );
 
-        // hide original input field
+        // hide original input field (HINT: dont really hide it --> focus() wont work )
         inputElement[0]
             .style = 'height:0; width:0; border:0px none;margin: 0;padding: 0';
 
@@ -344,12 +397,13 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     function render(){
 
         var that = this,
-            data = that.templatesModel.data();
+            data = that.templatesModel.data(),
+            selectedId = that.inputElement.val();
 
         // render template items
         data.forEach(
             function( pConfig ) {
-                new tb(
+                var templateSelectorItem = new tb(
                     demoapp.configuration.TemplateSelectorItem,
                     tb.extend(
                         {}, // make this a copy
@@ -360,8 +414,23 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
                     ),
                     that.content.appendChild( document.createElement('span') )
                 ).render(); // we can render right away
+
+                if ( !!selectedId && selectedId === pConfig.TemplateId ){
+                    console.log( 'set selected item', selectedId );
+                    templateSelectorItem.trigger( 'select', selectedId );
+                    that.activeItem = selectedId;
+                }
             }
         );
+
+        // if no template selected yet, select first template
+        if ( !selectedId ){
+            that
+                .children()[0]
+                .trigger( 'activate' )
+                .trigger( 'select' );
+        }
+
 
         // append keypress handlers ( ArrowDown, ArrowUp, Return)
         //console.log( that.inputElement );
@@ -369,64 +438,64 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
             .on(
                 'keypress',
                 function( ev ) {
-                    var selectedItem = that.selectedItem;
 
-                    //console.log( 'key', ev.keyCode, ev );
+                    //console.log( 'key', ev, that );
 
                     switch ( ev.keyCode ){
                         case 13:
 
-                            ev.keyCode = 7; // change to tab keyCode and hand over to leave field
-                            ev.key = 'Tab';
+                            that.activeItem
+                                .trigger( 'select' );
 
+                            ev.preventDefault();
                             break;
                         case 37:
 
-                            selectedItem
+                            that.activeItem
                                 .prev()
-                                .trigger( 'select' );
+                                .trigger( 'activate' );
 
                             ev.preventDefault();
                             break;
 
                         case 39:
 
-                            selectedItem
+                            that.activeItem
                                 .next()
-                                .trigger( 'select' );
+                                .trigger( 'activate' );
 
                             ev.preventDefault();
                             break;
                     }
                 }
             )
-            .one( // we only need this once, since we cannot 'unselect' a template
+            .on(
                 'focus',
                 function(){
+                    //console.log( 'inputfield focus' );
                     that.trigger( 'focus' );
                 }
+            )
+            .on(
+                'blur',
+                function(){
+                    tb.dom( 'span.active', that.target )
+                        .removeClass( 'active' );
+                }
             );
+
     }
 
-    /**
-     focus handler
-
-     @event focus
-     @param e
-     */
-    function focus(){
-
+    function focus(e){
         var that = this;
 
-        // if no template selected yet, select first template
-        if ( !that.inputElement.val() ){
-            that
-                .children()[0]
-                .trigger( 'select' );
-        }
+        //console.log( 'ts focus', e, tb.dom( that.inputElement[0] ) );
 
-        // focus on input field
-        that.inputElement.trigger( 'focus' );
+        that
+            .children()[0]
+            .trigger( 'activate' );
+
+        e.stopPropagation();
     }
 
 })();

@@ -39,14 +39,14 @@
       ]
     },
     {
-      "legend": "{Testto}",
       "fields": [
-        "TestRecipient"
+        "TemplateID"
       ]
     },
     {
+      "legend": "{Testto}",
       "fields": [
-        "TemplateID"
+        "TestRecipient"
       ]
     }
   ],
@@ -290,6 +290,37 @@
         }
       }
     },
+    "TemplateID": {
+      "name": "TemplateID",
+      "tagName": "input",
+      "tagAttributes": {
+        "name": "TemplateID"
+      },
+      "label": "{TemplateID}",
+      "demoapp.configuration.TemplateSelector": {},
+      "tb.ui.FieldValidator": {
+        "focus": {
+          "info": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "change": {
+          "info": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "blur": {
+          "error": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        },
+        "beforeSubmit": {
+          "error": {
+            "required": "Bitte wählen Sie ein Template aus"
+          }
+        }
+      }
+    },
     "TestRecipient": {
       "name": "TestRecipient",
       "tagName": "input",
@@ -319,37 +350,6 @@
         "beforeSubmit": {
           "error": {
             "email": ";"
-          }
-        }
-      }
-    },
-    "TemplateID": {
-      "name": "TemplateID",
-      "tagName": "input",
-      "tagAttributes": {
-        "name": "TemplateID"
-      },
-      "label": "{TemplateID}",
-      "demoapp.configuration.TemplateSelector": {},
-      "tb.ui.FieldValidator": {
-        "focus": {
-          "info": {
-            "required": "Bitte wählen Sie ein Template aus"
-          }
-        },
-        "change": {
-          "info": {
-            "required": "Bitte wählen Sie ein Template aus"
-          }
-        },
-        "blur": {
-          "error": {
-            "required": "Bitte wählen Sie ein Template aus"
-          }
-        },
-        "beforeSubmit": {
-          "error": {
-            "required": "Bitte wählen Sie ein Template aus"
           }
         }
       }

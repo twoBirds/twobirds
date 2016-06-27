@@ -10,8 +10,12 @@
     padding: 2rem 2rem;
     display: inline-block;
 
-    &.selectedTemplate {
+    &.selected {
       background-color: lightgrey;
+    }
+
+    &.active {
+      border: 1px solid black;
     }
 
     & > div {

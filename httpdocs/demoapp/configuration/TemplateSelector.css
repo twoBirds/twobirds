@@ -8,8 +8,10 @@
     max-width: 200px;
     padding: 2rem 2rem;
     display: inline-block; }
-    .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem.selectedTemplate {
+    .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem.selected {
       background-color: lightgrey; }
+    .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem.active {
+      border: 1px solid black; }
     .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem > div {
       text-overflow: ellipsis; }
 
