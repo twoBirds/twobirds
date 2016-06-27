@@ -8,7 +8,8 @@
   padding: 0.5rem 0;
   background-color: #3129a3;
   color: antiquewhite;
-  text-align: center; }
+  text-align: center;
+  font-size: 1.5rem; }
   .demoapp-footer > .demoapp-footer-content {
     overflow: hidden;
     max-width: 1040px;

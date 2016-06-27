@@ -8,12 +8,14 @@
   padding: 0.5rem 0;
   background-color: #3129a3;
   color: antiquewhite;
-  text-align: center; }
+  text-align: center;
+  font-size: 1.5rem; }
   .demoapp-header > .demoapp-header-content {
     overflow: hidden;
     max-width: 1040px;
     margin: 0 auto;
-    text-align: left; }
+    text-align: left;
+    font-size: 1rem; }
     .demoapp-header > .demoapp-header-content > :first-child {
       margin-left: 2.5rem; }
     .demoapp-header > .demoapp-header-content > :last-child {

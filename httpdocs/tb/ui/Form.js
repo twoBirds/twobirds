@@ -1027,9 +1027,24 @@
                 .empty()
                 .attr( that.config['tagAttributes'] || {} );
 
+            // show/hide fieldSet contents, callback
+            function toggleLegend( ev ){
+                if ( this.checked ){ // if checkbox checked
+                    tb.dom( that.target ) // show fields
+                        .children()
+                        .show();
+                } else {
+                    tb.dom( that.target ) // hide fields
+                        .children()
+                        .not( 'legend' )
+                        .hide();
+                }
+            }
+
             if ( !!that.config['legend'] ){
                 legend = that.target.appendChild( document.createElement( 'legend' ) );
 
+                // checkbox handling
                 tb.dom(
                     tb.dom( legend ) // the legend node
                         .html( that.config.legend ) // insert html
@@ -1038,20 +1053,12 @@
                         [0] // null or checkbox node
                 ).on( // implicit if not null
                     'click',
-                    function toogleLegend( ev ){
-                        if ( this.checked ){ // if checkbox checked
-                            tb.dom( that.target ) // show fields
-                                .children()
-                                .show();
-                        } else {
-                            tb.dom( that.target ) // hide fields
-                                .children()
-                                .not( 'legend' )
-                                .hide();
-                        }
+                    toggleLegend
+                ).forEach( // initially set show/hide according to checked state
+                    function( pCheckboxNode ){
+                        toggleLegend.apply( pCheckboxNode );
                     }
                 );
-
             }
 
             that.config.fields

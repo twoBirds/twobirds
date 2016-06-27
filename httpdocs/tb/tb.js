@@ -37,7 +37,11 @@ this.Element && function(ElementPrototype) {
 
 tb = (function(){
 
-    //private
+    // Variables
+    var regExReturn = /\r/g,
+        regExSpaces = /[\x20\t\r\n\f]+/g,
+        regExWord = /\S+/g,
+        regExHtml = /^<>$/g;
 
     /**
      * tb.dom() function
@@ -81,7 +85,9 @@ tb = (function(){
                         }
                     );
                     return;
-                } else if (pSelector instanceof Array || pSelector instanceof HTMLCollection ) {
+                } else if (pSelector instanceof Array
+                    || pSelector instanceof HTMLCollection
+                    || pSelector instanceof NodeList ) {
                     [].forEach.call(
                         pSelector,
                         function (pElement) {   // copy only DOM nodes
@@ -93,28 +99,39 @@ tb = (function(){
                     return;
                 } else if (typeof pSelector !== 'string') { // wrong selector type
                     return;
-                }
+                } else { // pSelector is a string
 
-                domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
+                    var DOM = _htmlToElements( pSelector );
 
-                pSelector
-                    .split( ',' )
-                    .forEach(
-                        function forEachTbDomSelector( pThisSelector ){
-                            nodeList = domNode.querySelectorAll(pSelector);
+                    if ( DOM.length === 1 && DOM[0].nodeType === 3 ){ // it is not an HTML string
 
-                            if (!!nodeList.length) {
-                                [].forEach.call(
-                                    nodeList,
-                                    function (domElement) {
-                                        that[that.length] = domElement;
-                                        that.length++;
+                        domNode = pDomNode && !!pDomNode['nodeType'] ? pDomNode : document;
+
+                        pSelector
+                            .split( ',' )
+                            .forEach(
+                                function forEachTbDomSelector( pThisSelector ){
+                                    nodeList = domNode.querySelectorAll(pSelector);
+
+                                    if (!!nodeList.length) {
+                                        [].forEach.call(
+                                            nodeList,
+                                            function (domElement) {
+                                                that[that.length] = domElement;
+                                                that.length++;
+                                            }
+                                        );
                                     }
-                                );
-                            }
 
-                        }
-                    );
+                                }
+                            );
+
+                    } else { // it is an HTML string
+
+                        return new dom( DOM );
+
+                    }
+                }
 
             };
 
@@ -145,6 +162,7 @@ tb = (function(){
                 add: add,
                 addClass: addClass,
                 append: append,
+                appendTo: appendTo,
                 attr: attr,
                 children: children,
                 empty: empty,
@@ -169,11 +187,6 @@ tb = (function(){
             };
 
             return new dom( pSelector, pDomNode );
-
-            var regExReturn = /\r/g,
-                regExSpaces = /[\x20\t\r\n\f]+/g,
-                regExWord = /\S+/g,
-                regExHtml = /^<?[^<]+>$/g;
 
             // INTERNAL ONLY Private Functions
             function _addEvent( pDomNode, pEventName, pHandler ) {
@@ -216,7 +229,7 @@ tb = (function(){
                     case 'string':
                         if ( !!regExHtml.match( pElement )['0'] ){
                             docFrag.innerHTML = pElement;
-                        } else if ( !!!!regExWord.match( pElement )['0'] ){
+                        } else if ( !!regExWord.match( pElement )['0'] ){
                             docFrag.appendChild( document.createElement( regExWord.match( pElement )[0] ) );
                         }
                         break;
@@ -230,20 +243,34 @@ tb = (function(){
                 return docFrag;
             }
 
+            function _htmlToElements(html) {
+                var template = document.createElement('template');
+                template.innerHTML = html;
+                return template.content.childNodes;
+            }
 
 
 
-            // Private Functions, exposed @todo: test
-            function append( pElement ){
+
+            // Private Functions, exposed
+            function appendTo( pElement ){
                 var that = this;
 
                 that.forEach(
                     function( pDomNode ){
                         if ( !!pDomNode.nodeType ){
+                            if ( !pElement.length ){
+                                pElement= [ pElement ];
+                            }
 
-                            pDomNode
-                                .appendChild( _create( pElement ).cloneNode(deep) );
-
+                            [].forEach.call(
+                                pElement,
+                                function( pThisElement ){
+                                    if ( !!pThisElement['nodeType'] ){
+                                        pThisElement.appendChild( pDomNode );
+                                    }
+                                }
+                            );
                         }
                     }
                 );
@@ -251,18 +278,42 @@ tb = (function(){
                 return that;
             }
 
-            function insertBefore( pElement ){
+            function append( pElement ){
                 var that = this;
 
                 that.forEach(
                     function( pDomNode ){
                         if ( !!pDomNode.nodeType ){
+                            if ( !pElement.length ){
+                                pElement= [ pElement ];
+                            }
 
-                            pDomNode
-                                .parentElement
+                            [].forEach.call(
+                                pElement,
+                                function( pThisElement ){
+                                    if ( !!pThisElement['nodeType'] ){
+                                        pDomNode.appendChild( pThisElement );
+                                    }
+                                }
+                            );
+                        }
+                    }
+                );
+
+                return that;
+            }
+
+            function insertBefore( pTarget ){
+                var that = this;
+
+                that.forEach(
+                    function( pDomNode ){
+                        if ( !!pDomNode.nodeType && !!pTarget.nodeType ){
+
+                            pTarget.parentElement
                                 .insertBefore(
-                                    _create( pElement ).cloneNode(deep),
-                                    pDomNode
+                                    pDomNode.cloneNode( true ),
+                                    pTarget
                                 );
 
                         }
@@ -273,23 +324,26 @@ tb = (function(){
             }
 
             function insertAfter( pElement ){
-                var that = this;
+                var that = this,
+                    nextDomNode = pElement.nextSibling || false;
 
                 that.forEach(
                     function( pDomNode ){
                         if ( !!pDomNode.nodeType ){
 
-                            if ( pDomNode.nextSibling ){
-                                pDomNode
+                            if ( nextDomNode ){
+                                pElement
                                     .parentElement
                                     .insertBefore(
-                                        _create( pElement ).cloneNode(deep),
-                                        pDomNode.nextSibling
+                                        pDomNode.cloneNode( true ),
+                                        nextDomNode
                                     );
                             } else {
-                                pDomNode
+                                pElement
                                     .parentElement
-                                    .appendChild( _create( pElement ).cloneNode(deep) );
+                                    .appendChild(
+                                        pDomNode.cloneNode( true )
+                                    );
                             }
 
                         }
@@ -994,24 +1048,16 @@ tb = (function(){
                     .split(',')
                     .forEach(
                         function( pThisSelector ){
-                            tb.dom( pSelector )
+                            tb.dom( pThisSelector )
                                 .filter('[data-tb]')
-                                .filter(
+                                .forEach(
                                     function ( pDomNode ) {
-
-                                        var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
-
-                                        if ( !!namespaces['0'] ) {
-                                            namespaces.forEach(
-                                                function (pNamespace) {
-                                                    if ( !!pDomNode[pNamespace]
-                                                        && pDomNode[pNamespace] instanceof tb
-                                                    ) {
-                                                        tbElements.push(pDomNode[pNamespace]);
-                                                    }
+                                        for ( var i in pDomNode )
+                                            if ( pDomNode.hasOwnProperty( i ) ){
+                                                if ( pDomNode[i] instanceof tb ){
+                                                    tbElements.push(pDomNode[i]);
                                                 }
-                                            );
-                                        }
+                                            }
                                     }
                                 );
                         }
@@ -1024,44 +1070,33 @@ tb = (function(){
                 if ( pSelector instanceof RegExp ){ // it is a regular expression
 
                     tb.dom( '[data-tb]' )
-                        .map(
+                        .forEach(
                             function ( pDomNode ) {
-
-                                var namespaces = pDomNode.getAttribute( 'data-tb' ).split( ' ' );
-
-                                if ( !!namespaces['0'] ){
-                                    namespaces.forEach(
-                                        function( pNamespace ){
-                                            if ( !!pNamespace.match(pSelector) && !!pDomNode[pNamespace] ){
-                                                tbElements.push( pDomNode[ pNamespace ] );
-                                            }
+                                for ( var i in pDomNode )
+                                    if ( pDomNode.hasOwnProperty( i ) ){
+                                        if ( pDomNode[i] instanceof tb
+                                            && !!pNamespace.match(pSelector)
+                                        ){
+                                            tbElements.push(pDomNode[i]);
                                         }
-                                    );
-                                }
+                                    }
 
                             }
                         );
 
                 } else if ( !!pSelector['nodeType'] ){ // it is a dom node
-
                     tb.dom( pSelector )
-                        .map(
+                        .forEach(
                             function ( pDomNode ) {
-
-                                var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
-
-                                if ( !!namespaces['0'] ) {
-                                    namespaces.forEach(
-                                        function (pNamespace) {
-                                            if ( pNamespace.match(pSelector)
-                                                && !!pDomNode[pNamespace]
-                                                && !!pDomNode[pNamespace] instanceof tb
-                                            ){
-                                                tbElements.push(pDomNode[pNamespace]);
-                                            }
+                                for ( var i in pDomNode ) {
+                                    //console.log('tb property', i, pDomNode.hasOwnProperty(i) );
+                                    if (pDomNode.hasOwnProperty(i)) {
+                                        //console.log('tb own property', i, pDomNode[i] instanceof tb, pDomNode[i]);
+                                        if ( pDomNode[i] instanceof tb
+                                        ) {
+                                            tbElements.push(pDomNode[i]);
                                         }
-                                    );
-
+                                    }
                                 }
                             }
                         );
@@ -1077,29 +1112,22 @@ tb = (function(){
                 tb.dom( '[data-tb]' )
                     .map(
                         function ( pDomNode ) {
-
-                            var namespaces = pDomNode.getAttribute( 'data-tb').split( ' ' );
-
-                            if ( !!namespaces['0'] ) {
-                                namespaces.forEach(
-                                    function( pNamespace ){
-                                        if ( !!pDomNode[pNamespace]
-                                            && pDomNode[pNamespace] instanceof tb
-                                            && pDomNode[pNamespace] instanceof pSelector
-                                        ){
-                                            tbElements.push( pDomNode[pNamespace] );
-                                        }
+                            for ( var i in pDomNode )
+                                if ( pDomNode.hasOwnProperty( i ) ){
+                                    if ( pDomNode[i] instanceof tb
+                                        && pDomNode[i] instanceof pSelector
+                                    ){
+                                        tbElements.push(pDomNode[i]);
                                     }
-                                );
-                            }
-
+                                }
                         }
                     );
 
                 break;
         }
+
         // add all tb instances from dom into selector
-        tbElements.map(
+        tbElements.forEach(
             function ( pTbObject ) {
                 [].push.call( that, pTbObject );
             }
@@ -1305,7 +1333,7 @@ tb = (function(){
                     // trigger init directly if no requirement array
                     if ( !tbInstance['tb.require'] ) {
                         tbInstance.trigger( 'init' );
-                    } // otherwise tb.require will trigger it
+                    } // otherwise tb.require will trigger 'init'
 
                     // add property declared classes (prop contains ".") as tb objects
                     for ( var key in tbInstance ) {
@@ -1527,11 +1555,16 @@ tb = (function(){
                                     && !tbEvent.__immediateStopped__
                                     && !!handler
                                 ){
-                                    try{
-                                        handler.apply(that, [tbEvent]);
-                                    } catch (e){
-                                        console.error(e);
-                                    }
+                                    setTimeout(
+                                        function(){
+                                            try{
+                                                handler.apply(that, [tbEvent]);
+                                            } catch (e){
+                                                console.error(e);
+                                            }
+                                        }
+                                        ,0
+                                    );
 
                                     if ( !handler.once ) {
                                         temp.push( handler );
@@ -1563,7 +1596,8 @@ tb = (function(){
                                     var tbObject = tbObject.parent()[0] || false;
 
                                     if ( !!tbObject['handlers']
-                                        &&tbObject.handlers[ tbEvent.name ]
+                                        && !tbEvent.__stopped__
+                                        && tbObject.handlers[ tbEvent.name ]
                                     ){
                                         tbObject.trigger( tbEvent );
                                     }
@@ -1574,7 +1608,7 @@ tb = (function(){
                             if ( tbEvent.bubble.indexOf('d') > -1 ){
                                 tbEvent.bubble += tbEvent.bubble.indexOf('l') === -1 ? 'l' : '';
                                 [].map.call(
-                                    that.children().toArray(),
+                                    that.children(),
                                     function( tbObject ){
                                         if ( tbObject.handlers[ tbEvent.name ] ){
                                             tbObject.trigger(
@@ -1683,8 +1717,7 @@ tb = (function(){
             parent: function( pSelector ){
 
                 var that = this,
-                    ret = tb(),
-                    result = [];
+                    ret = tb();
 
                 if ( that instanceof TbSelector ) {
 
@@ -1696,7 +1729,7 @@ tb = (function(){
 
                     if ( !!that.target['nodeType'] ) { // tb object resides in DOM
 
-                        var tbParent = that.parents()['0'] || false;
+                        var tbParent = that.parents()[0] || false;
 
                         if ( !tbParent ){
 
@@ -1799,7 +1832,8 @@ tb = (function(){
             children: function( pSelector, pLocalOnly ){
 
                 var that = this,
-                    ret = tb( ''); // empty tb selector object
+                    ret = tb(''),
+                    compare = !!pSelector ? tb( pSelector ) : true;
 
                 if ( that instanceof TbSelector ) {
 
@@ -1808,9 +1842,11 @@ tb = (function(){
                 } else if ( that instanceof tb && !!that.target['nodeType'] && !pLocalOnly ) { // it must be a native tb object
 
                     tb.dom( '[data-tb]', that.target )
-                        .map(
+                        .forEach(
                             function( pDomNode ) {
-                                if ( tb( pDomNode ).parent()[0].target === that.target ){
+                                if ( ( compare || -1 < compare.indexOf( pDomNode ) )
+                                    && tb( pDomNode ).parent()[0].target === that.target
+                                ){
                                     for ( var i in pDomNode ){
                                         if ( pDomNode.hasOwnProperty(i) && pDomNode[i] instanceof tb ){
                                             [].push.call( ret, pDomNode[i] ); // push tb object to tb selector content
@@ -2000,7 +2036,7 @@ tb = (function(){
             filter: function( pSelector ){
 
                 var that = this,
-                    compare = tb( pSelector ).toArray(), // object array to check against
+                    compare = tb( pSelector ), // object array to check against
                     ret = tb();
 
                 if ( !pSelector ) {
@@ -2008,16 +2044,16 @@ tb = (function(){
                 }
 
                 if ( that instanceof TbSelector ) {
-                    [].map.call(
-                        tb.dom().toArray.call( that ),     // convert these results to true array
+                    [].forEach.call(
+                        that,
                         function( tbObject ) {
-                            if ( [].indexOf.call( compare, tbObject ) > -1 ){
+                            if ( -1 < [].indexOf.call( compare, tbObject ) ){
                                 [].push.call( ret, tbObject );
                             }
                         }
                     );
                 } else if ( that instanceof tb ){
-                    if ( compare.indexOf( that ) > -1 ){
+                    if ( -1 < [].indexOf.call( compare, that ) ){
                         [].push.call( ret, that );
                     }
                 }
@@ -2822,7 +2858,10 @@ tb.extend = function( pObj ){ // any number of arguments may be given
             .keys(cp)
             .forEach(
                 function(key) {
-                    if ( (cp[key]).constructor === Object ){
+                    if ( cp[key] !== null
+                        && !!cp[key][constructor]
+                        && (cp[key]).constructor === Object
+                    ){
                         pObj[key] = tb.extend( pObj[key] || {}, cp[key] );
                     } else {
                         pObj[key] = cp[key];
@@ -2854,7 +2893,7 @@ tb.extend = function( pObj ){ // any number of arguments may be given
 tb.parse = function( pWhat, pParse ){
 
     if ( typeof pWhat === 'string' ){
-        var vars = pWhat.match( /\{[^\{\}]*\}/ );
+        var vars = pWhat.match( /\{[^\{\}]*\}/g );
 
         if ( !!vars ) {
             vars
@@ -3041,7 +3080,7 @@ tb.parse = function( pWhat, pParse ){
 
         }
 
-    };
+    }
 
     _Requirement.prototype = {
         namespace: '_Requirement'

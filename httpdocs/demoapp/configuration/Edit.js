@@ -139,7 +139,7 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
             data = that.configurationModel.data(),
             title = !!data ? messages['edit configuration'] : messages['create configuration'],
             formData;
-
+        
         // form configuration object
         formConfig = tb.loader.get('/demoapp/configuration/mock/demoapp-configuration-editFormConfig.json');
         formConfig.model = that.configurationModel;

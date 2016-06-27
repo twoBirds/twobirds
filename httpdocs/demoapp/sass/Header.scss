@@ -9,12 +9,14 @@
   background-color: hsl(244, 60%, 40%);
   color: antiquewhite;
   text-align: center;
+  font-size: 1.5rem;
 
   > .demoapp-header-content {
     overflow: hidden;
     max-width: 1040px;
     margin: 0 auto;
     text-align: left;
+    font-size: 1rem;
 
     > :first-child {
       margin-left: 2.5rem;

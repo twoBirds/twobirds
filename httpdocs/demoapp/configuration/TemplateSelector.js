@@ -40,8 +40,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
         that.template =
             '<div>{TemplateName}</div>'
-            + '<div>{ModifiedDate}</div>'
-            + '<image src="/{TemplatePreviewImagePath}" />';
+            + '<div>{TemplateUpdateDate}</div>'
+            + '<image src="{TemplatePreviewImagePath}" />';
 
         that.handlers = {
             // doesnt need init()
@@ -93,7 +93,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             html = tb.parse( that.template, that.config );
 
         tb.dom( that.target )
-            .append( html )
+            .append( tb.dom( html ) );
+
+        tb.dom( that.target )
             .on(
                 'click',
                 function( ev ){
@@ -117,23 +119,20 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
     function select(){
 
         var that = this,
-            target = tb.dom( that.target );
+            ts = that.config.templateSelector;
 
         // set selected item in TemplateSelector
-        that.config.templateSelector.selectedItem = that;
+        ts.selectedItem = that.config.TemplateID;
 
         // put selected template id in input field
-        that.config.templateSelector.target
-            .val( that.config.TemplateID )
-            .trigger( 'change' );
+        ts.inputElement
+            .val( that.config.TemplateID );
 
-        // on all of these items, trigger 'onSelect'
-        that
-            .parent()
+        that.config.templateSelector
             .trigger(
                 'onSelect',
                 that.config.TemplateID,
-                'd' // not local, bubble down to children
+                'd'
             );
 
     }
@@ -157,13 +156,13 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
         if ( id === that.config.TemplateID ){
             target.addClass( 'selectedTemplate active' );
 
-            // scrollto active element
-            position = target[0]
-                    .offsetTop
-                - outerContainer.offsetTop
-                - outerContainer.scrollTop;
+            console.log( 'onSelect', id, target[0].offsetTop, outerContainer.offsetTop, outerContainer.scrollTop );
 
-            // console.log( 'tS scrollTo', position );
+            // scrollto active element
+            position = target[0].offsetTop
+                - outerContainer.offsetTop;
+
+            console.log( 'tS scrollTo', position );
 
             outerContainer.scrollTop =  position;
         }
@@ -178,152 +177,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
 // CLASS TemplateSelector CLASS
 tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
-
-    // VARIABLES
-    var messages = {
-    };
-
-    // PRIVATE FUNCTIONS
-    /**
-    @for demoapp.configuration.TemplateSelector
-     */
-
-
-    /**
-    init handler
-
-    @event init
-    @param e
-     */
-    function init(){
-
-        var that = this,
-            docFrag;
-
-        // put a link to the validator in the data-tb attribute to aid in debugging
-        var dataTb = tb.dom( that.target.target ).attr('data-tb').split(' ');
-
-        dataTb.push( that.namespace );
-
-        tb.dom( that.target.target ).attr('data-tb',
-            dataTb.join(' ')
-        );
-
-        // set target to parent element target, that is the DOM node
-        that.target = that.target.target;
-
-        // append DIV tag after input tag
-        that.outerContainer = document.createDocumentFragment();
-        that.outerContainer.innerHTML = '<div><div /></div>';
-        that.target.appendChild( that.outerContainer );
-        that.content = that.outerContainer.childNodes[0];
-        
-    }
-
-    /**
-    render function, both used in handlers and as a method
-
-    @event render
-     */
-    function render(){
-
-        var that = this,
-            data = that.templatesModel.data(),
-            target = that.target;
-
-        // render template items
-        data.forEach(
-            function( value ) {
-                new tb(
-                    demoapp.configuration.TemplateSelectorItem,
-                    tb.extend(
-                        {}, // make this a copy
-                        value, // the config data
-                        {   // extend: templateSelector
-                            templateSelector: that
-                        }
-                    ),
-                    that.content.append( document.createElement('span') )
-                ).render(); // we can render right away
-            }
-        );
-
-        // append keypress handlers ( ArrowDown, ArrowUp, Return)
-        tb.dom( target )
-            .on(
-                'keypress',
-                function( ev ) {
-                    // console.log( 'key', ev.keyCode );
-                    switch ( ev.keyCode ){
-                        case 13:
-
-                            ev.keyCode = 7; // change to tab keyCode and hand over to leave field
-                            ev.key = 'Tab';
-
-                            break;
-                        case 37:
-
-                            var selectedItem = that.selectedItem;
-
-                            selectedItem
-                                .prev()
-                                .is(  tb.ui.TemplateSelectorItem  )
-                                .trigger( 'select' );
-
-                            ev.preventDefault();
-                            break;
-
-                        case 39:
-
-                            var selectedItem = that.selectedItem;
-
-                            selectedItem
-                                .next()
-                                .is(  tb.ui.TemplateSelectorItem  )
-                                .trigger( 'select' );
-
-                            ev.preventDefault();
-                            break;
-                    }
-                }
-            )
-            .one( // we only need this once, since we cannot 'unselect' a template
-                'focus',
-                function(){
-                    that.trigger( 'focus' );
-                }
-            )
-            .on(
-                'blur',
-                function(){
-                    $target.removeClass( 'selectedTemplate active' );
-                }
-
-        );
-    }
-
-    /**
-     focus handler
-
-     @event focus
-     @param e
-     */
-    function focus(){
-
-        var that = this,
-            target = tb.dom( that.target );
-
-        // if no template selected yet, select first template
-        if ( !target.val() ){
-            that
-                .parent() // Field
-                .children( demoapp.configuration.TemplateSelectorItem )[0]
-                .trigger( 'select' );
-        }
-
-        // focus on input field
-        target.focus();
-    }
 
     /**
     TemplateSelector constructor
@@ -382,34 +235,27 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
         */
         that.handlers = {
-            init: init,
-            render: render,
-            focus: focus
-        }
+            init,
+            render,
+            focus
+        };
 
         // templates crud model
         that.templatesModel = new tb.Model({
             'read': {
-                url: '/demoapp/configuration/mock/demoapp-configuration-templates.mock.json', // mock data
+                url: '/demoapp/configuration/mock/demoapp-configuration-templates.json', // mock data
                 method: 'GET',
+                type: 'json',
                 params: {
                 },
                 success: function( pResult ){
-                    // put new data into observable
-                    that.templatesModel.data( pResult.data );
+                    that.templatesModel.data( JSON.parse( pResult.text ).data );
+                },
+                error: function( pResult ){
+                    console.log( 'an error occured', pResult );
                 }
             }
         });
-
-        // when template list data has been read, render
-        that.templatesModel.data.observe(
-            function(){
-                that.trigger( 'render' );
-            }
-        );
-
-        // read data
-        that.templatesModel.read();
 
     };
 
@@ -437,5 +283,163 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     };
 
     return TemplateSelector;
+
+    // PRIVATE FUNCTIONS
+    /**
+     @for demoapp.configuration.TemplateSelector
+     */
+
+
+    /**
+     init handler
+
+     @event init
+     @param e
+     */
+    function init(){
+
+        var that = this,
+            inputElement = that.target.inputElement;
+
+        that.inputElement = inputElement;
+
+        // append DIV tag after input tag
+        tb.dom( '<div><div /></div>' )
+            .insertAfter( inputElement[0] );
+
+        // hide original input field
+        inputElement
+            .attr({ // hide original input DOM node
+                'type': 'hidden'
+            });
+
+        // set target
+        that.target = inputElement[0].nextSibling;
+
+        // add the selector instance to the dom node
+        that.target['demoapp.configuration.TemplateSelector'] = that;
+
+        // put a link to the validator in the data-tb attribute to aid in debugging
+        tb.dom( that.target ).attr( 'data-tb', that.namespace );
+
+        // append domNode class
+        tb.dom( that.target ).addClass( 'demoapp-configuration-templateselector' );
+
+        that.outerContainer = that.target;
+        that.content = that.outerContainer.childNodes[0];
+
+        // when template list data has been read, render
+        that.templatesModel.data.observe( function templateModelDataChanged(){
+            that.trigger( 'render' );
+        });
+
+        // read data
+        that.templatesModel.read();
+
+    }
+
+    /**
+     render function, both used in handlers and as a method
+
+     @event render
+     */
+    function render(){
+
+        var that = this,
+            data = that.templatesModel.data(),
+            target = that.target;
+
+        // render template items
+        data.forEach(
+            function( pConfig ) {
+                new tb(
+                    demoapp.configuration.TemplateSelectorItem,
+                    tb.extend(
+                        {}, // make this a copy
+                        pConfig, // the config data
+                        {   // extend: templateSelector
+                            templateSelector: that
+                        }
+                    ),
+                    that.content.appendChild( document.createElement('span') )
+                ).render(); // we can render right away
+            }
+        );
+
+        // append keypress handlers ( ArrowDown, ArrowUp, Return)
+        tb.dom( target )
+            .on(
+                'keypress',
+                function( ev ) {
+                    // console.log( 'key', ev.keyCode );
+                    switch ( ev.keyCode ){
+                        case 13:
+
+                            ev.keyCode = 7; // change to tab keyCode and hand over to leave field
+                            ev.key = 'Tab';
+
+                            break;
+                        case 37:
+
+                            var selectedItem = that.selectedItem;
+
+                            selectedItem
+                                .prev()
+                                .is(  tb.ui.TemplateSelectorItem  )
+                                .trigger( 'select' );
+
+                            ev.preventDefault();
+                            break;
+
+                        case 39:
+
+                            var selectedItem = that.selectedItem;
+
+                            selectedItem
+                                .next()
+                                .is(  tb.ui.TemplateSelectorItem  )
+                                .trigger( 'select' );
+
+                            ev.preventDefault();
+                            break;
+                    }
+                }
+            )
+            .one( // we only need this once, since we cannot 'unselect' a template
+                'focus',
+                function(){
+                    that.trigger( 'focus' );
+                }
+            )
+            .on(
+                'blur',
+                function(){
+                    $target.removeClass( 'selectedTemplate active' );
+                }
+
+            );
+    }
+
+    /**
+     focus handler
+
+     @event focus
+     @param e
+     */
+    function focus(){
+
+        var that = this,
+            selectedItem = that.selectedItem || false;
+
+        // if no template selected yet, select first template
+        if ( !that.inputElement.val() ){
+            that
+                .children( demoapp.configuration.TemplateSelectorItem )[0]
+                .trigger( 'select' );
+        }
+
+        // focus on input field
+        that.inputElement.trigger( 'focus' );
+    }
 
 })();

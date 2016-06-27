@@ -1,0 +1,67 @@
+{
+
+    "status": 1,
+
+    "transport": {
+        "url": "/newsletter/configuration/ajax-fetch-data",
+        "urlParams": {
+        }
+    },
+
+    "method": "GET",
+
+    "header": {
+    },
+
+    "params": {
+
+        "POST": {
+        },
+
+        "GET": {
+        }
+
+    },
+
+    "data": [
+        {
+            "TemplateID": "1",
+            "TemplateName": "Sample 1",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        },
+        {
+            "TemplateID": "2",
+            "TemplateName": "Sample 2",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        },
+        {
+            "TemplateID": "3",
+            "TemplateName": "Sample 3",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        },
+        {
+            "TemplateID": "4",
+            "TemplateName": "Sample 4",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        },
+        {
+            "TemplateID": "5",
+            "TemplateName": "Sample 5",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        },
+        {
+            "TemplateID": "6",
+            "TemplateName": "Sample 6",
+            "TemplatePreviewImagePath": "/demoapp/configuration/img/image.png",
+            "TemplateUpdateDate": "12.12.2015"
+        }
+    ],
+
+    "message": "...optional..."
+
+}

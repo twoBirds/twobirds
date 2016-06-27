@@ -1,21 +1,16 @@
-.nl-ui-templateselector[name="TemplateID"] {
-  max-height: 0 !important;
-  border: 0 none !important;
-  padding: 0 !important; }
-
-.nl-ui-templateselector[name="TemplateID"] + div {
+.demoapp-configuration-templateselector {
   clear: both;
   height: 280px !important;
   overflow: hidden;
   overflow-y: auto; }
-  .nl-ui-templateselector[name="TemplateID"] + div .nl-ui-templateselectoritem {
+  .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem {
     font-size: 0.9rem;
     max-width: 200px;
     padding: 2rem 2rem;
     display: inline-block; }
-    .nl-ui-templateselector[name="TemplateID"] + div .nl-ui-templateselectoritem.selectedTemplate {
+    .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem.selectedTemplate {
       background-color: lightgrey; }
-    .nl-ui-templateselector[name="TemplateID"] + div .nl-ui-templateselectoritem > div {
+    .demoapp-configuration-templateselector .demoapp-configuration-templateselectoritem > div {
       text-overflow: ellipsis; }
 
 /*# sourceMappingURL=TemplateSelector.css.map */
