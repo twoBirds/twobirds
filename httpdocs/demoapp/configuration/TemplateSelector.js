@@ -43,16 +43,13 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             + '<div>{TemplateUpdateDate}</div>'
             + '<image src="{TemplatePreviewImagePath}" />';
 
-        that.handlers = {
-            // doesnt need init()
+        that.handlers = { // doesnt need init()
             render: render,
-            select: select,
             onSelect: onSelect,
-            activate: activate,
             onActivate: onActivate
         }
 
-    };
+    }
 
     // prototype
     TemplateSelectorItem.prototype = {
@@ -120,7 +117,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
             );
 
         if ( that.config.TemplateID === that.config.templateSelector.inputElement.val() ){
-            that.trigger( 'select' );
+            that.select();
         }
 
     }
@@ -134,6 +131,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
         var that = this,
             ts = that.config.templateSelector;
+
+        console.log('activate()', that.namespace, that);
 
         // set active item in TemplateSelector
         ts.activeItem = that;
@@ -153,10 +152,10 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
      @event onActivate
      */
-    function onActivate( ev ){
+    function onActivate( e ){
 
         var that = this,
-            id = ev.data,
+            id = e.data,
             target = tb.dom( that.target ),
             templateSelector =  that.config.templateSelector,
             outerContainer = templateSelector.outerContainer,
@@ -186,6 +185,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
         var that = this,
             ts = that.config.templateSelector;
 
+        console.log('select()', that.namespace, that);
+
         // set selected item in TemplateSelector
         ts.selectedItem = that;
 
@@ -208,10 +209,10 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
      @event onSelect
      */
-    function onSelect( ev ){
+    function onSelect( e ){
 
         var that = this,
-            id = ev.data,
+            id = e.data,
             target = tb.dom( that.target );
 
         target.removeClass( 'selected' );
@@ -417,7 +418,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
                 if ( !!selectedId && selectedId === pConfig.TemplateId ){
                     console.log( 'set selected item', selectedId );
-                    templateSelectorItem.trigger( 'select', selectedId );
+                    templateSelectorItem.select();
                     that.activeItem = selectedId;
                 }
             }
@@ -427,8 +428,8 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
         if ( !selectedId ){
             that
                 .children()[0]
-                .trigger( 'activate' )
-                .trigger( 'select' );
+                .activate()
+                .select();
         }
 
 
@@ -445,24 +446,27 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
                         case 13:
 
                             that.activeItem
-                                .trigger( 'select' );
+                                .select();
 
                             ev.preventDefault();
                             break;
                         case 37:
+                            var prevItem = that.activeItem.prev();
 
-                            that.activeItem
-                                .prev()
-                                .trigger( 'activate' );
+                            if ( !!prevItem[0] ){
+                                prevItem[0].activate();
+                            }
 
                             ev.preventDefault();
                             break;
 
                         case 39:
 
-                            that.activeItem
-                                .next()
-                                .trigger( 'activate' );
+                            var nextItem = that.activeItem.next();
+
+                            if ( !!nextItem[0] ){
+                                nextItem[0].activate();
+                            }
 
                             ev.preventDefault();
                             break;
@@ -489,11 +493,11 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     function focus(e){
         var that = this;
 
-        //console.log( 'ts focus', e, tb.dom( that.inputElement[0] ) );
+        console.log( 'ts focus', e, tb.dom( that.inputElement[0] ) );
 
         that
             .children()[0]
-            .trigger( 'activate' );
+            .activate();
 
         e.stopPropagation();
     }
