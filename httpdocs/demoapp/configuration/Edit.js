@@ -167,7 +167,7 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
         }
 
         // now create the form
-        form = new tb(
+        new tb(
             'tb.ui.Form',
             formData,
             that.target.appendChild( document.createElement('form') )

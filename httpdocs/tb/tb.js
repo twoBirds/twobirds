@@ -379,6 +379,7 @@ tb = (function(){
                     }
                 );
 
+                return that;
             }
 
             function on( pEventName, pHandler ){

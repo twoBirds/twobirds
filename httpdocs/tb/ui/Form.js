@@ -831,7 +831,7 @@
                 that.target.appendChild( that.inputElement[0] );
 
                 // attach native event
-                tb.dom( that.inputElement[0] )
+                that.inputElement
                     .on(
                         'focus',
                         function(){
@@ -850,7 +850,7 @@
             that.target.appendChild(that.messageElement[0]);
 
             // keyhandler for direction
-            tb.dom( that.inputElement[0] )
+            that.inputElement
                 .on(
                     'keypress',
                     function( ev ){
@@ -864,15 +864,17 @@
 
                         if ( !!that.direction ){
                             if ( that.direction === 'next' && that.nextField ){
+                                //console.log( 'tb.ui.Field:next()', that.nextField, tb.dom(that.nextField.target) );
                                 that.nextField.trigger( 'focus' );
                             } else if ( that.direction === 'prev' && that.prevField ){
+                                //console.log( 'tb.ui.Field:prev()', that.prevField );
                                 that.prevField.trigger( 'focus' );
                             }
                         }
 
+                        ev.stopPropagation();
                     }
                 );
-
 
             // if masked input field -> hide alltogether
             if (tb.namespace('input.type', false, config) === 'hidden') {
@@ -887,7 +889,7 @@
                     });
             } else {
                 // set previous and next field
-                if ( prevField ){
+                if ( prevField ){ // closure - global in file context
                     that.prevField = prevField; // my prev field from global var
                     that.prevField.nextField = that; // this one is the next field in the previous one
                 } else {
@@ -923,7 +925,9 @@
         function focus() {
             var that = this;
 
+            //console.log( 'field:focus', that.inputElement );
             that.scrollTo();
+            that.inputElement[0].focus();
         }
 
         /**
@@ -1104,7 +1108,7 @@
             var that = this; // for minification purposes
 
             // reset global vars since new form is being constructed
-            prevField = nextField = false;
+            prevField = false;
 
             that.config = pConfig;
 

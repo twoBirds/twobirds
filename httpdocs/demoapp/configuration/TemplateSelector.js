@@ -26,7 +26,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
                 TemplateID: '1',
                 TemplatePreviewImagePath: '/img/image.png',
                 TemplateUpdateDate: '12.12.2015',
-                $TemplateInput: <jquery: parent input tag, contains template id>
+                TemplateSelector: <templateSelector instance>
             },
             target.appendChild( document.createElement( 'span' ) )                    // DOM node to insert the object item
          );
@@ -36,16 +36,43 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
         var that = this;
 
-        that.config = pConfig;
+        /**
+         configuration as given in constructor parameter pConfig
 
+         @property config
+         @type object
+         */
+         that.config = pConfig;
+
+        /**
+         template string, later parsed with data and added to DOM
+
+         @property template
+         @type string
+         */
         that.template =
             '<div>{TemplateName}</div>'
             + '<div>{TemplateUpdateDate}</div>'
             + '<image src="{TemplatePreviewImagePath}" />';
 
+        /**
+         event handlers object: key = event name, value = event handler function
+
+         @property handlers
+         @type object
+         */
         that.handlers = { // doesnt need init()
-            render: render,
+            /**
+             onSelect handler
+
+             @event onSelect
+             */
             onSelect: onSelect,
+            /**
+             onActivate handler
+
+             @event onActivate
+             */
             onActivate: onActivate
         }
 
@@ -88,11 +115,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
     return TemplateSelectorItem;
 
     
-    /**
-     render method
-
-     @method render
-     */
     function render(){
 
         var that = this,
@@ -122,17 +144,12 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
     }
 
-    /**
-     activate method
-
-     @method select
-     */
     function activate(){
 
         var that = this,
             ts = that.config.templateSelector;
 
-        console.log('activate()', that.namespace, that);
+        //console.log('activate()', that.namespace, that);
 
         // set active item in TemplateSelector
         ts.activeItem = that;
@@ -147,11 +164,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
         return that;
     }
 
-    /**
-     onActivate handler
-
-     @event onActivate
-     */
     function onActivate( e ){
 
         var that = this,
@@ -175,17 +187,12 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
     }
 
-    /**
-     select method
-
-     @method select
-     */
     function select(){
 
         var that = this,
             ts = that.config.templateSelector;
 
-        console.log('select()', that.namespace, that);
+        //console.log('select()', that.namespace, that);
 
         // set selected item in TemplateSelector
         ts.selectedItem = that;
@@ -204,11 +211,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
         return that;
     }
 
-    /**
-     onSelect handler
-
-     @event onSelect
-     */
     function onSelect( e ){
 
         var that = this,
@@ -233,30 +235,29 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     /**
-    TemplateSelector constructor
+     @for demoapp.configuration.TemplateSelector
+     */
 
-    @class TemplateSelector
-    @constructor
+    /**
+     TemplateSelector constructor
 
-    @param pConfig
+     @class TemplateSelector
+     @constructor
 
-     new tb(
-         nl.configuration.TemplateSelector,
-         {
-             TemplateID: '1',
-             TemplatePreviewImagePath: '/img/image.png',
-             TemplateUpdateDate: '12.12.2015',
-             TemplateInput: input tag
-         },
-         $( '<span />' ).appendTo( <someContainerNodeInDOM> )
-     );
+     @param pConfig
+
+     @example
+
+         new tb(
+             nl.configuration.TemplateSelector,
+             {}, // no config needed
+             <input type="text"> DOM node
+         );
 
      */
-    var TemplateSelector = function( pConfig ){
+    var TemplateSelector = function(){
 
         var that = this;
-
-        that.config = pConfig;
 
         /**
         event handlers of this instance at creation time
@@ -267,7 +268,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
         @example
 
             // in constructor
-            <instance>.handlers = { <event name>: <function name> }
+            <instance>.handlers = {
+                <event name>: <function name>
+            }
 
 
 
@@ -275,7 +278,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
             // define handler function
             var fct = function( ev ){
-            // ....your operations
+                // ....your operations
             }
 
             <instance>.on( <event name>, fct ); // permanent handler
@@ -289,8 +292,24 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
         */
         that.handlers = {
+            /**
+             init handler
+
+             @event init
+             @param e
+             */
             init,
+            /**
+             render handler
+
+             @event render
+             */
             render,
+            /**
+             focus handler
+
+             @event focus
+             */
             focus
         };
 
@@ -339,17 +358,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     return TemplateSelector;
 
     // PRIVATE FUNCTIONS
-    /**
-     @for demoapp.configuration.TemplateSelector
-     */
 
-
-    /**
-     init handler
-
-     @event init
-     @param e
-     */
     function init(){
 
         var that = this,
@@ -390,11 +399,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     }
 
-    /**
-     render handler
-
-     @event render
-     */
     function render(){
 
         var that = this,
@@ -482,6 +486,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
             .on(
                 'blur',
                 function(){
+                    //console.log( 'inputfield blur' );
                     tb.dom( 'span.active', that.target )
                         .removeClass( 'active' );
                 }
@@ -489,19 +494,22 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     }
 
-    /**
-     focus handler
-
-     @event focus
-     */
     function focus(){
         var that = this;
 
-        that
-            .children()[0]
-            .activate();
+        if ( !that['activeItem'] ){
+            that
+                .children()[0]
+                .activate();
+        } else {
+            that.activeItem
+                .activate()
+        }
 
-        e.stopPropagation();
+        console.log(that.parents( tb.ui.field )[0]);
+        that
+            .parents( tb.ui.field )[0]
+            .inputElement[0].focus();
     }
 
 })();

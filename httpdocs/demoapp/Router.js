@@ -1,15 +1,19 @@
 /**
- * @namespace in3
+ @namespace demoapp
  */
 tb.namespace( 'demoapp', true ).Router = (function(){
 
     /**
-     * Router constructor
-     *
-     * @class Router
-     * @constructor
-     *
-     * @param pConfig
+     @for demoapp.Router
+     */
+
+    /**
+     Router constructor
+
+     @class Router
+     @constructor
+
+     @param pConfig
      */
     var Router = function( pFunction ){
         // var
@@ -17,16 +21,21 @@ tb.namespace( 'demoapp', true ).Router = (function(){
             route = window.location.pathname;
 
         /**
-         * event handlers of this instance at creation time
-         *
-         * the object &lt;property name&gt; equals the event name you trigger, like
-         *
-         * @example handlers = { &lt;event name&gt;: &lt;function name&gt; }
-         *
-         * @example &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+         event handlers of this instance at creation time
 
-         * @property handlers
-         * @type object
+         the object &lt;property name&gt; equals the event name you trigger, like
+
+         @property handlers
+         @type object
+
+         @example
+
+         handlers = { &lt;event name&gt;: &lt;function name&gt; }
+
+         @example
+
+         &lt;instance&gt;.trigger( &lt;event name&gt;, &lt;event data&gt;, &lt;bubble&gt; );
+
          */
         that.handlers = {
             init: init
@@ -38,21 +47,21 @@ tb.namespace( 'demoapp', true ).Router = (function(){
     Router.prototype = {
 
         /**
-         * used to identify instance(s) via tb( /&lt;string&gt;/ )
-         *
-         * @property namespace
-         * @type string
-         * @static
+         used to identify instance(s) via tb( /&lt;string&gt;/ )
+
+         @property namespace
+         @type string
+         @static
          */
         namespace: 'demoapp.Router',
 
         /**
-         * @method setRoute
+         @method setRoute
          */
         setRoute: setRoute,
 
         /**
-         * @method getParams
+         @method getParams
          */
         getParams: getParams
 
@@ -63,30 +72,27 @@ tb.namespace( 'demoapp', true ).Router = (function(){
     // VARIABLES
 
     // PRIVATE FUNCTIONS
-    /**
-     * @for demoapp.Router
-     */
 
     /**
-     * init handler
-     *
-     * @event init
-     * @param e
+     init handler
+
+     @event init
+     @param e
      */
     function init( e ){
     }
 
     /**
-     * setroute method
-     *
-     * @param pRoute {string} the route to set -> url
+     setroute method
+
+     @param pRoute {string} the route to set -> url
      */
     function setRoute( pRoute ){
         console.log( 'no rooting function given' );
     }
 
     /**
-     * getParams method, extracts path elements and get parameters from url
+     getParams method, extracts path elements and get parameters from url
      */
     function getParams( pRoute ){
 
