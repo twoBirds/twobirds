@@ -2,7 +2,7 @@
  * @namespace demoapp.configuration
  */
 
-// CLASS TemplateSelectorItem CLASS
+// CLASS TemplateSelectorItem
 tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function(){
 
     /**
@@ -89,9 +89,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
     
     /**
-     render handler
+     render method
 
-     @event render
+     @method render
      */
     function render(){
 
@@ -123,9 +123,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
     }
 
     /**
-     activate handler, both event and method
+     activate method
 
-     @event select
+     @method select
      */
     function activate(){
 
@@ -176,9 +176,9 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
     }
 
     /**
-     select handler, both event and method
+     select method
 
-     @event select
+     @method select
      */
     function select(){
 
@@ -229,7 +229,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
 
 
 
-// CLASS TemplateSelector CLASS
+// CLASS TemplateSelector
 tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     /**
@@ -391,7 +391,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
     }
 
     /**
-     render function, both used in handlers and as a method
+     render handler
 
      @event render
      */
@@ -461,7 +461,6 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
                             break;
 
                         case 39:
-
                             var nextItem = that.activeItem.next();
 
                             if ( !!nextItem[0] ){
@@ -490,10 +489,13 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelector = (function(){
 
     }
 
-    function focus(e){
-        var that = this;
+    /**
+     focus handler
 
-        console.log( 'ts focus', e, tb.dom( that.inputElement[0] ) );
+     @event focus
+     */
+    function focus(){
+        var that = this;
 
         that
             .children()[0]
