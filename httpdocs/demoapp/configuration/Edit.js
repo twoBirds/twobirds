@@ -119,7 +119,7 @@ tb.namespace( 'demoapp.configuration', true ).Edit = (function(){
         
         // read data ( triggers new form rendering )
         that.configurationModel.data.observe(function(){
-            that.trigger( 'render' );
+            that.render();
         });
 
         that.configurationModel.read({

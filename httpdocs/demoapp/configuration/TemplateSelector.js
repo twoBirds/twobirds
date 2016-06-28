@@ -42,7 +42,7 @@ tb.namespace( 'demoapp.configuration', true ).TemplateSelectorItem = (function()
          @property config
          @type object
          */
-         that.config = pConfig;
+        that.config = pConfig;
 
         /**
          template string, later parsed with data and added to DOM

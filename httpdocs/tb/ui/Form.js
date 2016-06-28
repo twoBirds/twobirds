@@ -520,7 +520,7 @@
     /**
      * @namespace tb.ui.FormValidator
      */
-    tb.namespace( 'tb.ui', true ).FormValidator = (function() {
+    tb.namespace( 'tb.ui', true ).FormValidator = (function(){
 
         /**
          FormValidator constructor
@@ -696,7 +696,7 @@
     /**
      * @namespace tb.ui.Field
      */
-    tb.namespace( 'tb.ui', true ).Field = (function() {
+    tb.namespace( 'tb.ui', true ).Field = (function(){
 
         /**
          Field constructor
