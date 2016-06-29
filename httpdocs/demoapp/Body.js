@@ -81,7 +81,7 @@ tb.namespace( 'demoapp', true ).Body = (function(){
      * @event init
      * @param e
      */
-    function init( e ){
+    function init(){
         this.render();
     }
 

@@ -877,17 +877,7 @@
                 );
 
             // if masked input field -> hide alltogether
-            if (tb.namespace('input.type', false, config) === 'hidden') {
-                tb.dom( that.target )
-                    .attr({
-                        overflow: 'hidden',
-                        height: '0',
-                        width: '0',
-                        margin: '0',
-                        padding: '0',
-                        border: '0px none'
-                    });
-            } else {
+            if ( tb.namespace('tagAttributes.type', false, config) !== 'hidden') {
                 // set previous and next field
                 if ( prevField ){ // closure - global in file context
                     that.prevField = prevField; // my prev field from global var
