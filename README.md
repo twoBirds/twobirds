@@ -1,7 +1,8 @@
 # Repo has moved to [twobirds-core](https://github.com/FrankieTh-xx/twobirds-core)
 
-- this repo is here for historical reasons
-- this twobirds-core above repo is mirrored from [gitlab twobirds-core](https://gitlab.com/twoBirds/twobirds-core)
+- the repo above is mirrored from [gitlab twobirds-core](https://gitlab.com/twoBirds/twobirds-core)
+- if you want to send pull requests, fork from the gitlab repo.
+- this repo is DEPRECATED and only here for historical reasons
 
 # twoBirds v7.0a
 
