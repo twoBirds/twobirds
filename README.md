@@ -1,3 +1,8 @@
+# Repo has moved to [twoBirds](https://github.com/FrankieTh-xx/twobirds-core)
+
+- this repo is here for historical reasons
+- this repo is mirrored from [twoBirds](https://gitlab.com/twoBirds/twobirds-core)
+
 # twoBirds v7.0a
 
 Welcome Birdies ;-)
